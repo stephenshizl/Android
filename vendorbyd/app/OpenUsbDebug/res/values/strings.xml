@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title">UsbDebug</string>
+    <string name="summary">Connect USB and then select it to open diag,modem,nmea</string>
+    <string name="app_name">OpenUsbDebug</string>
+</resources>

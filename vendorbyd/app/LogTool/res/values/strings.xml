@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">LogTool</string>
+    <string name="saveAllLogs_prefs">SAVE_LOG</string>
+    <string name="save_all">Save all logs</string>
+    <string name="summary_save_all_logs">Save All Logs to Internal storage/Logs</string>
+    <string name="saving_all_log">Saving logs to sdcard......</string>
+    <string name="logSetting_prefs">LOG_SETTING</string>
+    <string name="log_setting_app">Logs Setting</string>
+    <string name="summary_log_setting">Enable/Disable Logs</string>
+    <string name="AndroidLogSettingSum">Enable/Disable Android Log</string>
+    <string name="AndroidLogSetting">Android Log Setting</string>
+    <string name="APLogEnable">APLogEnable/Disable</string>
+    <string name="APLogSummary">AP Log run when booting up</string>
+    <string name="no_sdcard">There is no SDCard, please insert it.</string>
+    <string name="no_space">Please free space in SD card, it can not save log when available space less than 100MB.</string>
+</resources>

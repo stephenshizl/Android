@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+<string name="recentCalls_removeSame">Odstrani enake</string>
+<string name="show_call_sub1">Sub1</string>
+<string name="show_call_sub2">Sub2</string>
+<string name="out_software_version">različica programske opreme</string>
+<string name="head_and_body_sar">&quot;<b >Mobilni telefon Lenovon</b><b >MODEL: Lenovo PB1-770Mn</b><b >Informacije o določeni stopnji absorbiranjan</b>Ta mobilna naprava izpolnjuje Indijske nacionalne omejitve za vrednost SAR.nOmejitev vrednosti SAR, veljavna v Indiji, za mobilne naprave je 1,6 W/kg povprečno za 1 gram tkiva. Testi vrednosti SAR so opravljeni v običajnih delovnih položajih, ko naprava oddaja pri najvišjih potrjenih ravneh moči v vseh testiranih frekvenčnih pasovih.nNajvišje vrednosti SAR za naprave Lenovo pri testiranju za uporabo ob glavi in telesu je opisana na naslednji način:nSAR OB GLAVI: 0,211 W/kg nSAR OB TELESU: 1,42 W/kg nZa več informacij si oglejte uporabniški priročnik.&quot;</string>
+<string name="facotry_mode_dialog_message">S klikom gumba OK izbrišete vse uporabniške podatke, vendar nameščene aplikacije. Običajni uporabniki naj tega ne uporabljajo, da ne izgubijo podatkov v telefonu</string>
+
+<string name="show_call_all">Vse</string>
+<string name="menu_callNumber">Pokliči <xliff:g id="NUMBER">%s</xliff:g>&quot;</string>
+<string name="strict_ops_message">Če kliknite gumb za spremembo, se bo naprava znova zagnala.</string>
+<string name="strict_ops_current_state">Trenutno stanje:</string>
+<string name="strict_ops_disable">Onemogočanje možnosti aplikacij</string>
+<string name="description_image_button_eight">osem</string>
+<string name="strict_ops_enable">Omogočanje možnosti aplikacij</string>
+<string name="description_image_button_five">pet</string>
+<string name="description_image_button_four">štiri</string>
+<string name="software_version">Interna različica</string>
+<string name="simContacts_emptyLoading">Nalaganje s kartice SIM ...</string>
+<string name="description_image_button_nine">devet</string>
+<string name="description_image_button_one">ena</string>
+<string name="description_image_button_pound">funt</string>
+<string name="description_image_button_seven">sedem</string>
+<string name="simContacts_title">Stiki na kartici SIM</string>
+<string name="description_image_button_six">šest</string>
+<string name="description_image_button_star">zvezdica</string>
+<string name="description_image_button_three">tri</string>
+<string name="description_image_button_two">dva</string>
+<string name="facotry_mode_dialog_title">Izbriši uporabniške podatke s tovarniškim načinom.</string>
+<string name="description_image_button_zero">nič</string>
+</resources>

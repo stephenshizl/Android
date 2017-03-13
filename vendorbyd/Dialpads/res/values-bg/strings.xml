@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+<string name="show_call_sub1">Sub1</string>
+<string name="show_call_sub2">Sub2</string>
+<string name="out_software_version">версия на софтуера</string>
+<string name="head_and_body_sar">&quot;<b >Мобилен телефон Lenovon</b><b >МОДЕЛ: Lenovo PB1-770Mn</b><b >Информация за специфична поглъщана мощност (SAR)n</b>Това мобилно устройство отговаря на националните ограничения за SAR на Индия.nОграничението на SAR за Индия за мобилни устройства е средно 1,6 W/kg на 1 грам тъкан.Тестове за SAR се провеждат чрез стандартни работни позиции, като устройството предава с най-високото ниво на мощност, за което е сертифицирано, на всички тестови честоти.nНай-високите стойности на SAR за устройства на Lenovo, когато се тества при използване до главата и тялото, са описани по-долу:nSAR ДО ГЛАВАТА: 0,211 W/kg nSAR ДО ТЯЛОТО: 1,42 W/kg nЗа повече информация вж. ръководството за потребителя.&quot;</string>
+<string name="facotry_mode_dialog_message">Ако щракнете върху бутона OK, всички потребителски данни ще се изтрият, но инсталираните приложения ще се запазят. Препоръчително е обикновените потребители да не го използват, за да избегнат загуба на данни в телефона</string>
+
+<string name="show_call_all">Всички</string>
+<string name="menu_callNumber">"Обаждане на <xliff:g id="NUMBER">%s</xliff:g>&quot;</string>
+<string name="strict_ops_message">Щракнете върху бутона за промяна, устройството ще се рестартира!</string>
+<string name="strict_ops_current_state">Текущо състояние:</string>
+<string name="strict_ops_disable">Деактивиране на app ops</string>
+<string name="description_image_button_eight">осем</string>
+<string name="strict_ops_enable">Активиране на app ops</string>
+<string name="description_image_button_five">пет</string>
+<string name="description_image_button_four">четири</string>
+<string name="software_version">Вътрешна версия</string>
+<string name="simContacts_emptyLoading">Зарежда се от SIM карта...</string>
+<string name="description_image_button_nine">девет</string>
+<string name="ok">OK</string>
+<string name="description_image_button_one">едно</string>
+<string name="description_image_button_pound">лира</string>
+<string name="recentCalls_removeSame">"Премахване на същия"</string>
+<string name="description_image_button_seven">седем</string>
+<string name="simContacts_title">Контакти от SIM карта</string>
+<string name="description_image_button_six">шест</string>
+<string name="description_image_button_star">звезда</string>
+<string name="description_image_button_three">три</string>
+<string name="description_image_button_two">две</string>
+<string name="facotry_mode_dialog_title">Изтриване на потребителски данни чрез фабричния режим</string>
+<string name="description_image_button_zero">нула</string>
+</resources>

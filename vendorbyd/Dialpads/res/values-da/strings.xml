@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+<string name="software_version">Softwareversion</string>
+<string name="recentCalls_removeSame">Fjern samme</string>
+<string name="show_call_sub1">Sub1</string>
+<string name="show_call_sub2">Sub2</string>
+<string name="out_software_version">softwareversion</string>
+<string name="head_and_body_sar">&quot;<b >Lenovo-mobiltelefonn</b><b >MODEL: Lenovo PB1-770Mn</b><b >Oplysninger om Specific Absorption Rate (SAR)n</b>Denne mobile enhed overholder Indiens nationale SAR-grænseværdier.nIndiens SAR-grænseværdier for mobile enheder er 1,6 W/kg i gennemsnit over 1 gram væv. SAR-test udføres under standarddrift, mens enheden udsender med højeste certificerede effektniveau i alle testede frekvensbånd.nDen højeste SAR-værdi for din Lenovo-enhed, når den testes til brug på hoved og krop, er angivet som følger:nHOVED SAR: 0,211 W/kg nKROP SAR: 1,42 W/kg nSe brugervejledningen for at få flere oplysninger.&quot;</string>
+<string name="facotry_mode_dialog_title">Ryd brugerdata, gendan til fabrikstilstand</string>
+<string name="facotry_mode_dialog_message">Klik på OK-knappen for at slette alle brugerdata, men bevare de installerede applikationer. Det anbefales, at almindelige brugere ikke anvender dette, for at undgå at miste data på telefonen</string>
+</resources>

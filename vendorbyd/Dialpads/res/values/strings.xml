@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">phone</string>
+    <string name="description_delete_button">backspace</string>
+    
+    <string name="description_image_button_one">one</string>
+    <string name="description_image_button_two">two</string>
+    <string name="description_image_button_three">three</string>
+    <string name="description_image_button_four">four</string>
+    <string name="description_image_button_five">five</string>
+    <string name="description_image_button_six">six</string>
+    <string name="description_image_button_seven">seven</string>
+    <string name="description_image_button_eight">eight</string>
+    <string name="description_image_button_nine">nine</string>
+    <string name="description_image_button_star">star</string>
+    <string name="description_image_button_zero">zero</string>
+    <string name="description_image_button_pound">pound</string>
+    <string name="ok">OK</string>
+    <!--add by huayanchun for ops control-->
+    <string name="strict_ops_title">App Ops</string>
+    <string name="strict_ops_message">Click the change button, device will be reboot! </string>
+    <string name="strict_ops_current_state">Current state: </string>
+    <string name="strict_ops_enable">Enable app ops</string>
+    <string name="strict_ops_disable">Disable app ops</string>
+    <!--end for ops control-->
+    <!-- Added by sunhongzhe begin -->
+    <string name="recentCalls_removeSame">Remove same</string>
+    <string name="show_call_all">All</string>
+    <string name="show_call_sub1">Sub1</string>
+    <string name="show_call_sub2">Sub2</string>
+    <!-- Added by sunhongzhe end -->
+    <!-- Added by nhl -->
+    <string name="software_version">Internal Version</string>
+    <string name="out_software_version">software version</string>
+    <!-- Start add by cui.yuehua@byd.com for secret codes-->
+    <string name="head_and_body_sar">"<b>Lenovo Mobile phone\n</b><b>MODEL:Lenovo PB1-770M\n</b><b>Specific Absorption Rate information\n</b>This mobile device meets india`s national SAR Limits.\nThe India SAR limit for mobile devices is 1.6 W/kg average over 1 grams of tissue.Tests for SAR are conducted using standard operating with the device transmitting at its highest certified power level in all tested frequency bands.\nThe highest SAR value for your lenovo device when tested for use at the head and body is outlined as follows:\nHEAD SAR:0.211 W/kg \nBODY SAR:1.42 W/kg \nFor more information, please consult the user manual."</string>
+    <string name="facotry_mode_dialog_title">Wipe user data by factory mode</string>
+    <string name="facotry_mode_dialog_message">Click OK button will clear all user data,but retain the installed applications,suggest ordinary users do not use it,to avoid losing data in the phone</string>
+    <!-- End add by cui.yuehua@byd.com for secret codes-->
+    <string name="simContacts_title">SIM card contacts</string>
+    <string name="imei">IMEI</string>
+    <string name="menu_callNumber">Call <xliff:g id="number">%s</xliff:g></string>
+    <string name="simContacts_emptyLoading">Loading from SIM card\u2026</string>
+    <string name="meid">MEID</string>
+</resources>

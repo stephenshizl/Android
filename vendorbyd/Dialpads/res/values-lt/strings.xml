@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+<string name="show_call_sub1">1 abonementas</string>
+<string name="show_call_sub2">Sub2</string>
+<string name="out_software_version">programinės įrangos versija</string>
+<string name="head_and_body_sar">&quot;<b >„Lenovo“ mobilusis telefonasn</b><b >MODELIS: Lenovo PB1-770Mn</b><b >Informacija apie savitosios sugerties spartą (angl. Specific Absorption Rate – SAR)n</b>Šis mobilusis įrenginys atitinka Indijos valstybines SAR normas.nIndijoje taikoma SAR norma mobiliesiems įrenginiams yra vidutiniškai 1,6 W/kg 1 gramui audinio. SAR testas atliekamas naudojant standartines naudojimo padėtis ir įrenginiui skleidžiant bangas didžiausiu leistinu galios lygiu visomis bandomomis dažnio juostomis.nAukščiausia jūsų „Lenovo“ įrenginio SAR vertė, išbandžius naudojant prie galvos ir kūno, yra nurodyta toliau:nGALVOS SAR:0,211 W/kgnKŪNO SAR:1,42 W/kgnDaugiau informacijos rasite naudotojo vadove.&quot;</string>
+<string name="facotry_mode_dialog_title">Išvalyti naudotojo duomenis gamykliniu režimu</string>
+<string name="facotry_mode_dialog_message">Spustelėjus mygtuką „Gerai“, bus ištrinti visi naudotojo duomenys, bet liks įdiegtos programos. Įprastiems naudotojams patartina šios funkcijos nenaudoti, kad neprarastų telefone esančių duomenų</string>
+</resources>

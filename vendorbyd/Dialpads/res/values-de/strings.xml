@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+<string name="show_call_sub1">Sub1</string>
+<string name="show_call_sub2">Sub2</string>
+<string name="out_software_version">Softwareversion</string>
+<string name="head_and_body_sar">&quot;<b >Lenovo-Mobiltelefonn</b><b >Modell: Lenovo PB1-770Mn</b><b >Informationen zur spezifischen Absorptionsraten</b>Dieses Mobilgerät entspricht den nationalen SAR-Grenzwerten für Indien.nDer SAR-Grenzwert für mobile Geräte in Indien entspricht 1,6 W/kg im Durchschnitt pro 1 Gramm Körpergewebe. SAR-Tests werden im Standardbetrieb durchgeführt, wobei das Gerät mit der höchsten zugelassenen Leistungsstufe in alle getestete Frequenzbänder überträgt.nDer höchste SAR-Wert für Ihr Lenovo-Gerät beim Test für die Verwendung am Kopf und Körper lautet wie folgt:nKOPF SAR: 0,211 W/kg nKÖRPER SAR: 1,42 W/kg nWeitere Informationen finden Sie im Benutzerhandbuch.&quot;</string>
+<string name="facotry_mode_dialog_message">Wenn Sie auf die Schaltfläche OK klicken, werden alle Benutzerdaten gelöscht, aber die installierten Anwendungen werden beibehalten. Gewöhnliche Benutzer sollten diese Funktion nicht verwenden, um Datenverluste im Telefon zu vermeiden.</string>
+</resources>

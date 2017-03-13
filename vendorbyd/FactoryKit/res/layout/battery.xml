@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (c) 2011-2014, Qualcomm Technologies, Inc. All Rights Reserved.
+  Qualcomm Technologies Proprietary and Confidential.
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/battery_layout"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/white">
+</LinearLayout>
+
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+    <TextView
+        android:id="@+id/note"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dip"/>
+
+    <ListView android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:drawSelectorOnTop="false"/>
+
+    <TextView android:id="@+id/threshold"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30dip"
+        android:gravity="center_horizontal" />
+
+    <TextView
+        android:id="@+id/sensor"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30dip"
+        android:gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/tvPower"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30dip"
+        android:gravity="center_horizontal"/>
+    <TextView
+        android:id="@+id/tvVoltage"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30dip"
+        android:gravity="center_horizontal"/>
+    <TextView
+        android:id="@+id/tvCurrent"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30dip"
+        android:gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/tvTemp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30dip"
+        android:gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/lenovonote"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30dip"
+        android:gravity="center_horizontal"/>
+
+   <ListView android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:drawSelectorOnTop="false"/>
+
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button android:id="@+id/bttntrue"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/pass"/>
+        <Button android:id="@+id/bttnfail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/fail"/>
+</LinearLayout>
+</LinearLayout>
+

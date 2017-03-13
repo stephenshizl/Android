@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+<string name="show_call_sub1">Sub1</string>
+<string name="show_call_sub2">Sub2</string>
+<string name="out_software_version">إصدار البرنامج</string>
+<string name="head_and_body_sar">&quot;<b >هاتف Lenovo المحمولn</b><b >الطراز: Lenovo PB1-770Mn</b><b >معلومات حول معدل الامتصاص النوعيn</b>يتوافق هذا الجهاز المحمول مع الحدود الوطنية لمعدل الامتصاص النوعي في الهند.nيبلغ حد معدل الامتصاص النوعي في الهند للأجهزة المحمولة 1,6 واط/كغ لمتوسط 1 غرام من القماش. يتم إجراء الاختبارات لمعدل الامتصاص النوعي باستخدام التشغيل القياسي عندما يرسل الجهاز في أعلى مستوى طاقة معتمد في كل نطاقات التردد المختبرة.nإن القيمة العليا لمعدل الاتصال النوعي لجهاز lenovo عند اختباره للاستخدام على مستوى الرأس والجسم هي كالتالي:nمعدل الامتصاص النوعي على مستوى الرأس: 0,211 واط/كغ nمعدل الامتصاص النوعي على مستوى الجسم: 1,42 واط/كغ nلمزيد من المعلومات، الرجاء مراجعة دليل المستخدم.&quot;</string>
+<string name="facotry_mode_dialog_message">سيؤدي النقر فوق الزر &quot;موافق&quot; إلى مسح كل بيانات المستخدم، مع الاحتفاظ بالتطبيقات المُثبَّتة، ولذلك يفضّل للمستخدمين العاديين عدم استخدام هذا الإجراء تجنبًا لفقدان البيانات المخزنة في الهاتف</string>
+
+<string name="show_call_all">"الكل"</string>
+<string name="menu_callNumber">"الاتصال بالرقم <xliff:g id="NUMBER">%s</xliff:g>&quot;</string>
+<string name="strict_ops_message">انقر فوق زر التغيير لإعادة تشغيل الجهاز!</string>
+<string name="strict_ops_current_state">الحالة الآن:</string>
+<string name="strict_ops_disable">تعطيل app ops</string>
+<string name="description_image_button_eight">"ثمانية"</string>
+<string name="strict_ops_enable">تمكين app ops</string>
+<string name="description_image_button_five">"خمسة"</string>
+<string name="description_image_button_four">"أربعة"</string>
+<string name="software_version">إصدار داخلي</string>
+<string name="simContacts_emptyLoading">"جارٍ التحميل من بطاقة SIM?</string>
+<string name="description_image_button_nine">"تسعة"</string>
+<string name="ok">موافق</string>
+<string name="description_image_button_one">"واحد"</string>
+<string name="description_image_button_pound">"رنين"</string>
+<string name="recentCalls_removeSame">"إزالة المتشابه"</string>
+<string name="description_image_button_seven">"سبعة"</string>
+<string name="simContacts_title">"�بطاقة SIM وجهات الاتصال"</string>
+<string name="description_image_button_six">"ستة"</string>
+<string name="description_image_button_star">"نجمة"</string>
+<string name="description_image_button_three">"ثلاثة"</string>
+<string name="description_image_button_two">"اثنان"</string>
+<string name="facotry_mode_dialog_title">مسح بيانات المستخدم بواسطة وضع المصنع</string>
+<string name="description_image_button_zero">"صفر"</string>
+</resources>

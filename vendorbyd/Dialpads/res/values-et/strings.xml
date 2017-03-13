@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+<string name="simContacts_title">SIM-kaardi kontaktide haldamine</string>
+<string name="show_call_sub1">Sub1</string>
+<string name="show_call_sub2">Sub2</string>
+<string name="out_software_version">tarkvaraversioon</string>
+<string name="head_and_body_sar">&quot;<b >Lenovo mobiiltelefonn</b><b >MUDEL:Lenovo PB1-770Mn</b><b >Erineelduvuskiiruse teaven</b>See mobiilseade vastab India riiklikele SAR-piirväärtustele.nIndia SAR-piirväärtused mobiilseadmetele on 1,6 W/kg keskmistatuna 1 grammi koe kohta. SAR-testid viiakse läbi standardsetes kasutuspositsioonides, kus seadmed edastavad kõrgeimal sertifitseeritud võimsuse tasemel kõikidel testitud sagedusribadel.nKäesoleva Lenovo seadme kõrgeim SAR-väärtus testituna kasutamisel pea ja keha juures on järgmine:nPEA SAR:0,211 W/kg nKEHA SAR:1,42 W/kg nLisateavet leiab kasutusjuhendist.&quot;</string>
+<string name="facotry_mode_dialog_title">Kasutajaandmete kustutamine tehaserežiimis</string>
+<string name="facotry_mode_dialog_message">Nupu OK vajutamisel kustutatakse kõik kasutajaandmed,kuid säilitatakse paigaldatud rakendused,soovitame tavakasutajatel seda mitte kasutada,et telefonis olevatest andmetest mitte ilma jääda</string>
+</resources>

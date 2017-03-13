@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+<string name="show_call_sub1">Sub1</string>
+<string name="show_call_sub2">Sub2</string>
+<string name="out_software_version">ソフトウェアのバージョン</string>
+<string name="head_and_body_sar">&quot;<b >Lenovo モバイル・フォンn</b><b >MODEL:Lenovo PB1-770Mn</b><b >比吸収率に関する情報n</b>このモバイル・デバイスはインドの SAR 制限に適合しています。nモバイル・デバイスに対するインドの SAR 制限は生体 1 g あたり平均 1.6 W/kg です。SAR に関する試験では標準的な操作で、すべての周波数に対して認可された最大出力レベルでデバイス送信を行っています。nLenovo デバイスの頭部および身体部に対する使用試験時の SAR 最高値は次のとおりです。n頭部 SAR:0.211 W/kg n身体部 SAR:1.42 W/kg n詳細については、ユーザー・マニュアルを参照してください。&quot;</string>
+<string name="facotry_mode_dialog_message">「OK」ボタンをクリックすると、すべてのユーザー・データが消去されますが、インストールされているアプリケーションは保持され、携帯電話内のデータの喪失を回避するために、一般ユーザーはこのボタンを使用しないことが推奨されます</string>
+</resources>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:gravity="center_vertical|center_horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <TextView
+        android:id="@+id/lsensor_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dip"
+        android:text="@string/lsensor_hint"/>
+
+    <ListView android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:drawSelectorOnTop="false"/>
+
+    <TextView
+        android:id="@+id/adc_value"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30dip"
+        android:gravity="center_horizontal"
+        android:text="@string/lsensor_adc_value"/>
+
+    <TextView
+        android:id="@+id/dac"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30dip"
+        android:gravity="center_horizontal"/>
+
+   <ListView android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:drawSelectorOnTop="false"/>
+
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="horizontal"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content">
+
+<Button android:id="@+id/btntrue"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="@string/pass"/>
+
+<Button android:id="@+id/btnfail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="@string/fail"/>
+</LinearLayout>
+</LinearLayout>

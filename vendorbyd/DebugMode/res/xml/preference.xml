@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+                android:key="primary_example"
+                android:title="@string/debugmode_title_1"
+                android:summary="@string/debugmode_title_1_summary"></Preference>
+    <Preference
+                android:key="primary_ums"
+                android:title="@string/debugmode_title_2"
+                android:summary="@string/debugmode_title_2_summary"></Preference>
+</PreferenceScreen>

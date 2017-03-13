@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+<string name="recentCalls_removeSame">Ukloni isto</string>
+<string name="show_call_sub1">Pretplata 1</string>
+<string name="show_call_sub2">Pretplata 2</string>
+<string name="out_software_version">verzija softvera</string>
+<string name="head_and_body_sar">&quot;<b >Mobilni telefon Lenovon</b><b >MODEL: Lenovo PB1-770Mn</b><b >Informacije o specifičnoj brzini apsorpcijen</b>Ovaj mobilni uređaj zadovoljava ograničenja specifične brzine apsorpcije za Indiju.nOgraničenje specifične brzine apsorpcije za Indiju za mobilne uređaje iznosi 1,6 W/kg na 1 g tkiva, u prosjeku. Testiranja specifične brzine apsorpcije provode se koristeći standardne položaje korištenja s uređajem koji izvršava prijenos na svojoj najvišoj certificiranoj razini snage u svim testiranim rasponima frekvencija.nNajviše vrijednosti specifične brzine apsorpcije uređaja Lenovo za glavu i tijelo su sljedeće:nBrzina apsorpcije za glavu: 0,211 W/kg nBrzina apsorpcije za tijelo: 1,42 W/kg nViše informacija potražite u korisničkom priručniku.&quot;</string>
+<string name="facotry_mode_dialog_message">Ako pritisnete U redu, izbrisat ćete sve korisničke podatke, no nećete izbrisati aplikacije koje su unaprijed instalirane na mobilni telefon. Korisnicima preporučujemo da ne koriste ovu opciju kako ne bi izgubili podatke</string>
+
+<string name="show_call_all">Sve</string>
+<string name="menu_callNumber">Nazovite <xliff:g id="NUMBER">%s</xliff:g>&quot;</string>
+<string name="strict_ops_message">Pritisnite gumb za promjenu, uređaj će se ponovo pokrenuti!</string>
+<string name="strict_ops_current_state">Trenutno stanje:</string>
+<string name="strict_ops_disable">Onemogući operacije aplikacije</string>
+<string name="description_image_button_eight">osam</string>
+<string name="strict_ops_enable">Omogući operacije aplikacije</string>
+<string name="description_image_button_five">pet</string>
+<string name="description_image_button_four">četiri</string>
+<string name="software_version">Interna verzija</string>
+<string name="simContacts_emptyLoading">Učitavanje sa SIM kartice...</string>
+<string name="description_image_button_nine">devet</string>
+<string name="ok">U redu</string>
+<string name="description_image_button_one">jedan</string>
+<string name="description_image_button_pound">funta</string>
+<string name="description_image_button_seven">sedam</string>
+<string name="simContacts_title">Kontakti SIM kartice</string>
+<string name="description_image_button_six">šest</string>
+<string name="description_image_button_star">zvjezdica</string>
+<string name="description_image_button_three">tri</string>
+<string name="description_image_button_two">dva</string>
+<string name="facotry_mode_dialog_title">Izbriši korisničke podatke pomoću tvorničkog načina rada</string>
+<string name="description_image_button_zero">nula</string>
+</resources>

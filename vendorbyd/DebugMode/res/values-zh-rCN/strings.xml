@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="debugmode_title_1">示例</string>
+    <string name="debugmode_title_1_summary">本项仅作为向暗码debug下添加新项目的示例。如需添加，详见/vendor/byd/app/DebugMode-DebugModeActivity。</string>
+    <string name="debugmode_title_2">打开UMS模式</string>
+    <string name="debugmode_title_2_summary">设置属性sys.usb.config为mass_storage,该功能仅限于调试。</string>
+    <string name="ums_turn_on">UMS 模式已经打开。</string>
+    <string name="ums_inster_SDCard">请插入SD卡并连接USB线。</string>
+    <string name="botton_name">"确定"</string>
+    <string name="app_name">"调试模式"</string>
+</resources>

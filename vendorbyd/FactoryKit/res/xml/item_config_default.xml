@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright (c) 2011-2014, Qualcomm Technologies, Inc. All Rights Reserved.
+  Qualcomm Technologies Proprietary and Confidential.
+
+*FuelGaugeCalibration   FmRadio Speaker  Wi-Fi Bluetooth  SD Card Hall  OTG  Compass  LightSensor
+Gyroscope  MSensor  GSensor  PSensor   Vibrator  LCM  SIM1  SIM2  CameraFront  CameraBack  NFC
+Keypad  TouchPanel Edge  Backlight  Flashlight  Led  TouchPanel Key
+-->
+<FactoryTest>
+
+    <FunctionItem
+        name="led_name"
+        auto="false"
+        enable="true"
+        packageName="com.qti.factory.Led"
+        parameter="red=chg_red;green=chg_green;blue=chg_blue;" >
+    </FunctionItem>
+    <FunctionItem
+        name="flashlight_name"
+        auto="false"
+        enable="true"
+        packageName="com.qti.factory.Flashlight"
+        parameter="path=/sys/class/leds/torch-light/brightness">
+    </FunctionItem>
+    <FunctionItem
+        name="backlight_name"
+        auto="false"
+        enable="true"
+        packageName="com.qti.factory.Backlight"
+        parameter="" >
+    </FunctionItem>
+    <FunctionItem
+        name="touchpanel_edge_name"
+        auto="false"
+        enable="true"
+        packageName="com.qti.factory.TouchPanelEdge"
+        parameter="" >
+    </FunctionItem>
+    <FunctionItem
+        name="touchpanel_key_name"
+        auto="false"
+        enable="false"
+        packageName="com.qti.factory.TouchPanelKey"
+        parameter="" >
+    </FunctionItem>
+    <FunctionItem
+        name="keypad_name"
+        auto="false"
+        enable="true"
+        packageName="com.qti.factory.Keypad"
+        parameter="KeyMode=0" >
+    </FunctionItem>
+    <FunctionItem
+        name="nfc_name"
+        auto="false"
+        enable="false"
+        packageName="com.qti.factory.NFC"
+        parameter="service=intent.NFC.NfcService;ServiceDelay=5000" >
+    </FunctionItem>
+    <FunctionItem
+        name="cameraback_name"
+        auto="false"
+        enable="true"
+        packageName="com.qti.factory.CameraBack"
+        parameter="AutoFocus=true" >
+    </FunctionItem>
+    <FunctionItem
+        name="camerafront_name"
+        auto="true"
+        enable="true"
+        packageName="com.qti.factory.CameraFront"
+        parameter="Orientation=0" >
+    </FunctionItem>
+    <FunctionItem
+        name="lcm_name"
+        auto="false"
+        enable="true"
+        packageName="com.qti.factory.LCM"
+        parameter="" >
+    </FunctionItem>
+    <FunctionItem
+        name="sim1_name"
+        auto="true"
+        enable="true"
+        packageName="com.qti.factory.SIM1"
+        parameter="service=intent.SIM1.SIM1Service;ServiceDelay=9000;" >
+    </FunctionItem>
+    <FunctionItem
+        name="sim2_name"
+        auto="true"
+        enable="true"
+        packageName="com.qti.factory.SIM2"
+        parameter="service=intent.SIM2.SIM2Service;ServiceDelay=9500;" >
+    </FunctionItem>
+    <FunctionItem
+        name="vibrate_name"
+        auto="false"
+        enable="true"
+        packageName="com.qti.factory.Vibrate"
+        parameter="" >
+    </FunctionItem>
+    <FunctionItem
+        name="psensor_name"
+        auto="true"
+        enable="true"
+        packageName="com.qti.factory.PSensor"
+        parameter="service=intent.PSensor.PSensorService;ServiceDelay=3000;" >
+    </FunctionItem>
+    <FunctionItem
+        name="gsensor_name"
+        auto="true"
+        enable="true"
+        packageName="com.qti.factory.GSensor"
+        parameter="service=intent.GSensor.GSensorService;ServiceDelay=2500;" >
+    </FunctionItem>
+    <FunctionItem
+        name="msensor_name"
+        auto="false"
+        enable="false"
+        packageName="com.qti.factory.MSensor"
+        parameter="service=intent.MSensor.MSensorService;ServiceDelay=2500;" >
+    </FunctionItem>
+    <FunctionItem
+        name="gyroscope_name"
+        auto="false"
+        enable="false"
+        packageName="com.qti.factory.Gyroscope"
+        parameter="service=intent.Gyroscope.GyroscopeService;ServiceDelay=3500;" >
+    </FunctionItem>
+    <FunctionItem
+        name="lightsensor_name"
+        auto="true"
+        enable="true"
+        packageName="com.qti.factory.LightSensor"
+        parameter="service=intent.LightSensor.LightSensorService;ServiceDelay=3000;" >
+    </FunctionItem>
+    <FunctionItem
+        name="compass_name"
+        auto="true"
+        enable="true"
+        packageName="com.qti.factory.Compass"
+        parameter="" >
+    </FunctionItem>
+    <FunctionItem
+        name="otg_name"
+        auto="true"
+        enable="true"
+        packageName="com.qti.factory.OTG"
+        parameter="" >
+    </FunctionItem>
+    <FunctionItem
+        name="hall_name"
+        auto="true"
+        enable="true"
+        packageName="com.qti.factory.Hall"
+        parameter="" >
+    </FunctionItem>
+    <FunctionItem
+        name="sdcard_name"
+        auto="true"
+        enable="true"
+        packageName="com.qti.factory.SDCard"
+        parameter="service=intent.SDCard.SDCardService;ServiceDelay=1000;" >
+    </FunctionItem>
+    <FunctionItem
+        name="bluetooth_name"
+        auto="true"
+        enable="true"
+        packageName="com.qti.factory.Bluetooth"
+        parameter="service=intent.Bluetooth.BluetoothService;ServiceDelay=2000" >
+    </FunctionItem>
+    <FunctionItem
+        name="wifi_name"
+        auto="true"
+        enable="true"
+        packageName="com.qti.factory.WiFi"
+        parameter="service=intent.WiFi.WiFiService;ServiceDelay=1000;" >
+    </FunctionItem>
+    <FunctionItem
+        name="speaker_name"
+        auto="false"
+        enable="true"
+        packageName="com.qti.factory.Speaker"
+        parameter="" >
+    </FunctionItem>
+    <FunctionItem
+        name="handset_name"
+        auto="false"
+        enable="true"
+        packageName="com.qti.factory.Handset"
+        parameter="" >
+    </FunctionItem>
+    <FunctionItem
+        name="TransmitterReceiver"
+        auto="false"
+        enable="false"
+        packageName="com.qti.factory.TransmitterReceiver" >
+    </FunctionItem>
+    <FunctionItem
+        name="TransmitterSpeaker"
+        auto="false"
+        enable="false"
+        packageName="com.qti.factory.TransmitterSpeaker" >
+    </FunctionItem>
+    <FunctionItem
+        name="headset_name"
+        auto="false"
+        enable="true"
+        packageName="com.qti.factory.Headset"
+        parameter="forceHeadset=false" >
+    </FunctionItem>
+    <FunctionItem
+        name="fm_name"
+        auto="false"
+        enable="true"
+        packageName="com.qti.factory.FM"
+        parameter="forceHeadset=false" >
+    </FunctionItem>
+    <FunctionItem
+        name="gps_name"
+        auto="true"
+        enable="true"
+        packageName="com.qti.factory.GPS"
+        parameter="service=intent.GPS.GpsService;timeout=150000;ServiceDelay=1500" >
+    </FunctionItem>
+    <FunctionItem
+        name="battery_name"
+        auto="false"
+        enable="true"
+        packageName="com.qti.factory.Battery"
+        parameter="service=intent.Battery.BatteryService;" >
+    </FunctionItem>
+    <FunctionItem
+        name="fuelgauge_name"
+        auto="false"
+        enable="false"
+        packageName="com.qti.factory.FuelGaugeCalibration" >
+    </FunctionItem>
+    <FunctionItem
+        name="KeypadBacklight_name"
+        auto="false"
+        enable="false"
+        packageName="com.qti.factory.KeypadBacklight" >
+    </FunctionItem>
+
+</FactoryTest>

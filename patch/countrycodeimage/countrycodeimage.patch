@@ -1,0 +1,273 @@
+From 0bfd871ea9ea50c0b726c51fa6e4890fc34d9e2e Mon Sep 17 00:00:00 2001
+From: qianyan <echo.qian@byd.com>
+Date: Thu, 10 Nov 2016 14:20:20 +0800
+Subject: [PATCH] LF1001QN_C000123[countrycodeimage]
+
+Change-Id: I5663479cead726a5cf9765ed74e826ec4b00e356
+---
+ LINUX/android/build/core/main.mk                   |  1 +
+ .../android/device/qcom/msm8952_64/AndroidBoard.mk |  4 ++
+ .../qcom/msm8952_64/generate_countrycode_image.mk  | 54 ++++++++++++++++++++++
+ .../android/device/qcom/msm8952_64/init.target.rc  |  1 +
+ .../java/com/android/server/SystemServer.java      | 45 ++++++++++++++++++
+ LINUX/android/system/core/rootdir/init.rc          | 11 +++++
+ LINUX/android/system/sepolicy/file_contexts        |  3 ++
+ .../vendor/byd/countrycode/empty/countrycode.mk    |  6 +++
+ .../qrdplus/Extension/config/default.prop          |  2 +-
+ common/config/partition.xml                        |  2 +-
+ 10 files changed, 127 insertions(+), 2 deletions(-)
+ create mode 100755 LINUX/android/device/qcom/msm8952_64/generate_countrycode_image.mk
+ mode change 100644 => 100755 LINUX/android/frameworks/base/services/java/com/android/server/SystemServer.java
+ create mode 100755 LINUX/android/vendor/byd/countrycode/empty/countrycode.mk
+
+diff --git a/LINUX/android/build/core/main.mk b/LINUX/android/build/core/main.mk
+index 86e06e0..7899f37 100755
+--- a/LINUX/android/build/core/main.mk
++++ b/LINUX/android/build/core/main.mk
+@@ -951,6 +951,7 @@ endif
+ droidcore: files \
+ 	systemimage \
+ 	userstoreimage \
++	countrycode \
+ 	$(INSTALLED_BOOTIMAGE_TARGET) \
+ 	$(INSTALLED_RECOVERYIMAGE_TARGET) \
+ 	$(INSTALLED_USERDATAIMAGE_TARGET) \
+diff --git a/LINUX/android/device/qcom/msm8952_64/AndroidBoard.mk b/LINUX/android/device/qcom/msm8952_64/AndroidBoard.mk
+index 9e31ac4..ef6aa32 100755
+--- a/LINUX/android/device/qcom/msm8952_64/AndroidBoard.mk
++++ b/LINUX/android/device/qcom/msm8952_64/AndroidBoard.mk
+@@ -170,4 +170,8 @@ endif
+ # extra images
+ #----------------------------------------------------------------------
+ include device/qcom/common/generate_extra_images.mk
++
+ include device/qcom/msm8952_64/generate_userstore_image.mk
++
++include device/qcom/msm8952_64/generate_countrycode_image.mk
++
+diff --git a/LINUX/android/device/qcom/msm8952_64/generate_countrycode_image.mk b/LINUX/android/device/qcom/msm8952_64/generate_countrycode_image.mk
+new file mode 100755
+index 0000000..aa87bc6
+--- /dev/null
++++ b/LINUX/android/device/qcom/msm8952_64/generate_countrycode_image.mk
+@@ -0,0 +1,54 @@
++#lijinghua 20150311 add countrycode support
++#----------------------------------------------------------------------
++# Generate countrycode image (countrycode.img)
++#----------------------------------------------------------------------
++
++TARGET_REGION :=empty
++# build countrycode when set region
++ifneq (,$(TARGET_REGION))
++
++# countrycode resource dir
++COUNTRYCODE_DIR := vendor/byd/countrycode/$(TARGET_REGION)
++
++# countrycode out image dir
++TARGET_OUT_COUNTRYCODE_TOTAL := $(PRODUCT_OUT)/countrycode
++TARGET_OUT_COUNTRYCODE := $(TARGET_OUT_COUNTRYCODE_TOTAL)/$(TARGET_REGION)
++TARGET_OUT_COUNTRYCODE_CFG := $(TARGET_OUT_COUNTRYCODE)/cfg
++
++# countrycode partition size
++BOARD_COUNTRYCODEIMAGE_PARTITION_SIZE := 6291456
++
++COUNTRYCODE_PACKAGES :=
++
++include vendor/byd/countrycode/$(TARGET_REGION)/countrycode.mk
++
++INSTALLED_COUNTRYCODEIMAGE_TARGET := $(PRODUCT_OUT)/countrycode.img
++SELINUX_FC := $(TARGET_ROOT_OUT)/file_contexts.bin
++
++define mkdir-countrycode-cfg-files
++    echo "start mkdir-countrycode-cfg-file"
++    @mkdir -p $(TARGET_OUT_COUNTRYCODE_CFG)
++endef
++
++define build-countrycodeimage-target
++    $(call pretty,"Target countrycode fs image: $(INSTALLED_COUNTRYCODEIMAGE_TARGET)")
++    @mkdir -p $(TARGET_OUT_COUNTRYCODE)
++    $(hide) $(MKEXTUSERIMG) $(TARGET_OUT_COUNTRYCODE) $@ ext4 countrycode $(BOARD_COUNTRYCODEIMAGE_PARTITION_SIZE) $(SELINUX_FC)
++    $(hide) chmod a+r $@    
++endef
++
++$(INSTALLED_COUNTRYCODEIMAGE_TARGET): cleancountrycode $(MKEXTUSERIMG) $(MAKE_EXT4FS) $(COUNTRYCODE_PACKAGES) $(SELINUX_FC)
++	@echo "start generate countrycode image"
++	$(mkdir-countrycode-cfg-files)
++	$(build-countrycodeimage-target)
++	#@cp vendor/byd/Download.cmd\
++            #$(PRODUCT_OUT)/Download.cmd
++endif
++
++.PHONY: cleancountrycode
++cleancountrycode:
++	@echo "start clean countrycode: $(TARGET_REGION)"
++	@rm -rf $(TARGET_OUT_COUNTRYCODE)
++
++.PHONY: countrycode
++countrycode: $(INSTALLED_COUNTRYCODEIMAGE_TARGET)
+diff --git a/LINUX/android/device/qcom/msm8952_64/init.target.rc b/LINUX/android/device/qcom/msm8952_64/init.target.rc
+index 1ffbd4e..6a2ddb5 100755
+--- a/LINUX/android/device/qcom/msm8952_64/init.target.rc
++++ b/LINUX/android/device/qcom/msm8952_64/init.target.rc
+@@ -62,6 +62,7 @@ on fs
+     mount vfat /dev/block/bootdevice/by-name/modem /firmware ro context=u:object_r:firmware_file:s0,shortname=lower,uid=1000,gid=1000,dmask=227,fmask=337
+     start setup_fs
+     mount ext4 /dev/block/bootdevice/by-name/userstore /userstore nosuid nodev barrier=1
++    mount ext4 /dev/block/bootdevice/by-name/countrycode /countrycode nosuid nodev barrier=1
+     #write /sys/kernel/boot_adsp/boot 1
+ 
+ on init
+diff --git a/LINUX/android/frameworks/base/services/java/com/android/server/SystemServer.java b/LINUX/android/frameworks/base/services/java/com/android/server/SystemServer.java
+old mode 100644
+new mode 100755
+index 8425cc6..3f8b06f
+--- a/LINUX/android/frameworks/base/services/java/com/android/server/SystemServer.java
++++ b/LINUX/android/frameworks/base/services/java/com/android/server/SystemServer.java
+@@ -112,6 +112,13 @@ import java.util.Locale;
+ import java.util.Timer;
+ import java.util.TimerTask;
+ 
++import java.io.FileWriter;
++import java.io.BufferedReader;
++import java.io.BufferedWriter;
++import java.io.IOException;
++import java.io.FileReader;
++import java.io.FileWriter;
++import android.util.Log;
+ public final class SystemServer {
+     private static final String TAG = "SystemServer";
+ 
+@@ -323,6 +330,10 @@ public final class SystemServer {
+             Trace.traceEnd(Trace.TRACE_TAG_SYSTEM_SERVER);
+         }
+ 
++        //add by qianyan for countrycode
++        String code = readFile("/countrycode/cfg/countryflag");
++        if(!code.equals("")) SystemProperties.set("persist.sys.nationvalue",code);
++        //end
+         // Start services.
+         try {
+             Trace.traceBegin(Trace.TRACE_TAG_SYSTEM_SERVER, "StartServices");
+@@ -1494,4 +1505,38 @@ public final class SystemServer {
+         Trace.traceBegin(Trace.TRACE_TAG_SYSTEM_SERVER, name);
+         Slog.i(TAG, name);
+     }
++
++    //add by qianyan for countrycode
++    public String readFile(String path) {
++        Log.i(TAG, "start read countrycode ");
++        String code = SystemProperties.get("ro.lenovo.easyimage.code");
++        if(code == null || code.equals("")){
++            File file = new File(path);
++            try {
++                BufferedReader br = new BufferedReader(new FileReader(file));
++                String str = null;
++                String result = "";
++                while ((str = br.readLine()) != null) {
++                    if (str != null) {
++                        result += str;
++                    }
++                }  
++                br.close();
++                Log.i(TAG, "readFile " + path +"=" + result);
++                String[] para = result.split("&");
++                Log.i(TAG, "countrycode string para:" + para.length);
++                if(para.length == 2){
++                    Log.i(TAG, "get string return if:" + para[1]);
++                    return para[1];
++                } else {
++                    return "";
++                }
++            } catch (IOException e) {
++                e.printStackTrace();
++                return "";
++            }
++        }
++        return "";
++    }
++    //end add
+ }
+diff --git a/LINUX/android/system/core/rootdir/init.rc b/LINUX/android/system/core/rootdir/init.rc
+index d2d26a4..2457576 100755
+--- a/LINUX/android/system/core/rootdir/init.rc
++++ b/LINUX/android/system/core/rootdir/init.rc
+@@ -57,6 +57,11 @@ on init
+     chmod 0664 /dev/stune/tasks
+     chmod 0664 /dev/stune/foreground/tasks
+ 
++    #lijinghua add
++    mkdir /countrycode 0771 root root
++    #mount ext4 /dev/block/bootdevice/by-name/countrycode /countrycode rw
++    #lijinghua end
++
+     # Mount staging areas for devices managed by vold
+     # See storage config details at http://source.android.com/tech/storage/
+     mount tmpfs tmpfs /mnt mode=0755,uid=0,gid=1000
+@@ -323,6 +328,12 @@ on post-fs
+     # create the lost+found directories, so as to enforce our permissions
+     mkdir /cache/lost+found 0770 root root
+ 
++    #lijinghua add
++    chown root system /countrycode
++    chmod 0771 /countrycode
++    chown root system /countrycode/cfg
++    chmod 0771 /countrycode/cfg
++    #lijinghua end
+ on post-fs-data
+     # We chown/chmod /data again so because mount is run as root + defaults
+     chown system system /data
+diff --git a/LINUX/android/system/sepolicy/file_contexts b/LINUX/android/system/sepolicy/file_contexts
+index d142b87..4b033d9 100755
+--- a/LINUX/android/system/sepolicy/file_contexts
++++ b/LINUX/android/system/sepolicy/file_contexts
+@@ -398,6 +398,9 @@
+ /storage(/.*)?              u:object_r:storage_file:s0
+ # userstore file
+ /userstore(/.*)?               u:object_r:system_data_file:s0
++# countrycode file
++#
++/countrycode(/.*)?             u:object_r:system_data_file:s0
+ 
+ /system/bin/setup_fs           u:object_r:setup_fs_exec:s0
+ /system/bin/data_pt_check      u:object_r:data_pt_check_exec:s0
+diff --git a/LINUX/android/vendor/byd/countrycode/empty/countrycode.mk b/LINUX/android/vendor/byd/countrycode/empty/countrycode.mk
+new file mode 100755
+index 0000000..db84f7a
+--- /dev/null
++++ b/LINUX/android/vendor/byd/countrycode/empty/countrycode.mk
+@@ -0,0 +1,6 @@
++LOCAL_PATH := $(call my-dir)
++include $(CLEAR_VARS)
++
++COUNTRYCODE_PACKAGES :=
++
++
+diff --git a/LINUX/android/vendor/qcom/proprietary/qrdplus/Extension/config/default.prop b/LINUX/android/vendor/qcom/proprietary/qrdplus/Extension/config/default.prop
+index 0962e22..2514b67 100755
+--- a/LINUX/android/vendor/qcom/proprietary/qrdplus/Extension/config/default.prop
++++ b/LINUX/android/vendor/qcom/proprietary/qrdplus/Extension/config/default.prop
+@@ -12,7 +12,7 @@
+ #persist.radio.ignore_dom_time=5
+ 
+ # set default multisim config to dsds
+-persist.radio.multisim.config=dsds
++persist.radio.multisim.config=ssss
+ 
+ #
+ # PROPERTIES FOR IMS
+diff --git a/common/config/partition.xml b/common/config/partition.xml
+index a0cf9ab..6127d18 100755
+--- a/common/config/partition.xml
++++ b/common/config/partition.xml
+@@ -61,7 +61,7 @@
+ 	<partition label="msadp" size_in_kb="256" type="ED9E8101-05FA-46B7-82AA-8D58770D200B" bootable="false" readonly="false" filename=""/>
+ 	<partition label="dpo" size_in_kb="8" type="11406F35-1173-4869-807B-27DF71802812" bootable="false" readonly="false" filename=""/>
+ 	<partition label="userencrypt" size_in_kb="1024" type="5594C694-C871-4B5F-90B1-690A6F68E0F7" bootable="false" readonly="false" filename=""/>
+-	<partition label="countrycode" size_in_kb="6144" type="5594C694-C871-4B5F-90B1-690A6F68E0F7" bootable="false" readonly="false" filename=""/>
++	<partition label="countrycode" size_in_kb="6144" type="5594C694-C871-4B5F-90B1-690A6F68E0F7" bootable="false" readonly="false" filename="countrycode.img"/>
+ 	<partition label="userdata" size_in_kb="8388608" type="1B81E7E6-F50D-419B-A739-2AEEF8DA3335" bootable="false" readonly="false" filename="userdata.img" sparse="true"/>
+   </physical_partition>
+ 
+-- 
+2.1.3
+

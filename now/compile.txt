@@ -1,0 +1,320 @@
+下载代码:
+进入你将要保存此代码的文件夹内：
+ 1、spark:git clone -b spark_ww14dev ssh://<Owner>@10.31.99.88:29418/Spark.git *****
+ 
+ 2、comm:\\10.31.99.35\sw_public\Project_Release\Qualcomm\8939\LF4701Q
+      git clone -b lf4701q_r21125dev ssh://<Owner>@10.31.99.88:29418/LF4701Q
+
+
+提交代码:
+ 1、scp -p -P 29418 10.31.99.88:hooks/commit-msg .git/hooks //建立钩子
+ 2、git checkout -b branchname  //创建分支 
+ 3、git status  //获取分支修改状态
+ 4、git add files //提交修改文件
+ 5、git commit -m "CR/PR ID [模块名 + 功能名]" //最终提交
+ 6、git push origin HEAD:refs/for/spark_ww14dev //集成到服务器
+git commit --amend
+
+冲突：
+git pull --rebase origin lf4701q_r2032dev(查找冲突位置)
+git add file
+git rebase --continue
+git push ----
+
+全编译代码:
+spark:
+ 1、方法一：
+ source build/envsetup.sh
+ lunch spark_lte_voice_row-eng
+ make update-api
+ make  -j32
+2、方法二：
+ make clean
+ lunch
+ 2
+ make update-api;make -j32
+
+lf4701:
+方法一：进入目录:cd LINUX/android
+ . build/envsetup.sh
+ choosecombo 1 lf4701q 3
+ make -j32
+方法二：make clean //清除下编译环境
+ lunch
+ 2
+ make update-api;make -j32
+
+ 整个项目全编./mk all
+
+清除命令：
+git checkout ./* //清掉修改过的代码
+git clean -fd ./* //清掉增加的代码
+git branch -D 分支名 //删除分支
+git reset --hard HEAD^ //更新当地代码
+//将branch_name这个分支的最后一个commit动作copy到当前分支
+git cherry-pick branch_name
+
+单编译:
+putty重启要先执行: 
+进入spark文件：
+source build/envsetup.sh
+lunch spark_lte_voice_row-eng
+make blank_flashfiles flashfiles -j8
+make flashfiles -j64 2>&1|tee log.txt
+进入Y:\spark_0923/packages/apps/ServiceMenu目录
+单编:mm -B
+
+push进pad
+cmd命令中：
+adb remount//挂载
+adb -s 设备号 remount//挂载到指定的设备
+adb push [单编路径，如Y:/sparkLTE140930/out/target/product/spark/system/app/ServiceMenu.apk] /system/app
+
+抓log
+cmd:adb logcat >d:a.txt
+    adb -d -s **** > D:/log.txt //抓取tag为***的log
+    adb shell logcat -v time > e:log.txt
+    adb logcat -vtime -b all > log.txt
+
+user版本adb remount 无权限:
+cmd:adb shell -> setprop persist.secret.root 1  ->  exit
+
+搜索文件:
+putty:find . -name [文件名]
+      find ./ -name *.txt //查找同一类型的文件
+
+ls //列出当前所有文件
+cd //切换路径
+
+查询文件大小：
+du -sh lf4701_commit //查询文件大小
+删除:rm -rf spark*
+
+git reset --hard HEAD^ //更新本地代码
+
+down 4701版本:
+adb reboot bootloader
+退出:fastboot reboot
+
+卸载push进去的apk
+adb shell
+进入安装的目录cd /system/app
+rm -rf **.apk
+
+生成patch：
+建立分支后修改好文件，然后git diff > /home/[owner]/**.patch
+
+diff before.txt after.txt >mypatch.txt
+
+cp -rf ../0001-LF4701Q_C000121-CIT.patch ./
+git apply patchname
+  
+adb shell ps > e:/shell.txt //查看进程
+adb shell system/bin  chmod 777 mm-audio-ftm修改权限
+
+重启：adb shell stop 
+adb shell start
+
+查看sensor频率
+cd sys/class/sensors/MPU6050-gyro
+cat poll_delay
+
+
+make update-api -j16 && make -j16 2>&1|tee log.txt
+
+adb shell ps |grep "music|camera" 查看进程ID 
+adb logcat -v threadtime |grep PID 显示指定进程的Log 
+adb logcat -b main >
+//打patch包
+git add 
+git commit
+git log -2
+git format-patch loginfo
+git apply *.patch
+git reset --soft HEAD^
+git reset --soft log
+
+//手机校准
+adb reboot bootloader
+fastboot erase fsg
+fastboot erase modemst1
+fastboot erase modemst2
+fastboot flash fsg cefs30.img
+fastboot reboot
+//编译时抓log
+ make -j64 2>&1|tee log.txt
+ 
+ //commit 后想再修改
+ 
+ 
+ 
+ git reset path//
+
+//shell修改owner
+chown root:system filepath
+chmod 777 filepath
+
+//恢复到手机down完版本的那时
+adb reboot bootloader
+fastboot erase userdata
+fastboot reboot
+
+//单编image
+make bootimage -j16
+//down image
+adb reboot-bootloader
+fastboot flash boot pathofimage
+fastboot reboot
+//查找包含“***”的文件
+grep -rn "***" .
+find .|xargs grep "***" 2>/dev/null
+find . -name "*.mk" | xargs grep "LOCAL_MODULE:= adb"
+//恢复到指定的log
+git reset --hard 1209fc3e6283b10dc4306e4ab6aa0be0f0197544
+
+//回退分支到原来的代码
+git log
+git revert -n logtag
+git commit
+git push
+//创建空文件
+touch abc
+edit A.txt //编辑A.txt文本文件，如果A.txt文件不存在，则创建文件
+
+//查看谁修改了某个文件
+git log filepath/filename
+
+//user查看avc log
+cat proc/kmsg > *.txt
+
+adb reboot bootloader
+fastboot oem enable_flash_image
+fastboot.exe oem unlock-go
+devinfo_unlocked.dump
+fastboot erase userdata
+
+fastboot flash fastboot "%~dp0droidboot.img"
+
+fastboot flash boot "%~dp0boot.img"
+
+fastboot flash recovery "%~dp0recovery.img"
+
+fastboot flash system "%~dp0system.img"
+
+fastboot reboot
+
+//抓取手机重启的log
+手机重启后，请抓取/mnt/sdcard/logs
+和 /logs里面的log。adb remount，adb pull  /mnt/sdcard/logs和adb pull  /logs。
+adb shell logcat -v time -b radio > radio.txt 
+adb hsell logcat -v time > logcat.txt 
+user版本：
+enable:setprop persist.service.apklogfs.enable 1
+disable:setprop persist.service.apklogfs.enable 0
+
+LF4701的驱动变成同平台的驱动:
+进入设备管理器，端口的硬件IP
+进入lf4701driver下android_winusb.inf里面的[Google.NTx86]和[Google.NTamd64]这个后面全加上%CompositeAdbInterface%     = USB_Install, USB\VID_17EF&PID_78D1&REV_FFFF&MI_02（硬件IP)，然后再安装驱
+
+//拉分支
+git branch -r命令查看远程分支
+git checkout --track origin/spark_row_wifi命令进行分支切换
+git pull origin spark_row_wifi
+
+ADB server didn't ACK
+* failed to start daemon *
+error: cannot connect to daemon
+taskkill /f /t /im adb.exe
+adb kill-server和adb start-server
+
+netstat -ano | findstr "5037"
+tasklist /fi "pid eq 8612"
+tskill 8612
+编译modem层：
+./mk -h
+选择所需的版本
+
+./mk 6
+fastboot flash modem NON-HLOS.bin
+
+java -jar chkbugreport-0.4-185.jar 9_BugReport.txt解析出report的内容
+User ID: BYDCORP
+Password: QXDM25
+Admin Key: 2022
+Registration Key: 848de9cf972d3e43dadcb39b957b6918d889eb95cb293e19d9dcbe9bc77b69188dc4ba95c2606d57bce88aadf37d1e4b
+
+adb shell am broadcast -a com.android.test --es test_string "this is test string"
+ am start -n com.example.android.helloactivity/com.example.android.helloactivity.HelloActivity
+ adb shell am broadcast -a android.intent.action.MASTER_CLEAR --ez shutdown true
+am start -n com.focaltech.ft_terminal_test/com.focaltech.ft_terminal_test.MainActivity --ei command 1 --ei view 0 --ei autoFinish 2
+高通：
+wang.haowen@byd.com
+Wang.haowen075
+
+lianxiang:
+byd_merlinshi_tmp	mwJ4UI4p
+
+
+OA:
+账户：369928
+密码：Byd@userwhw075
+google account:
+yanghangdan@gmail.com
+07947331769
+13002171382@163.com
+密码xz654321
+
+
+02203143,02203856,02203868.02238243,02245569,02297639
+SystemProperties.get("ro.product.countrycode")
+代码获取SystemProperties.get("ro.product.countrycode")
+ro.lenovo.easyimage.code
+adb获取：adb shell getprop persist.sys.nationvalue
+mount -t ext4 /dev/block/bootdevice/by-name/countrycode /countrycode
+快捷查询之前敲入的命令：ctrl+r
+unkmB8LosD7a
+
+git log  --author=qianyan 
+         --stat //仅简要的显示 文件 增改行数统计，每个提交都列出了修改过的文件 
+git log > all.txt
+git format-patch 6148e8b25e0c389fb6ff0a02c919bcdab0eea1d4..1af89cbf5ae1757e62f50ea9528b0a1dbb3da470
+fastboot format userdata
+MINI:*#*#201206#*#*
+
+02357409  02357579 02366803 02409175
+             if(DocumentsActivity.isCopy) {
+                Toast.makeText(activity.getApplicationContext(), getString(com.android.internal.R.string.restr_pin_try_later), 1000).show();
+
+LF7001QM_P000461  LF7001QM_P000375  
+
+adb shell
+find -name *.java | xargs perl -pi -e 's|runrunin|runin|g' 将runrunin都全替换成runin
+logcat -v time>storage/log.txt&
+ emmc=$(cat proc/partitions | grep -w 'mmcblk0');emmca=${emmc%mmcblk0*};echo ${emmca#*0}
+ 
+ 02481392
+ 02513522
+ 
+ ANDYPLUS-4238
+ isLayoutRtl = (TextUtils.getLayoutDirectionFromLocale(Locale.getDefault())
+                == View.LAYOUT_DIRECTION_RTL);
+                
+ adb wait-for-device logcat 
+ git push --no-thin origin HEAD:refs/for/branchname
+ mk文件打log
+ $(warning value of PRODUCT_CHARACTERISTICS IS '$(PRODUCT_CHARACTERISTICS)')
+ 
+
+adb shell cat proc/kmsg
+adb shell dmesg
+adb bugreport > bugreport.txt
+
+vmlinux是否一致：
+进入Port_com目录：
+grep -a "Linux version" -r vmlinux
+grep -a "Linux version" -r DDRCSO.BIN
+
+mk dos-->unix dos2unix lenovo_buildinfo.mk
+find . -name "*.make" -type f | xargs dos2unix 
+make V=1 SHOW_COMMANDS=true 2>&1 | tee build.log
+ps -aux | grep jack

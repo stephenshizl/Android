@@ -1,0 +1,485 @@
+From d491850442f4e105cd39ac2a9bdf2af23e6bbecf Mon Sep 17 00:00:00 2001
+From: qianyan <echo.qian@byd.com>
+Date: Mon, 14 Nov 2016 18:46:28 +0800
+Subject: [PATCH] propertyiesjni
+
+Change-Id: I632507ef202d1af90c9cb4d3848d091da0c96c1d
+---
+ .../core/java/android/os/GetSystemProperties.java  | 148 +++++++++++++
+ LINUX/android/frameworks/base/core/jni/Android.mk  |   1 +
+ .../frameworks/base/core/jni/AndroidRuntime.cpp    |   2 +
+ .../core/jni/android_os_GetSystemProperties.cpp    | 246 +++++++++++++++++++++
+ .../contacts/activities/PeopleActivity.java        |   4 +-
+ 5 files changed, 400 insertions(+), 1 deletion(-)
+ create mode 100755 LINUX/android/frameworks/base/core/java/android/os/GetSystemProperties.java
+ mode change 100644 => 100755 LINUX/android/frameworks/base/core/jni/Android.mk
+ mode change 100644 => 100755 LINUX/android/frameworks/base/core/jni/AndroidRuntime.cpp
+ create mode 100755 LINUX/android/frameworks/base/core/jni/android_os_GetSystemProperties.cpp
+
+diff --git a/LINUX/android/frameworks/base/core/java/android/os/GetSystemProperties.java b/LINUX/android/frameworks/base/core/java/android/os/GetSystemProperties.java
+new file mode 100755
+index 0000000..1f29c73
+--- /dev/null
++++ b/LINUX/android/frameworks/base/core/java/android/os/GetSystemProperties.java
+@@ -0,0 +1,148 @@
++/*
++ * Copyright (C) 2006 The Android Open Source Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package android.os;
++
++import java.util.ArrayList;
++
++
++public class GetSystemProperties
++{
++    public static final int PROP_NAME_MAX = 31;
++    public static final int PROP_VALUE_MAX = 91;
++
++    private static final ArrayList<Runnable> sChangeCallbacks = new ArrayList<Runnable>();
++
++    private static native String native_get(String key);
++    private static native String native_get(String key, String def);
++    private static native int native_get_int(String key, int def);
++    private static native long native_get_long(String key, long def);
++    private static native boolean native_get_boolean(String key, boolean def);
++    private static native void native_set(String key, String def);
++    private static native void native_add_change_callback();
++
++    /**
++     * Get the value for the given key.
++     * @return an empty string if the key isn't found
++     * @throws IllegalArgumentException if the key exceeds 32 characters
++     */
++    public static String get(String key) {
++        if (key.length() > PROP_NAME_MAX) {
++            throw new IllegalArgumentException("key.length > " + PROP_NAME_MAX);
++        }
++        return native_get(key);
++    }
++
++    /**
++     * Get the value for the given key.
++     * @return if the key isn't found, return def if it isn't null, or an empty string otherwise
++     * @throws IllegalArgumentException if the key exceeds 32 characters
++     */
++    public static String get(String key, String def) {
++        if (key.length() > PROP_NAME_MAX) {
++            throw new IllegalArgumentException("key.length > " + PROP_NAME_MAX);
++        }
++        return native_get(key, def);
++    }
++
++    /**
++     * Get the value for the given key, and return as an integer.
++     * @param key the key to lookup
++     * @param def a default value to return
++     * @return the key parsed as an integer, or def if the key isn't found or
++     *         cannot be parsed
++     * @throws IllegalArgumentException if the key exceeds 32 characters
++     */
++    public static int getInt(String key, int def) {
++        if (key.length() > PROP_NAME_MAX) {
++            throw new IllegalArgumentException("key.length > " + PROP_NAME_MAX);
++        }
++        return native_get_int(key, def);
++    }
++
++    /**
++     * Get the value for the given key, and return as a long.
++     * @param key the key to lookup
++     * @param def a default value to return
++     * @return the key parsed as a long, or def if the key isn't found or
++     *         cannot be parsed
++     * @throws IllegalArgumentException if the key exceeds 32 characters
++     */
++    public static long getLong(String key, long def) {
++        if (key.length() > PROP_NAME_MAX) {
++            throw new IllegalArgumentException("key.length > " + PROP_NAME_MAX);
++        }
++        return native_get_long(key, def);
++    }
++
++    /**
++     * Get the value for the given key, returned as a boolean.
++     * Values 'n', 'no', '0', 'false' or 'off' are considered false.
++     * Values 'y', 'yes', '1', 'true' or 'on' are considered true.
++     * (case sensitive).
++     * If the key does not exist, or has any other value, then the default
++     * result is returned.
++     * @param key the key to lookup
++     * @param def a default value to return
++     * @return the key parsed as a boolean, or def if the key isn't found or is
++     *         not able to be parsed as a boolean.
++     * @throws IllegalArgumentException if the key exceeds 32 characters
++     */
++    public static boolean getBoolean(String key, boolean def) {
++        if (key.length() > PROP_NAME_MAX) {
++            throw new IllegalArgumentException("key.length > " + PROP_NAME_MAX);
++        }
++        return native_get_boolean(key, def);
++    }
++
++    /**
++     * Set the value for the given key.
++     * @throws IllegalArgumentException if the key exceeds 32 characters
++     * @throws IllegalArgumentException if the value exceeds 92 characters
++     */
++    public static void set(String key, String val) {
++        if (key.length() > PROP_NAME_MAX) {
++            throw new IllegalArgumentException("key.length > " + PROP_NAME_MAX);
++        }
++        if (val != null && val.length() > PROP_VALUE_MAX) {
++            throw new IllegalArgumentException("val.length > " +
++                PROP_VALUE_MAX);
++        }
++        native_set(key, val);
++    }
++
++    public static void addChangeCallback(Runnable callback) {
++        synchronized (sChangeCallbacks) {
++            if (sChangeCallbacks.size() == 0) {
++                native_add_change_callback();
++            }
++            sChangeCallbacks.add(callback);
++        }
++    }
++
++    static void callChangeCallbacks() {
++        synchronized (sChangeCallbacks) {
++            //Log.i("foo", "Calling " + sChangeCallbacks.size() + " change callbacks!");
++            if (sChangeCallbacks.size() == 0) {
++                return;
++            }
++            ArrayList<Runnable> callbacks = new ArrayList<Runnable>(sChangeCallbacks);
++            for (int i=0; i<callbacks.size(); i++) {
++                callbacks.get(i).run();
++            }
++        }
++    }
++}
+diff --git a/LINUX/android/frameworks/base/core/jni/Android.mk b/LINUX/android/frameworks/base/core/jni/Android.mk
+old mode 100644
+new mode 100755
+index ee3d14c..8f67d7e
+--- a/LINUX/android/frameworks/base/core/jni/Android.mk
++++ b/LINUX/android/frameworks/base/core/jni/Android.mk
+@@ -87,6 +87,7 @@ LOCAL_SRC_FILES:= \
+     android_os_SELinux.cpp \
+     android_os_SystemClock.cpp \
+     android_os_SystemProperties.cpp \
++    android_os_GetSystemProperties.cpp \
+     android_os_Trace.cpp \
+     android_os_UEventObserver.cpp \
+     android_net_LocalSocketImpl.cpp \
+diff --git a/LINUX/android/frameworks/base/core/jni/AndroidRuntime.cpp b/LINUX/android/frameworks/base/core/jni/AndroidRuntime.cpp
+old mode 100644
+new mode 100755
+index 5eae338..8457bb1
+--- a/LINUX/android/frameworks/base/core/jni/AndroidRuntime.cpp
++++ b/LINUX/android/frameworks/base/core/jni/AndroidRuntime.cpp
+@@ -161,6 +161,7 @@ extern int register_android_os_MessageQueue(JNIEnv* env);
+ extern int register_android_os_Parcel(JNIEnv* env);
+ extern int register_android_os_SELinux(JNIEnv* env);
+ extern int register_android_os_SystemProperties(JNIEnv *env);
++extern int register_android_os_GetSystemProperties(JNIEnv *env);
+ extern int register_android_os_SystemClock(JNIEnv* env);
+ extern int register_android_os_Trace(JNIEnv* env);
+ extern int register_android_os_FileObserver(JNIEnv *env);
+@@ -1280,6 +1281,7 @@ static const RegJNIRec gRegJNI[] = {
+     REG_JNI(register_android_view_KeyCharacterMap),
+     REG_JNI(register_android_os_Process),
+     REG_JNI(register_android_os_SystemProperties),
++    REG_JNI(register_android_os_GetSystemProperties),
+     REG_JNI(register_android_os_Binder),
+     REG_JNI(register_android_os_Parcel),
+     REG_JNI(register_android_nio_utils),
+diff --git a/LINUX/android/frameworks/base/core/jni/android_os_GetSystemProperties.cpp b/LINUX/android/frameworks/base/core/jni/android_os_GetSystemProperties.cpp
+new file mode 100755
+index 0000000..fc67aba
+--- /dev/null
++++ b/LINUX/android/frameworks/base/core/jni/android_os_GetSystemProperties.cpp
+@@ -0,0 +1,246 @@
++/* //device/libs/android_runtime/android_os_SystemProperties.cpp
++**
++** Copyright 2006, The Android Open Source Project
++**
++** Licensed under the Apache License, Version 2.0 (the "License");
++** you may not use this file except in compliance with the License.
++** You may obtain a copy of the License at
++**
++**     http://www.apache.org/licenses/LICENSE-2.0
++**
++** Unless required by applicable law or agreed to in writing, software
++** distributed under the License is distributed on an "AS IS" BASIS,
++** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++** See the License for the specific language governing permissions and
++** limitations under the License.
++*/
++
++#define LOG_TAG "SysPropJNI"
++
++#include "cutils/properties.h"
++#include "utils/misc.h"
++#include <utils/Log.h>
++#include "jni.h"
++#include "core_jni_helpers.h"
++#include <nativehelper/JNIHelp.h>
++
++namespace android
++{
++
++static jstring GetSystemProperties_getSS(JNIEnv *env, jobject clazz,
++                                      jstring keyJ, jstring defJ)
++{
++    int len;
++    const char* key;
++    char buf[PROPERTY_VALUE_MAX];
++    jstring rvJ = NULL;
++
++    if (keyJ == NULL) {
++        jniThrowNullPointerException(env, "key must not be null.");
++        goto error;
++    }
++
++    key = env->GetStringUTFChars(keyJ, NULL);
++
++    len = property_get(key, buf, "");
++    if ((len <= 0) && (defJ != NULL)) {
++        rvJ = defJ;
++    } else if (len >= 0) {
++        rvJ = env->NewStringUTF(buf);
++    } else {
++        rvJ = env->NewStringUTF("");
++    }
++
++    env->ReleaseStringUTFChars(keyJ, key);
++
++error:
++    return rvJ;
++}
++
++static jstring GetSystemProperties_getS(JNIEnv *env, jobject clazz,
++                                      jstring keyJ)
++{
++    return GetSystemProperties_getSS(env, clazz, keyJ, NULL);
++}
++
++static jint GetSystemProperties_get_int(JNIEnv *env, jobject clazz,
++                                      jstring keyJ, jint defJ)
++{
++    int len;
++    const char* key;
++    char buf[PROPERTY_VALUE_MAX];
++    char* end;
++    jint result = defJ;
++
++    if (keyJ == NULL) {
++        jniThrowNullPointerException(env, "key must not be null.");
++        goto error;
++    }
++
++    key = env->GetStringUTFChars(keyJ, NULL);
++
++    len = property_get(key, buf, "");
++    if (len > 0) {
++        result = strtol(buf, &end, 0);
++        if (end == buf) {
++            result = defJ;
++        }
++    }
++
++    env->ReleaseStringUTFChars(keyJ, key);
++
++error:
++    return result;
++}
++
++static jlong GetSystemProperties_get_long(JNIEnv *env, jobject clazz,
++                                      jstring keyJ, jlong defJ)
++{
++    int len;
++    const char* key;
++    char buf[PROPERTY_VALUE_MAX];
++    char* end;
++    jlong result = defJ;
++
++    if (keyJ == NULL) {
++        jniThrowNullPointerException(env, "key must not be null.");
++        goto error;
++    }
++
++    key = env->GetStringUTFChars(keyJ, NULL);
++
++    len = property_get(key, buf, "");
++    if (len > 0) {
++        result = strtoll(buf, &end, 0);
++        if (end == buf) {
++            result = defJ;
++        }
++    }
++
++    env->ReleaseStringUTFChars(keyJ, key);
++
++error:
++    return result;
++}
++
++static jboolean GetSystemProperties_get_boolean(JNIEnv *env, jobject clazz,
++                                      jstring keyJ, jboolean defJ)
++{
++    int len;
++    const char* key;
++    char buf[PROPERTY_VALUE_MAX];
++    jboolean result = defJ;
++
++    if (keyJ == NULL) {
++        jniThrowNullPointerException(env, "key must not be null.");
++        goto error;
++    }
++
++    key = env->GetStringUTFChars(keyJ, NULL);
++
++    len = property_get(key, buf, "");
++    if (len == 1) {
++        char ch = buf[0];
++        if (ch == '0' || ch == 'n')
++            result = false;
++        else if (ch == '1' || ch == 'y')
++            result = true;
++    } else if (len > 1) {
++         if (!strcmp(buf, "no") || !strcmp(buf, "false") || !strcmp(buf, "off")) {
++            result = false;
++        } else if (!strcmp(buf, "yes") || !strcmp(buf, "true") || !strcmp(buf, "on")) {
++            result = true;
++        }
++    }
++
++    env->ReleaseStringUTFChars(keyJ, key);
++
++error:
++    return result;
++}
++
++static void GetSystemProperties_set(JNIEnv *env, jobject clazz,
++                                      jstring keyJ, jstring valJ)
++{
++    int err;
++    const char* key;
++    const char* val;
++
++    if (keyJ == NULL) {
++        jniThrowNullPointerException(env, "key must not be null.");
++        return ;
++    }
++    key = env->GetStringUTFChars(keyJ, NULL);
++
++    if (valJ == NULL) {
++        val = "";       /* NULL pointer not allowed here */
++    } else {
++        val = env->GetStringUTFChars(valJ, NULL);
++    }
++
++    err = property_set(key, val);
++
++    env->ReleaseStringUTFChars(keyJ, key);
++
++    if (valJ != NULL) {
++        env->ReleaseStringUTFChars(valJ, val);
++    }
++
++    if (err < 0) {
++        jniThrowException(env, "java/lang/RuntimeException",
++                          "failed to set system property");
++    }
++}
++
++static JavaVM* sVM = NULL;
++static jclass sClazz = NULL;
++static jmethodID sCallChangeCallbacks;
++
++static void do_report_sysprop_change() {
++    //ALOGI("Java SystemProperties: VM=%p, Clazz=%p", sVM, sClazz);
++    if (sVM != NULL && sClazz != NULL) {
++        JNIEnv* env;
++        if (sVM->GetEnv((void **)&env, JNI_VERSION_1_4) >= 0) {
++            //ALOGI("Java SystemProperties: calling %p", sCallChangeCallbacks);
++            env->CallStaticVoidMethod(sClazz, sCallChangeCallbacks);
++        }
++    }
++}
++
++static void GetSystemProperties_add_change_callback(JNIEnv *env, jobject clazz)
++{
++    // This is called with the Java lock held.
++    if (sVM == NULL) {
++        env->GetJavaVM(&sVM);
++    }
++    if (sClazz == NULL) {
++        sClazz = (jclass) env->NewGlobalRef(clazz);
++        sCallChangeCallbacks = env->GetStaticMethodID(sClazz, "callChangeCallbacks", "()V");
++        add_sysprop_change_callback(do_report_sysprop_change, -10000);
++    }
++}
++
++static const JNINativeMethod method_table[] = {
++    { "native_get", "(Ljava/lang/String;)Ljava/lang/String;",
++      (void*) GetSystemProperties_getS },
++    { "native_get", "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;",
++      (void*) GetSystemProperties_getSS },
++    { "native_get_int", "(Ljava/lang/String;I)I",
++      (void*) GetSystemProperties_get_int },
++    { "native_get_long", "(Ljava/lang/String;J)J",
++      (void*) GetSystemProperties_get_long },
++    { "native_get_boolean", "(Ljava/lang/String;Z)Z",
++      (void*) GetSystemProperties_get_boolean },
++    { "native_set", "(Ljava/lang/String;Ljava/lang/String;)V",
++      (void*) GetSystemProperties_set },
++    { "native_add_change_callback", "()V",
++      (void*) GetSystemProperties_add_change_callback },
++};
++
++int register_android_os_GetSystemProperties(JNIEnv *env)
++{
++    return RegisterMethodsOrDie(env, "android/os/GetSystemProperties", method_table,
++                                NELEM(method_table));
++}
++
++};
+diff --git a/LINUX/android/packages/apps/Contacts/src/com/android/contacts/activities/PeopleActivity.java b/LINUX/android/packages/apps/Contacts/src/com/android/contacts/activities/PeopleActivity.java
+index 70990d8..d662413 100755
+--- a/LINUX/android/packages/apps/Contacts/src/com/android/contacts/activities/PeopleActivity.java
++++ b/LINUX/android/packages/apps/Contacts/src/com/android/contacts/activities/PeopleActivity.java
+@@ -118,7 +118,7 @@ import java.util.Iterator;
+ import java.util.Locale;
+ import java.util.Set;
+ import java.util.concurrent.atomic.AtomicInteger;
+-
++import android.os.GetSystemProperties;
+ /**
+  * Displays a list to browse contacts.
+  */
+@@ -262,6 +262,8 @@ public class PeopleActivity extends ContactsActivity implements
+         if (Log.isLoggable(Constants.PERFORMANCE_TAG, Log.DEBUG)) {
+             Log.d(Constants.PERFORMANCE_TAG, "PeopleActivity.onCreate start");
+         }
++        String a = GetSystemProperties.get("ro.build.display.id","none");
++        Log.i("qianyan", "test propertides a=" + a);
+         super.onCreate(savedState);
+ 
+         // Get ContactMultiDeletionInteraction fragment from FragmentManager.
+-- 
+2.1.3
+

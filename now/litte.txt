@@ -1,0 +1,182 @@
+LOCAL_PRIVILEGED_MODULE := true
+LOCAL_MODULE_PATH := $(PRODUCT_OUT)/system/priv-app
+
+//弹出Toast
+import android.widget.Toast;
+Toast.makeText(ProximityTest2.this, "proximitytest2 oncreate", 3000).show();
+
+//Log.i
+import android.util.Log;
+Log.i("tag", "adf");
+
+//弹出对话框
+import android.content.DialogInterface;
+import android.app.AlertDialog;
+AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+	ShowPersoninfo.this);
+	alertDialog.setTitle(getString(R.string.strtitle));
+	alertDialog.setIcon(android.R.drawable.ic_dialog_info);
+	alertDialog.setMessage(R.string.str1);
+	alertDialog.setPositiveButton(R.string.okbutton,
+		new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(DialogInterface arg0, int arg1) {
+	//code here
+	}
+	}
+	});
+alertDialog.show();
+
+
+
+
+//暂停几秒钟
+try {                    
+	Thread.currentThread().sleep(1000);                
+	} catch (InterruptedException e) {                    
+		e.printStackTrace();
+	}
+
+
+
+textView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));//加粗
+
+textView.getPaint().setFakeBoldText(true);//加粗
+
+//可以改变主进程中的页面布局
+ runOnUiThread(new ennablePass());
+ class ennablePass implements Runnable {
+		@Override
+		public void run() {
+			findViewById(R.id.btn_pass).setEnabled(true);
+		}
+    }
+
+
+//弹出对话框
+ void showWarningDialog(String title) {
+        new AlertDialog.Builder(mContext).setTitle(title)
+                .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                }).setCancelable(false).show();
+    }
+
+    void showConfirmDialog() {
+        new AlertDialog.Builder(mContext).setTitle(getString(R.string.headset_confirm))
+                .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        btnChannel.setEnabled(true);
+                        tvMic.setText(getString(R.string.auto_ear_mic_pass));
+                    }
+                }).setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        //backToTest(0);
+                        setTestResult(FAIL);
+                        finish();
+                    }
+                }).setCancelable(false).show();
+    }
+
+
+//进入手机内部重置页面
+setProgressBarIndeterminateVisibility(true);
+Intent mIntent = new Intent();
+mIntent.setAction("android.settings.BACKUP_AND_RESET_SETTINGS");
+startActivity(mIntent);
+
+
+//Popwindown dialog
+public void onClick(View arg0) {
+	MainActivity.this.showDialog(DIALOG_ID);
+	}
+@Deprecated
+protected Dialog onCreateDialog(int dialogid) {
+	Dialog dialog;
+	switch (dialogid) {
+	case DIALOG_ID:
+		AlertDialog.Builder dialogbuilder = new AlertDialog.Builder(MainActivity.this);
+		dialogbuilder.setTitle("AlertDialog");
+		dialogbuilder.setPositiveButton("ok",
+		new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();// 此处可以添加你要执行的其他程序
+			}
+		});
+		dialog = dialogbuilder.create();
+		dialog.setCancelable(true);
+		break;
+	default:
+		dialog = null;
+		break;
+	}
+	return dialog;
+}
+
+
+//传感器列表
+//准备显示信息的UI组建   
+final TextView tx1 = (TextView) findViewById(R.id.TextView01);   
+//从系统服务中获得传感器管理器   
+SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE); 
+Sensor mSensor = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+//从传感器管理器中获得全部的传感器列表   
+List<Sensor> allSensors = sm.getSensorList(Sensor.TYPE_ALL);   
+//显示有多少个传感器   
+tx1.setText("经检测该手机有" + allSensors.size() + "个传感器，他们分别是：\n");   
+//显示每个传感器的具体信息   
+for (Sensor s : allSensors) {   String tempString = "\n" + "  设备名称：" + s.getName() + "\n" + "  设备版本：" + s.getVersion() + "\n" + "  供应商："  + s.getVendor() + "\n";   
+	switch (s.getType()) {   
+		case Sensor.TYPE_ACCELEROMETER:   
+			tx1.setText(tx1.getText().toString() + s.getType() + " 加速度传感器accelerometer" + tempString);   
+			break;   
+		case Sensor.TYPE_GYROSCOPE:   
+			tx1.setText(tx1.getText().toString() + s.getType() + " 陀螺仪传感器gyroscope" + tempString);   
+			break;   
+		case Sensor.TYPE_LIGHT:   
+			tx1.setText(tx1.getText().toString() + s.getType() + " 环境光线传感器light" + tempString);   
+			break;   
+		case Sensor.TYPE_MAGNETIC_FIELD:   
+			tx1.setText(tx1.getText().toString() + s.getType() + " 电磁场传感器magnetic field" + tempString);   
+			break;   
+		case Sensor.TYPE_ORIENTATION:   
+			tx1.setText(tx1.getText().toString() + s.getType() + " 方向传感器orientation" + tempString);   
+			break;   
+		case Sensor.TYPE_PRESSURE:   
+			tx1.setText(tx1.getText().toString() + s.getType() + " 压力传感器pressure" + tempString);   
+			break;   
+		case Sensor.TYPE_PROXIMITY:   
+			tx1.setText(tx1.getText().toString() + s.getType() + " 距离传感器proximity" + tempString);   
+			break;   
+		case Sensor.TYPE_TEMPERATURE:   
+			tx1.setText(tx1.getText().toString() + s.getType() + " 温度传感器temperature" + tempString);   
+			break;   
+		default:   
+			tx1.setText(tx1.getText().toString() + s.getType() + " 未知传感器" + tempString);   
+			break;   
+			}          
+}
+
+//一个xml页面引用另一个xml页面
+<include
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/bottom_bar" />
+
+
+//SharePreferences
+//read sharepreferences
+SharedPreferences sharePreferences = SharePreferencesHome.this
+				.getSharedPreferences(SHARE_NAME, MODE_PRIVATE);
+Editor editor = sharePreferences.edit();
+SharedPreferences settings = getSharedPreferences(SHARE_NAME, 0);
+boolean isRegist = settings.getBoolean("LOGIN", false);
+//write sharepreferences
+SharedPreferences sharePreferences = SharePreferencesHome.this.
+		getSharedPreferences(SHARE_NAME, MODE_PRIVATE);
+Editor editor = sharePreferences.edit();
+// 存入数据
+editor.putBoolean("LOGIN", true);
+editor.putString("USERNAME", userName.getText().toString());
+editor.putString("USERPASS", userPwd.getText().toString());
+editor.commit();

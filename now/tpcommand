@@ -1,0 +1,59 @@
+#!/system/bin/sh
+#set -x
+
+#log_file="HOME"/log/log."$TODAY";
+echo 0 > /data/test;
+num=-1;
+tppath="-1";
+result="-1";
+for i in 0 1 2 3 4 5 6 7 8 9 10; do 
+	path="/sys/class/input/input$i/fwid";
+	if [[ -f "$path" ]]; then
+		result=$(cat /sys/class/input/input$i/fwid 2>&1); 
+		num=$i;
+		echo num=$i;
+		echo result=$result;
+		break;
+	fi; 
+done;
+if [[ $result != "-1" ]]; then
+	echo 1 > /sys/class/input/input$num/reset; 
+	moduleid=${result:38:2};
+	paneltype=${result:52:2};
+	if [[ $moduleid = "05" ]]; then 
+	    if [[ $paneltype = "00" ]]; then  
+	        tppath="TestLimit_laibao_metal.xls";
+			echo TestLimit_laibao_metal;
+	    elif [[ $paneltype = "01" ]]; then 
+	        tppath="TestLimit_laibao_ito.xls";
+			echo TestLimit_laibao_ito;
+		fi;
+	elif [[ $moduleid = "06" ]]; then 
+	    if [[ $paneltype = "00" ]]; then  
+	        tppath="TestLimit_gis_metal.xls";
+			echo TestLimit_gis_metal;
+	    elif [[ $paneltype = "01" ]]; then  
+	        tppath="TestLimit_gis_ito.xls";
+			echo TestLimit_gis_ito;
+		fi;
+	fi;
+fi;
+if [[ $tppath != "-1" ]]; then
+	echo "tppath != -1 num=$num tppath=$tppath";
+    echo 1 > /sys/class/input/input$num/reset; 
+	echo "after reset";		
+	/system/bin/synaptics_production_test 20 -ds4 -x /system/bin/$tppath > /data/data/com.android.ServiceMenu/rawdata 2>&1;
+	#/system/bin/synaptics_production_test 20 -ds4 -x /system/bin/$tppath | grep PASS > /data/data/com.android.ServiceMenu/rawdata;
+	if [[ $? -eq 0 ]]; then
+	echo pass;
+	fi;
+	echo "after test tppath";	
+	chmod 777 /data/data/com.android.ServiceMenu/rawdata;
+	echo "chmod";
+	last=$(cat /data/data/com.android.ServiceMenu/rawdata 2>&1); 
+	echo last=$last;
+	echo "cat rawdata";
+fi;
+echo $log_file;
+echo 1 > /data/test;
+

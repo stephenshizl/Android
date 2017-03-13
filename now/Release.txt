@@ -1,0 +1,29 @@
+$ scp -p -P 29418 10.31.99.88:hooks/commit-msg .git/hooks
+$ git checkout -b branchname
+$ git add files
+$ git commit -m "CR/PR ID [模块名 + 功能名]"
+$ git push origin HEAD:refs/for/spark_lte_dev
+
+$ git pull origin lf4701q_r21131dev  //更新代码
+
+$ git status//查询修改什么地方的命令
+$ git add .//将修改后的所有代码提交上去
+$ git branch//查看所有分支
+$ git diff //查看修改的地方
+$ git commit //修改已提交的分支
+
+Rebase:
+git pull --rebase origin lf4701q_r2032dev(查找冲突位置)
+git add file
+git rebase --continue
+git push ----
+
+如果提交了还想修改:
+1 先修改代码
+2 在原来的分支上执行git status
+3 git add +文件路径或者add .
+4 git commit --amend + enter +ctrlo + enter +ctrlx
+5 git push origin HEAD:refs/for/lf4701q_01430_apdev
+
+
+手机重启：logcat -b main>/mnt/sdcard/log.txt &

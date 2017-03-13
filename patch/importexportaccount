@@ -1,0 +1,1104 @@
+From 325e1107b9729db55fcec36a2aae656db4aa6fff Mon Sep 17 00:00:00 2001
+From: qianyan <echo.qian@byd.com>
+Date: Tue, 30 Aug 2016 09:53:43 +0800
+Subject: [PATCH] LF7002Q_C000282[import/export account]
+
+Change-Id: I7cad093be306ee828387b673f834e1b16a10494c
+---
+ .../packages/apps/Contacts/res/values/strings.xml  |   4 +-
+ .../apps/ContactsCommon/res/values-ar/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-bg/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-cs/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-da/strings.xml  |   9 +-
+ .../apps/ContactsCommon/res/values-de/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-el/strings.xml  |   8 +
+ .../ContactsCommon/res/values-es-rUS/strings.xml   |   8 +
+ .../apps/ContactsCommon/res/values-es/strings.xml  |   8 +
+ .../ContactsCommon/res/values-et-rEE/strings.xml   |   9 +-
+ .../apps/ContactsCommon/res/values-fi/strings.xml  |   9 +-
+ .../apps/ContactsCommon/res/values-fr/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-hr/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-hu/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-it/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-iw/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-ja/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-ko/strings.xml  |   9 +-
+ .../apps/ContactsCommon/res/values-lt/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-lv/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-nb/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-nl/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-pl/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-pt/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-ro/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-ru/strings.xml  |   9 +-
+ .../apps/ContactsCommon/res/values-sk/strings.xml  |   9 +-
+ .../apps/ContactsCommon/res/values-sl/strings.xml  |   9 +-
+ .../apps/ContactsCommon/res/values-sr/strings.xml  |   8 +
+ .../apps/ContactsCommon/res/values-sv/strings.xml  |   9 +-
+ .../apps/ContactsCommon/res/values-tr/strings.xml  |   9 +-
+ .../apps/ContactsCommon/res/values-uk/strings.xml  |   8 +
+ .../ContactsCommon/res/values-ur-rPK/strings.xml   |   9 +-
+ .../ContactsCommon/res/values-zh-rCN/strings.xml   |   8 +
+ .../ContactsCommon/res/values-zh-rHK/strings.xml   |   8 +
+ .../ContactsCommon/res/values-zh-rTW/strings.xml   |   8 +
+ .../apps/ContactsCommon/res/values/strings.xml     |   9 +-
+ .../interactions/ImportExportDialogFragment.java   | 296 +++++++++++++++++++--
+ .../com/android/providers/media/MtpService.java    |   2 +-
+ LINUX/android/system/vold/Ext4Crypt.cpp            |   3 +
+ 40 files changed, 574 insertions(+), 30 deletions(-)
+ mode change 100644 => 100755 LINUX/android/packages/apps/ContactsCommon/res/values-es-rUS/strings.xml
+ mode change 100644 => 100755 LINUX/android/system/vold/Ext4Crypt.cpp
+
+diff --git a/LINUX/android/packages/apps/Contacts/res/values/strings.xml b/LINUX/android/packages/apps/Contacts/res/values/strings.xml
+index cbc3548..9792d80 100755
+--- a/LINUX/android/packages/apps/Contacts/res/values/strings.xml
++++ b/LINUX/android/packages/apps/Contacts/res/values/strings.xml
+@@ -760,8 +760,8 @@
+ 
+     <!-- File Authority for the photo picker -->
+     <string name="photo_file_provider_authority" translatable="false">com.android.contacts.files</string>
+-    <string name="btn_send_mail">Email</string>
+-    <string name="btn_send_sms">Text</string>
++    <string name="btn_send_mail">Send the email to group </string>
++    <string name="btn_send_sms">Send the message to group </string>
+     <!-- When a user tries to create an IM Hangouts field, an alert dialog pops up displaying this message. We don't want users entering email addresses of phone numbers into the IM field. [CHAR LIMIT=200] -->
+     <string name="contact_editor_hangouts_im_alert">Hangouts works better when you enter the person\'s Hangouts identifier into the email field or phone field.</string>
+ 
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-ar/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-ar/strings.xml
+index 035a81e..30029ff 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-ar/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-ar/strings.xml
+@@ -270,4 +270,12 @@
+ <string name="select_path">تحديد المسار</string>
+     <string name="export_to_sim_summary_no_number">التصدير إلى بطاقة SIM <xliff:g id="sim_name">%1$s</xliff:g></string>
+     <string name="export_to_sim_summary">التصدير إلى بطاقة SIM <xliff:g id="sim_name">^1</xliff:g> - <xliff:g id="sim_number">^2</xliff:g></string>
++    <string name="export_to_account">تصدير جهات الاتصال إلى الحساب</string>
++    <string name="import_from_account">استيراد جهات الاتصال من الحساب</string>
++    <string name="dialog_export_account">اختيار حساب للتصدير إليه:</string>
++    <string name="dialog_import_account">اختيار حساب للاستيراد منه:</string>
++    <string name="export_success">نجح التصدير</string>
++    <string name="export_fail">فشل التصدير</string>
++    <string name="import_success">نجح الاستيراد</string>
++    <string name="import_fail">فشل الاستيراد</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-bg/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-bg/strings.xml
+index 2fda86d..7dc3567 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-bg/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-bg/strings.xml
+@@ -266,4 +266,12 @@
+     <string name="select_path">Избор на пътека</string>
+     <string name="export_to_sim_summary">Експортиране в SIM <xliff:g id="sim_name">^1</xliff:g> – <xliff:g id="sim_number">^2</xliff:g></string>
+     <string name="export_to_sim_summary_no_number">Експортиране в SIM <xliff:g id="sim_name">%1$s</xliff:g></string>
++    <string name="export_to_account">Експортиране на контакти към акаунт</string>
++    <string name="import_from_account">Импортиране на контакти от акаунт</string>
++    <string name="dialog_export_account">Избор на акаунт, към който да се експортира:</string>
++    <string name="dialog_import_account">Избор на акаунт, от който да се импортира:</string>
++    <string name="export_success">Успешно експортиране</string>
++    <string name="export_fail">Експортирането е неуспешно</string>
++    <string name="import_success">Успешно импортиране</string>
++    <string name="import_fail">Импортирането е неуспешно</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-cs/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-cs/strings.xml
+index e5d19a3..59f1282 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-cs/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-cs/strings.xml
+@@ -268,4 +268,12 @@
+     <string name="select_path">Vybrat cestu</string>
+     <string name="export_to_sim_summary_no_number">Exportovat na kartu SIM <xliff:g id="sim_name">%1$s</xliff:g></string>
+     <string name="export_to_sim_summary">Exportovat na karty SIM <xliff:g id="sim_name">^1</xliff:g> až <xliff:g id="sim_number">^2</xliff:g></string>
++    <string name="export_to_account">Export kontaktů do účtu</string>
++    <string name="import_from_account">Import kontaktů z účtu</string>
++    <string name="dialog_export_account">Vyberte účet, kam proběhne export:</string>
++    <string name="dialog_import_account">Vyberte účet, odkud proběhne import:</string>
++    <string name="export_success">Export úspěšný</string>
++    <string name="export_fail">Export se nezdařil</string>
++    <string name="import_success">Import úspěšný</string>
++    <string name="import_fail">Import se nezdařil</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-da/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-da/strings.xml
+index 8f38b23..bfaf026 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-da/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-da/strings.xml
+@@ -268,5 +268,12 @@
+     <string name="ipcall_dialog_edit_hint">Indtast IP-præfiks</string>
+     <string name="select_path">Vælg sti</string>
+     <string name="set_ip_number">indstil IP-nummer</string>
+-
++    <string name="export_to_account">Eksporter kontakter til konto</string>
++    <string name="import_from_account">Importer kontakter fra konto</string>
++    <string name="dialog_export_account">Vælg den konto, der skal eksporteres til:</string>
++    <string name="dialog_import_account">Vælg den konto, der skal importeres fra:</string>
++    <string name="export_success">Eksport lykkedes</string>
++    <string name="export_fail">Eksport mislykkedes</string>
++    <string name="import_success">Import lykkedes</string>
++    <string name="import_fail">Import mislykkedes</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-de/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-de/strings.xml
+index 93a4fa0..8be5f06 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-de/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-de/strings.xml
+@@ -266,4 +266,12 @@
+ <string name="select_path">Pfad auswählen</string>
+     <string name="export_to_sim_summary_no_number">Exportieren auf SIM <xliff:g id="sim_name">%1$s</xliff:g></string>
+     <string name="export_to_sim_summary">Exportieren auf SIM <xliff:g id="sim_name">^1</xliff:g> – <xliff:g id="sim_number">^2</xliff:g></string>
++    <string name="export_to_account">Kontakte in Konto exportieren</string>
++    <string name="import_from_account">Kontakte aus Konto importieren</string>
++    <string name="dialog_export_account">Wählen Sie das Konto, in das exportiert werden soll:</string>
++    <string name="dialog_import_account">Wählen Sie das Konto, aus dem importiert werden soll:</string>
++    <string name="export_success">Export erfolgreich</string>
++    <string name="export_fail">Export fehlgeschlagen</string>
++    <string name="import_success">Import erfolgreich</string>
++    <string name="import_fail">Import fehlgeschlagen</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-el/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-el/strings.xml
+index b234c08..c9a803e 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-el/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-el/strings.xml
+@@ -266,4 +266,12 @@
+     <string name="select_path">Επιλογή διαδρομής</string>
+     <string name="export_to_sim_summary">Εξαγωγή στη SIM <xliff:g id="sim_name">^1</xliff:g> - <xliff:g id="sim_number">^2</xliff:g></string>
+     <string name="export_to_sim_summary_no_number">Εξαγωγή στη SIM <xliff:g id="sim_name">%1$s</xliff:g></string>
++    <string name="export_to_account">Εξαγωγή επαφών σε λογαριασμό</string>
++    <string name="import_from_account">Εισαγωγή επαφών από λογαριασμό</string>
++    <string name="dialog_export_account">Επιλογή λογαριασμού για εξαγωγή:</string>
++    <string name="dialog_import_account">Επιλογή λογαριασμού για εισαγωγή:</string>
++    <string name="export_success">Επιτυχής εξαγωγή</string>
++    <string name="export_fail">Αποτυχία εξαγωγής</string>
++    <string name="import_success">Επιτυχής εισαγωγή</string>
++    <string name="import_fail">Αποτυχία εισαγωγής</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-es-rUS/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-es-rUS/strings.xml
+old mode 100644
+new mode 100755
+index 873545f..af72e7c
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-es-rUS/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-es-rUS/strings.xml
+@@ -255,4 +255,12 @@
+     <string name="send_and_call_button" msgid="7459507823002185202">"ENVIAR Y LLAMAR"</string>
+     <string name="call_subject_limit" msgid="4746194916585506281">"<xliff:g id="COUNT">%1$s</xliff:g>/<xliff:g id="LIMIT">%2$s</xliff:g>"</string>
+     <string name="call_subject_type_and_number" msgid="517676698821671164">"<xliff:g id="TYPE">%1$s</xliff:g> • <xliff:g id="NUMBER">%2$s</xliff:g>"</string>
++    <string name="export_to_account">Exportar contactos a la cuenta</string>
++    <string name="import_from_account">Importar contactos desde la cuenta</string>
++    <string name="dialog_export_account">Elegir cuenta para exportar hacia:</string>
++    <string name="dialog_import_account">Elegir cuenta para importar desde:</string>
++    <string name="export_success">Exportación correcta</string>
++    <string name="export_fail">No fue posible exportar</string>
++    <string name="import_success">Importación correcta</string>
++    <string name="import_fail">No fue posible importar</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-es/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-es/strings.xml
+index a4fa172..46d6fc2 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-es/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-es/strings.xml
+@@ -266,4 +266,12 @@
+ <string name="select_path">Seleccionar ruta</string>
+     <string name="export_to_sim_summary_no_number">Exportar a la tarjeta SIM <xliff:g id="sim_name">%1$s</xliff:g></string>
+     <string name="export_to_sim_summary">Exportar a la tarjeta SIM <xliff:g id="sim_name">^1</xliff:g> - <xliff:g id="sim_number">^2</xliff:g></string>
++    <string name="export_to_account">Exportar contactos a la cuenta</string>
++    <string name="import_from_account">Importar contactos desde la cuenta</string>
++    <string name="dialog_export_account">Elegir cuenta para exportar hacia:</string>
++    <string name="dialog_import_account">Elegir cuenta para importar desde:</string>
++    <string name="export_success">Exportación correcta</string>
++    <string name="export_fail">No fue posible exportar</string>
++    <string name="import_success">Importación correcta</string>
++    <string name="import_fail">No fue posible importar</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-et-rEE/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-et-rEE/strings.xml
+index 696c0df..492a0b2 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-et-rEE/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-et-rEE/strings.xml
+@@ -268,5 +268,12 @@
+     <string name="ipcall_dialog_edit_hint">Sisestage IP-prefiks</string>
+     <string name="select_path">Valige tee</string>
+     <string name="set_ip_number">Määra IP-number</string>
+-
++    <string name="export_to_account">Ekspordi kontaktid kontole</string>
++    <string name="import_from_account">Impordi kontaktid kontole</string>
++    <string name="dialog_export_account">Valige konto kuhu eksportida:</string>
++    <string name="dialog_import_account">Valige konto kust importida:</string>
++    <string name="export_success">Eksportimine õnnestus</string>
++    <string name="export_fail">Eksportimine ebaõnnestus</string>
++    <string name="import_success">Importimine õnnestus</string>
++    <string name="import_fail">Importimine ebaõnnestus</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-fi/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-fi/strings.xml
+index 335969c..c048763 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-fi/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-fi/strings.xml
+@@ -268,5 +268,12 @@
+     <string name="no_ip_number_on_sim_card">Ei IP-numeroa SIM-kortilla</string>
+     <string name="select_path">Valitse polku</string>
+     <string name="set_ip_number">Määritä IP-numero</string>
+-
++    <string name="export_to_account">Vie yhteystiedot tilille</string>
++    <string name="import_from_account">Tuo yhteystiedot tililtä</string>
++    <string name="dialog_export_account">Valitse tili, jolle viedään:</string>
++    <string name="dialog_import_account">Valitse tili, jolta tuodaan:</string>
++    <string name="export_success">Vienti onnistui</string>
++    <string name="export_fail">Vienti epäonnistui</string>
++    <string name="import_success">Tuonti onnistui</string>
++    <string name="import_fail">Tuonti epäonnistui</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-fr/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-fr/strings.xml
+index 6f9be9c..033ac4a 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-fr/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-fr/strings.xml
+@@ -266,4 +266,12 @@
+     <string name="manage_sim_contacts"> Gérer les contacts de la carte SIM</string>
+     <string name="export_to_sim_summary">Exporter vers la carte SIM <xliff:g id="sim_name">^1</xliff:g> - <xliff:g id="sim_number">^2</xliff:g></string>
+     <string name="export_to_sim_summary_no_number">Exporter vers la carte SIM<xliff:g id="sim_name">%1$s</xliff:g></string>
++    <string name="export_to_account">Exporter les contacts vers le compte</string>
++    <string name="import_from_account">Importer des contacts vers le compte</string>
++    <string name="dialog_export_account">Choisir le compte sur lequel effectuer l\'exportation :</string>
++    <string name="dialog_import_account">Choisir le compte pour l\'importation :</string>
++    <string name="export_success">Exportation réussie</string>
++    <string name="export_fail">Échec de l\'exportation</string>
++    <string name="import_success">Importation réussie</string>
++    <string name="import_fail">Échec de l\'importation</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-hr/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-hr/strings.xml
+index da6f99b..f70af76 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-hr/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-hr/strings.xml
+@@ -268,4 +268,12 @@
+ 
+     <string name="export_to_sim_summary_no_number">Izvezi na SIM <xliff:g id="sim_name">%1$s</xliff:g></string>
+     <string name="export_to_sim_summary">Izvezi na SIM <xliff:g id="sim_name">^1</xliff:g> - <xliff:g id="sim_number">^2</xliff:g></string>
++    <string name="export_to_account">Izvoz kontakata na račun</string>
++    <string name="import_from_account">Uvoz kontakata s računa</string>
++    <string name="dialog_export_account">Odaberite račun na koji želite izvesti datoteke:</string>
++    <string name="dialog_import_account">Odaberite račun s kojeg želite uvesti datoteke:</string>
++    <string name="export_success">Izvoz je uspio</string>
++    <string name="export_fail">Izvoz nije uspio</string>
++    <string name="import_success">Uvoz je uspio</string>
++    <string name="import_fail">Uvoz nije uspio</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-hu/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-hu/strings.xml
+index d0ac1bd..571997d 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-hu/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-hu/strings.xml
+@@ -266,4 +266,12 @@
+     <string name="select_path">Útvonal kijelölése</string>
+     <string name="export_to_sim_summary_no_number">Exportálás SIM-re: <xliff:g id="sim_name">%1$s</xliff:g></string>
+     <string name="export_to_sim_summary">Exportálás SIM-re: <xliff:g id="sim_name">^1</xliff:g> – <xliff:g id="sim_number">^2</xliff:g></string>
++    <string name="export_to_account">Névjegyek exportálása fiókba</string>
++    <string name="import_from_account">Névjegyek importálása fiókból</string>
++    <string name="dialog_export_account">Fiók kiválasztása, amelybe exportálni kíván:</string>
++    <string name="dialog_import_account">Fiók kiválasztása, amelyből importálni kíván:</string>
++    <string name="export_success">Exportálás sikeres</string>
++    <string name="export_fail">Exportálás sikertelen</string>
++    <string name="import_success">Importálás sikeres</string>
++    <string name="import_fail">Importálás sikertelen</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-it/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-it/strings.xml
+index 7c24698..862c74f 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-it/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-it/strings.xml
+@@ -267,4 +267,12 @@
+ 
+     <string name="export_to_sim_summary_no_number">Esporta su SIM <xliff:g id="sim_name">%1$s</xliff:g></string>
+     <string name="export_to_sim_summary">Esporta su SIM <xliff:g id="sim_name">^1</xliff:g> - <xliff:g id="sim_number">^2</xliff:g></string>
++    <string name="export_to_account">Esporta contatti su account</string>
++    <string name="import_from_account">Importa contatti da account</string>
++    <string name="dialog_export_account">Scegli account su cui esportare:</string>
++    <string name="dialog_import_account">Scegli account da cui importare:</string>
++    <string name="export_success">Esportazione riuscita</string>
++    <string name="export_fail">Esportazione non riuscita</string>
++    <string name="import_success">Importazione riuscita</string>
++    <string name="import_fail">Importazione non riuscita</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-iw/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-iw/strings.xml
+index 46cdc2c..a045c4f 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-iw/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-iw/strings.xml
+@@ -269,4 +269,12 @@
+ 
+     <string name="export_to_sim_summary_no_number">יצא לכרטיס ה-SIM <xliff:g id="sim_name">%1$s</xliff:g> – </string>
+     <string name="export_to_sim_summary">יצא לכרטיס ה-SIM <xliff:g id="sim_name">^1</xliff:g> – <xliff:g id="sim_number">^2</xliff:g>;</string>
++    <string name="export_to_account">יצוא אנשי קשר לחשבון</string>
++    <string name="import_from_account">יבוא אנשי קשר מחשבון</string>
++    <string name="dialog_export_account">בחר חשבון שאליו יש לייצא:</string>
++    <string name="dialog_import_account">בחר חשבון שממנו יש לייבא:</string>
++    <string name="export_success">היצוא בוצע בהצלחה</string>
++    <string name="export_fail">הייצוא נכשל</string>
++    <string name="import_success">הייבוא בוצע בהצלחה</string>
++    <string name="import_fail">היבוא נכשל</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-ja/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-ja/strings.xml
+index c351f23..b084166 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-ja/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-ja/strings.xml
+@@ -267,4 +267,12 @@
+ 
+     <string name="export_to_sim_summary_no_number">SIM <xliff:g id="sim_name">%1$s</xliff:g> へのエクスポート</string>
+     <string name="export_to_sim_summary">SIM <xliff:g id="sim_name">^1</xliff:g> - <xliff:g id="sim_number">^2</xliff:g> へのエクスポート</string>
++    <string name="export_to_account">連絡先を次のアカウントにエクスポート</string>
++    <string name="import_from_account">連絡先を次のアカウントからインポート</string>
++    <string name="dialog_export_account">エクスポート先のアカウントを選択:</string>
++    <string name="dialog_import_account">インポート元のアカウントを選択:</string>
++    <string name="export_success">エクスポートに成功しました</string>
++    <string name="export_fail">エクスポートが失敗しました</string>
++    <string name="import_success">インポートに成功しました</string>
++    <string name="import_fail">インポートが失敗しました</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-ko/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-ko/strings.xml
+index f20f9d0..908ae1f 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-ko/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-ko/strings.xml
+@@ -268,5 +268,12 @@
+     <string name="no_ip_number_on_sim_card">SIM 카드에 IP 번호 없음</string>
+     <string name="select_path">경로 선택</string>
+     <string name="set_ip_number">IP 번호 설정</string>
+-
++    <string name="export_to_account">계정에 연락처 내보내기</string>
++    <string name="import_from_account">계정에서 연락처를 가져오시겠습니까</string>
++    <string name="dialog_export_account">다음에 내보낼 계정 선택:</string>
++    <string name="dialog_import_account">다음에서 가져올 계정 선택:</string>
++    <string name="export_success">내보내기 성공</string>
++    <string name="export_fail">내보내기 실패</string>
++    <string name="import_success">가져오기 성공</string>
++    <string name="import_fail">가져오기 실패</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-lt/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-lt/strings.xml
+index b97e1c7..9769e1b 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-lt/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-lt/strings.xml
+@@ -268,4 +268,12 @@
+ 	<string name="ipcall_dialog_edit_hint">Įveskite IP prefiksą</string>
+ 	<string name="select_path">Pasirinkite kelią</string>
+ 	<string name="set_ip_number">Nustatyti IP numerį</string>
++    <string name="export_to_account">Eksportuoti kontaktus į paskyrą</string>
++    <string name="import_from_account">Importuoti kontaktus iš paskyros</string>
++    <string name="dialog_export_account">Pasirinkti paskyrą eksportavimui:</string>
++    <string name="dialog_import_account">Pasirinkti paskyrą importavimui:</string>
++    <string name="export_success">Eksportuoti pavyko</string>
++    <string name="export_fail">Eksportuoti nepavyko</string>
++    <string name="import_success">Importuoti pavyko</string>
++    <string name="import_fail">Importuoti nepavyko</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-lv/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-lv/strings.xml
+index abdc455..6a1a374 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-lv/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-lv/strings.xml
+@@ -268,4 +268,12 @@
+ 	<string name="ipcall_dialog_edit_hint">Lūdzu, ievadiet IP prefiksu</string>
+ 	<string name="select_path">Atlasīt ceļu</string>
+ 	<string name="set_ip_number">Iestatīt IP numuru</string>
++    <string name="export_to_account">Eksportēt kontaktus uz kontu</string>
++    <string name="import_from_account">Importēt kontaktus no konta</string>
++    <string name="dialog_export_account">Izvēlieties kontu uz kuru eksportēt:</string>
++    <string name="dialog_import_account">Izvēlieties kontu no kura eksportēt:</string>
++    <string name="export_success">Eksportēšana izdevusies</string>
++    <string name="export_fail">Eksportēšana nav izdevusies</string>
++    <string name="import_success">Importēšana izdevusies</string>
++    <string name="import_fail">Importēšana nav izdevusies</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-nb/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-nb/strings.xml
+index 334ae9a..328ec7a 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-nb/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-nb/strings.xml
+@@ -266,4 +266,12 @@
+ 	<string name="ipcall_dialog_edit_hint">Angi IP-prefiks</string>
+ 	<string name="select_path">Velg bane</string>
+ 	<string name="set_ip_number">Angi IP-nummer</string>
++    <string name="export_to_account">Eksporter kontakter til konto</string>
++    <string name="import_from_account">Importer kontakter fra konto</string>
++    <string name="dialog_export_account">Velg kontoen du vil eksportere til:</string>
++    <string name="dialog_import_account">Velg kontoen du vil eksportere fra:</string>
++    <string name="export_success">Vellykket eksport</string>
++    <string name="export_fail">Eksport mislyktes</string>
++    <string name="import_success">Vellykket import</string>
++    <string name="import_fail">Import mislyktes</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-nl/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-nl/strings.xml
+index c9b44bba..137f54c 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-nl/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-nl/strings.xml
+@@ -266,4 +266,12 @@
+     <string name="ipcall_dialog_edit_hint">Voer IP-prefix in</string>
+     <string name="select_path">Selecteer pad</string>
+     <string name="set_ip_number">IP-nummer instellen</string>
++    <string name="export_to_account">Contacten exporteren naar account</string>
++    <string name="import_from_account">Contacten importeren van account</string>
++    <string name="dialog_export_account">Account kiezen om naar te exporteren:</string>
++    <string name="dialog_import_account">Account kiezen om van te importeren:</string>
++    <string name="export_success">Exporteren geslaagd</string>
++    <string name="export_fail">Exporteren mislukt</string>
++    <string name="import_success">Importeren geslaagd</string>
++    <string name="import_fail">Importeren mislukt</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-pl/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-pl/strings.xml
+index 960f178..da332f5 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-pl/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-pl/strings.xml
+@@ -269,4 +269,12 @@
+ 
+     <string name="export_to_sim_summary_no_number">Eksport na kartę SIM <xliff:g id="sim_name">%1$s</xliff:g></string>
+     <string name="export_to_sim_summary">Eksport na kartę SIM <xliff:g id="sim_name">^1</xliff:g> - <xliff:g id="sim_number">^2</xliff:g></string>
++    <string name="export_to_account">Eksportuj kontakty do konta</string>
++    <string name="import_from_account">Importuj kontakty z konta</string>
++    <string name="dialog_export_account">Wybierz konto docelowe eksportu:</string>
++    <string name="dialog_import_account">Wybierz konto źródłowe importu:</string>
++    <string name="export_success">Wyeksportowano</string>
++    <string name="export_fail">Eksport nie powiódł się</string>
++    <string name="import_success">Zaimportowano</string>
++    <string name="import_fail">Import nie powiódł się</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-pt/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-pt/strings.xml
+index 6db3fde..d28b903 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-pt/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-pt/strings.xml
+@@ -266,4 +266,12 @@
+     <string name="no_ip_number_on_sim_card">Sem número IP no cartão SIM</string>
+     <string name="select_path">Selecionar caminho</string>
+     <string name="set_ip_number">Definir número IP</string>
++    <string name="export_to_account">Exportar contactos para a conta</string>
++    <string name="import_from_account">Importar contactos da conta</string>
++    <string name="dialog_export_account">Escolher conta para a qual pretende exportar:</string>
++    <string name="dialog_import_account">Escolher conta da qual pretende importar:</string>
++    <string name="export_success">Exportados com êxito</string>
++    <string name="export_fail">Falha ao exportar</string>
++    <string name="import_success">Importados com êxito</string>
++    <string name="import_fail">Falha ao importar</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-ro/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-ro/strings.xml
+index 771297e..5f22fb7 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-ro/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-ro/strings.xml
+@@ -268,4 +268,12 @@
+ 
+     <string name="export_to_sim_summary_no_number">Exportul pe cartela SIM <xliff:g id="sim_name">%1$s</xliff:g></string>
+     <string name="export_to_sim_summary">Exportul pe cartela SIM <xliff:g id="sim_name">^1</xliff:g> - <xliff:g id="sim_number">^2</xliff:g></string>
++    <string name="export_to_account">Exportaţi contactele în contul</string>
++    <string name="import_from_account">Importaţi contactele din contul</string>
++    <string name="dialog_export_account">Alegeţi contul în care să exportaţi:</string>
++    <string name="dialog_import_account">Alegeţi contul din care să importaţi:</string>
++    <string name="export_success">Export realizat cu succes</string>
++    <string name="export_fail">Export eşuat</string>
++    <string name="import_success">Import realizat cu succes</string>
++    <string name="import_fail">Import eşuat</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-ru/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-ru/strings.xml
+index 8266cd7..126eb56 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-ru/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-ru/strings.xml
+@@ -268,5 +268,12 @@
+ <string name="select_path">Выберите путь</string>
+     <string name="export_to_sim_summary_no_number">Экспорт на SIM-карту: <xliff:g id="sim_name">%1$s</xliff:g></string>
+     <string name="export_to_sim_summary">Экспорт на SIM-карту: <xliff:g id="sim_name">^1</xliff:g> — <xliff:g id="sim_number">^2</xliff:g></string>
+-
++    <string name="export_to_account">Экспорт контактов в учетную запись</string>
++    <string name="import_from_account">Импорт контактов из учетной записи</string>
++    <string name="dialog_export_account">Выбор учетной записи для экспорта:</string>
++    <string name="dialog_import_account">Выбор учетной записи для импорта:</string>
++    <string name="export_success">Экспорт выполнен</string>
++    <string name="export_fail">Сбой экспорта</string>
++    <string name="import_success">Импорт выполнен</string>
++    <string name="import_fail">Сбой импорта</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-sk/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-sk/strings.xml
+index 9d380e9..023e4f7 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-sk/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-sk/strings.xml
+@@ -268,5 +268,12 @@
+     <string name="select_path">Výber cesty</string>
+     <string name="export_to_sim_summary_no_number">Exportovať na kartu SIM <xliff:g id="sim_name">%1$s</xliff:g></string>
+     <string name="export_to_sim_summary">Exportovať na kartu SIM<xliff:g id="sim_name">^1</xliff:g> – <xliff:g id="sim_number">^2</xliff:g></string>
+-
++    <string name="export_to_account">Exportovať kontakty na konto</string>
++    <string name="import_from_account">Importovať kontakty z konta</string>
++    <string name="dialog_export_account">Zvoliť konto, na ktoré sa má exportovať:</string>
++    <string name="dialog_import_account">Zvoliť konto, z ktorého sa má importovať:</string>
++    <string name="export_success">Exportovanie prebehlo úspešne</string>
++    <string name="export_fail">Exportovanie zlyhalo</string>
++    <string name="import_success">Importovanie prebehlo úspešne</string>
++    <string name="import_fail">Importovanie zlyhalo</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-sl/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-sl/strings.xml
+index ebae0bf..3f39048 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-sl/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-sl/strings.xml
+@@ -268,5 +268,12 @@
+     <string name="select_path">Izberi pot</string>
+     <string name="export_to_sim_summary_no_number">Izvozi na kartico SIM <xliff:g id="sim_name">%1$s</xliff:g>.</string>
+     <string name="export_to_sim_summary">Izvozi na kartico SIM <xliff:g id="sim_name">^1</xliff:g> – <xliff:g id="sim_number">^2</xliff:g>.</string>
+-
++    <string name="export_to_account">Izvozi stike v račun</string>
++    <string name="import_from_account">Uvozi stike iz računa</string>
++    <string name="dialog_export_account">Izberi račun za izvoz:</string>
++    <string name="dialog_import_account">Izberi račun za uvoz:</string>
++    <string name="export_success">Izvoz je uspel.</string>
++    <string name="export_fail">Izvoz ni uspel.</string>
++    <string name="import_success">Uvoz je uspel.</string>
++    <string name="import_fail">Uvoz ni uspel.</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-sr/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-sr/strings.xml
+index 1addb9c..a189a5d 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-sr/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-sr/strings.xml
+@@ -267,4 +267,12 @@
+     <string name="no_ip_number_on_sim_card">Na SIM kartici nema podešenog IP broja</string>
+     <string name="select_path">Izaberite putanju</string>
+     <string name="set_ip_number">Podesite IP broj</string>
++    <string name="export_to_account">Izvezi kontakte u nalog</string>
++    <string name="import_from_account">Uvezi kontakte iz naloga</string>
++    <string name="dialog_export_account">Izaberi nalog za izvoz:</string>
++    <string name="dialog_import_account">Izaberi nalog za uvoz:</string>
++    <string name="export_success">Izvoz uspešan</string>
++    <string name="export_fail">Izvoz nije uspeo</string>
++    <string name="import_success">Uvoz uspešan</string>
++    <string name="import_fail">Uvoz nije uspeo</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-sv/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-sv/strings.xml
+index e524657..fc73b3a 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-sv/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-sv/strings.xml
+@@ -266,5 +266,12 @@
+     <string name="no_ip_number_on_sim_card">Inget IP-nummer på SIM-kortet</string>
+     <string name="select_path">Välj sökväg</string>
+     <string name="set_ip_number">Ange IP-nummer</string>
+-
++    <string name="export_to_account">Exportera kontakter till konto</string>
++    <string name="import_from_account">Importera kontakter från konto</string>
++    <string name="dialog_export_account">Välj kontot du vill exportera till:</string>
++    <string name="dialog_import_account">Välj kontot du vill importera från:</string>
++    <string name="export_success">Export genomfördes</string>
++    <string name="export_fail">Export misslyckades</string>
++    <string name="import_success">Importen genomfördes</string>
++    <string name="import_fail">Importen misslyckades</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-tr/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-tr/strings.xml
+index 94137bc..91074e7 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-tr/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-tr/strings.xml
+@@ -266,5 +266,12 @@
+     <string name="select_path">Yolu Seçin</string>
+     <string name="export_to_sim_summary">SIM <xliff:g id="sim_name">^1</xliff:g> - <xliff:g id="sim_number">^2</xliff:g> kartına aktar</string>
+     <string name="export_to_sim_summary_no_number">SIM <xliff:g id="sim_name">%1$s</xliff:g> kartına aktar</string>
+-
++    <string name="export_to_account">Kişileri hesaba aktar</string>
++    <string name="import_from_account">Hesaptaki kişileri içe aktar</string>
++    <string name="dialog_export_account">Dışa aktarılacak hesabı seçin:</string>
++    <string name="dialog_import_account">İçe aktarılacak hesabı seçin:</string>
++    <string name="export_success">Dışa aktarma başarılı</string>
++    <string name="export_fail">Dışa aktarma başarısız</string>
++    <string name="import_success">İçe aktarma başarılı</string>
++    <string name="import_fail">İçe aktarma başarısız</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-uk/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-uk/strings.xml
+index c335d23..40ade64 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-uk/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-uk/strings.xml
+@@ -269,4 +269,12 @@
+ 
+     <string name="export_to_sim_summary">Експортувати до SIM-карти <xliff:g id="sim_name">^1</xliff:g> – <xliff:g id="sim_number">^2</xliff:g></string>
+     <string name="export_to_sim_summary_no_number">Експортувати до SIM-карти <xliff:g id="sim_name">%1$s</xliff:g></string>
++    <string name="export_to_account">Експортувати контакти до облікового запису</string>
++    <string name="import_from_account">Імпортувати контакти з облікового запису</string>
++    <string name="dialog_export_account">Вибрати обліковий запис для експорту:</string>
++    <string name="dialog_import_account">Вибрати обліковий запис для імпорту:</string>
++    <string name="export_success">Експорт успішно виконано</string>
++    <string name="export_fail">Збій експорту</string>
++    <string name="import_success">Імпорт успішно виконано</string>
++    <string name="import_fail">Збій імпорту</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-ur-rPK/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-ur-rPK/strings.xml
+index 326023d..db41bac 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-ur-rPK/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-ur-rPK/strings.xml
+@@ -267,5 +267,12 @@
+     <string name="no_ip_number_on_sim_card">SIM کارڈ پر کوئی IP نمبر نہیں ہے</string>
+     <string name="set_ip_number">IP نمبر سیٹ کریں</string>
+     <string name="ipcall_dialog_title">IP کال سیٹنگ</string>
+-
++    <string name="export_to_account">روابط اکاؤنٹ میں برآمد کریں</string>
++    <string name="import_from_account">اکاؤنٹ کے روابط درآمد کریں</string>
++    <string name="dialog_export_account">برآمد کرنے لیے اکاؤنٹ منتخب کریں:</string>
++    <string name="dialog_import_account">درآمد کرنے کے لیے اکاؤنٹ منتخب کریں:</string>
++    <string name="export_success">برآمد کامیاب ہوگيا</string>
++    <string name="export_fail">برآمد ناکام ہوگیا</string>
++    <string name="import_success">درآمد کامیاب ہوگيا</string>
++    <string name="import_fail">درآمد ناکام ہوگیا</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-zh-rCN/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-zh-rCN/strings.xml
+index 3cca4a2..0e3769e 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-zh-rCN/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-zh-rCN/strings.xml
+@@ -264,4 +264,12 @@
+     <string name="export_to_sim">"导出到 SIM 卡"</string>
+ <string name="manage_sim_contacts">SIM卡管理</string>
+ <string name="export_to_sim_summary_no_number">导出到SIM卡“<xliff:g id="sim_name">%1$s</xliff:g>”</string>
++    <string name="import_from_account">"从账户导入到本地"</string>
++    <string name="export_to_account">"从本地导出到帐户"</string>	
++    <string name="dialog_import_account">选择要导入的账户:</string>
++    <string name="dialog_export_account">选择要导出的账户：</string>
++    <string name="export_success">已成功导出联系人</string>
++    <string name="import_success">已成功导入联系人</string>
++    <string name="export_fail">导出联系人失败</string>
++    <string name="import_fail">导入联系人失败</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-zh-rHK/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-zh-rHK/strings.xml
+index 5bcab43..cefa9b8 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-zh-rHK/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-zh-rHK/strings.xml
+@@ -266,4 +266,12 @@
+     <string name="export_to_sim">匯出至 SIM 卡</string>
+     <string name="export_to_sim_summary">匯出至 SIM <xliff:g id="sim_name">^1</xliff:g> - <xliff:g id="sim_number">^2</xliff:g></string>
+     <string name="export_to_sim_summary_no_number">匯出至 SIM <xliff:g id="sim_name">%1$s</xliff:g></string>
++    <string name="export_to_account">將聯絡人匯出至帳戶</string>
++    <string name="import_from_account">從帳戶匯入聯絡人</string>
++    <string name="dialog_export_account">選擇要匯出的帳戶：</string>
++    <string name="dialog_import_account">選擇要匯入的帳戶：</string>
++    <string name="export_success">匯出成功</string>
++    <string name="export_fail">匯出失敗</string>
++    <string name="import_success">匯入成功</string>
++    <string name="import_fail">匯入失敗</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values-zh-rTW/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values-zh-rTW/strings.xml
+index ba05608..01bfd52 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values-zh-rTW/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values-zh-rTW/strings.xml
+@@ -266,4 +266,12 @@
+     <string name="export_to_sim">匯出至 SIM 卡</string>
+     <string name="export_to_sim_summary">匯出至 SIM <xliff:g id="sim_name">^1</xliff:g> - <xliff:g id="sim_number">^2</xliff:g></string>
+     <string name="export_to_sim_summary_no_number">匯出至 SIM <xliff:g id="sim_name">%1$s</xliff:g></string>
++    <string name="import_from_account">從帳戶匯入聯絡人</string>
++    <string name="export_to_account">將聯絡人匯出至帳戶</string>	
++    <string name="dialog_import_account">選擇要匯入的帳戶：</string>
++    <string name="dialog_export_account">選擇要匯出的帳戶：</string>
++    <string name="export_success">匯出成功</string>
++    <string name="import_success">匯入成功</string>
++    <string name="export_fail">匯出失敗</string>
++    <string name="import_fail">匯入失敗</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/res/values/strings.xml b/LINUX/android/packages/apps/ContactsCommon/res/values/strings.xml
+index a630203..5e4b2b2 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/res/values/strings.xml
++++ b/LINUX/android/packages/apps/ContactsCommon/res/values/strings.xml
+@@ -791,5 +791,12 @@ a        ren't members of any other group. [CHAR LIMIT=25] -->
+     <string name="ipcall_dialog_title">IP call setting</string>
+     <string name="ipcall_dialog_edit_hint">Please input the IP prefix</string>
+     <string name="select_path">Select Path</string>
+-	
++    <string name="import_from_account">"Import from account"</string>
++    <string name="export_to_account">"Export to account"</string>	
++    <string name="dialog_import_account">Choose account to import from:</string>
++    <string name="dialog_export_account">Choose account to export to:</string>
++    <string name="export_success">Export successful</string>
++    <string name="import_success">Import successful</string>
++    <string name="export_fail">Export failed</string>
++    <string name="import_fail">Import failed</string>
+ </resources>
+diff --git a/LINUX/android/packages/apps/ContactsCommon/src/com/android/contacts/common/interactions/ImportExportDialogFragment.java b/LINUX/android/packages/apps/ContactsCommon/src/com/android/contacts/common/interactions/ImportExportDialogFragment.java
+index ba9f233..8f15f7c 100755
+--- a/LINUX/android/packages/apps/ContactsCommon/src/com/android/contacts/common/interactions/ImportExportDialogFragment.java
++++ b/LINUX/android/packages/apps/ContactsCommon/src/com/android/contacts/common/interactions/ImportExportDialogFragment.java
+@@ -55,7 +55,28 @@ import com.android.contacts.common.vcard.VCardCommonArguments;
+ import com.android.contacts.commonbind.analytics.AnalyticsUtil;
+ 
+ import java.util.List;
+-
++import android.os.SystemProperties;
++import android.provider.ContactsContract.RawContacts;
++import android.provider.ContactsContract.RawContactsEntity;
++import android.content.Entity;
++import android.content.Entity.NamedContentValues;
++import android.content.EntityIterator;
++import android.provider.ContactsContract.Data;
++import java.util.Map;
++import android.content.ContentResolver;
++import android.content.ContentValues;
++import java.util.HashMap;
++import java.util.Map;
++import java.util.ArrayList;
++import android.content.ContentProviderOperation;
++import android.provider.ContactsContract;
++import android.os.RemoteException;
++import android.content.OperationApplicationException;
++import android.os.Message;
++import android.os.Handler;
++import android.app.Notification;
++import android.app.NotificationManager;
++import android.os.UserHandle;
+ /**
+  * An dialog invoked to import/export contacts.
+  */
+@@ -69,9 +90,11 @@ public class ImportExportDialogFragment extends DialogFragment
+     private final String[] LOOKUP_PROJECTION = new String[] {
+             Contacts.LOOKUP_KEY
+     };
+-
+     private SubscriptionManager mSubscriptionManager;
+-
++    private static Activity mActivity;
++    static private Handler handler = null;
++    static NotificationManager mNotificationManager;
++    private static boolean isProcess = false;
+     /** Preferred way to show this dialog */
+     public static void show(FragmentManager fragmentManager, boolean contactsAreAvailable,
+             Class callingActivity) {
+@@ -91,13 +114,72 @@ public class ImportExportDialogFragment extends DialogFragment
+     @Override
+     public Dialog onCreateDialog(Bundle savedInstanceState) {
+         // Wrap our context to inflate list items using the correct theme
++        mNotificationManager = (NotificationManager) getActivity().getSystemService(
++                Context.NOTIFICATION_SERVICE);
++        handler = new Handler() {
++            @Override
++            public void handleMessage(Message msg) {
++                // TODO Auto-generated method stub
++                switch (msg.what) {
++                case 0:
++                    int icon = android.R.drawable.stat_sys_upload;
++                    if(1 == msg.arg1) {
++                        notiText = mActivity.getString(R.string.import_success);
++                    }
++                    else {
++                        notiText = mActivity.getString(R.string.import_fail);
++                    }
++                    Notification notification = new Notification.Builder(mActivity)
++                        .setSmallIcon(icon)
++                        .setWhen(0)
++                        .setOngoing(false)
++                        .setTicker(notiText)
++                        .setDefaults(0)  // please be quiet
++                        .setPriority(Notification.PRIORITY_LOW)
++                        .setColor(mActivity.getColor(
++                                com.android.internal.R.color.system_notification_accent_color))
++                        .setContentTitle(notiText)
++                        .setVisibility(Notification.VISIBILITY_PUBLIC)
++                        .build();
++                    mNotificationManager.notifyAsUser("ImportExport", 0x123, notification, UserHandle.ALL);
++                    break;
++                case 1:
++                    int icon1 = android.R.drawable.stat_sys_download;
++                     if(1 == msg.arg1) {
++                        notiText = mActivity.getString(R.string.export_success);
++                    }
++                    else {
++                        notiText = mActivity.getString(R.string.export_fail);
++                    }
++                    Notification notification1 = new Notification.Builder(mActivity)
++                        .setSmallIcon(icon1)
++                        .setWhen(0)
++                        .setOngoing(false)
++                        .setTicker(notiText)
++                        .setDefaults(0)  // please be quiet
++                        .setPriority(Notification.PRIORITY_LOW)
++                        .setColor(mActivity.getColor(
++                                com.android.internal.R.color.system_notification_accent_color))
++                        .setContentTitle(notiText)
++                        .setVisibility(Notification.VISIBILITY_PUBLIC)
++                        .build();
++                    mNotificationManager.notifyAsUser("ImportExport", 0x123, notification1, UserHandle.ALL);
++                    break;
++                default:
++                    break;
++                }
++                super.handleMessage(msg);
++            }
++        };
++
++        
+         final Resources res = getActivity().getResources();
+         final LayoutInflater dialogInflater = (LayoutInflater)getActivity()
+                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+         final boolean contactsAreAvailable = getArguments().getBoolean(ARG_CONTACTS_ARE_AVAILABLE);
+         final String callingActivity = getArguments().getString(
+                 VCardCommonArguments.ARG_CALLING_ACTIVITY);
+-
++        mActivity = getActivity();
+         // Adapter that shows a list of string resources
+         final ArrayAdapter<AdapterEntry> adapter = new ArrayAdapter<AdapterEntry>(getActivity(),
+                 R.layout.select_dialog_item) {
+@@ -115,10 +197,17 @@ public class ImportExportDialogFragment extends DialogFragment
+                 (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
+ 
+         mSubscriptionManager = SubscriptionManager.from(getActivity());
+-
++        //add by qianyan for export/import account
++        AccountTypeManager accountTypes = AccountTypeManager.getInstance(getActivity());
++        List<AccountWithDataSet> accountListMail;
++        accountListMail = accountTypes.getAccounts(true, AccountTypeManager.FLAG_ALL_ACCOUNTS_WITHOUT_LOCAL);
+         if (res.getBoolean(R.bool.config_allow_import_from_vcf_file)) {
+             adapter.add(new AdapterEntry(getString(R.string.import_from_vcf_file),
+                     R.string.import_from_vcf_file));
++            if(accountListMail.size() > 0) {
++                adapter.add(new AdapterEntry(getString(R.string.import_from_account),
++                    R.string.import_from_account));
++            }
+         }
+         if (manager != null && res.getBoolean(R.bool.config_allow_sim_import)) {
+             List<SubscriptionInfo> subInfoRecords = null;
+@@ -152,6 +241,10 @@ public class ImportExportDialogFragment extends DialogFragment
+             if (contactsAreAvailable) {
+                 adapter.add(new AdapterEntry(getString(R.string.export_to_vcf_file),
+                         R.string.export_to_vcf_file));
++                if(accountListMail.size() > 0) {
++                    adapter.add(new AdapterEntry(getString(R.string.export_to_account),
++                        R.string.export_to_account));
++                }
+             }
+         }
+         if (res.getBoolean(R.bool.config_allow_share_visible_contacts)) {
+@@ -197,6 +290,17 @@ public class ImportExportDialogFragment extends DialogFragment
+                         startActivity(intent);
+                         break;
+                     }
++                    case R.string.import_from_account:
++                    case R.string.export_to_account: {
++                        if(!isProcess) {
++                            dismissDialog = handleImportRequest(resId, -1);
++                        } else {
++                            Toast.makeText(getActivity(), com.android.internal.R.string.httpErrorTooManyRequests, Toast.LENGTH_SHORT)
++                                .show();
++                            dismissDialog = true;
++                        }
++                        break;
++                    }
+                     default: {
+                         dismissDialog = true;
+                         Log.e(TAG, "Unexpected resource: "
+@@ -279,7 +383,8 @@ public class ImportExportDialogFragment extends DialogFragment
+             args.putInt(KEY_RES_ID, resId);
+             args.putInt(KEY_SUBSCRIPTION_ID, subscriptionId);
+             //add by qianyan for LF7001QM_P000446
+-            if(!(resId == R.string.manage_sim_contacts) && !(resId == R.string.import_from_vcf_file)) {
++            if(!(resId == R.string.manage_sim_contacts) && !(resId == R.string.import_from_vcf_file) 
++                && !(resId == R.string.import_from_account) && !(resId == R.string.export_to_account)) {
+                 SelectAccountDialogFragment.show(
+                     getFragmentManager(), this,
+                     R.string.dialog_new_contact_account,
+@@ -292,25 +397,184 @@ public class ImportExportDialogFragment extends DialogFragment
+             }
+         }
+         //add by qianyan for import from vcard default local account
+-        if((resId == R.string.import_from_vcf_file) && size > 0) {
+-            AccountSelectionUtil.doImport(getActivity(), resId,
+-                accountList.get(0), subscriptionId);
++        Bundle args = new Bundle();
++        args.putInt(KEY_RES_ID, resId);
++        args.putInt(KEY_SUBSCRIPTION_ID, subscriptionId);
++        if(resId == R.string.import_from_vcf_file) {
++            FragmentManager fm = getFragmentManager();
++            if (fm != null && (fm.findFragmentByTag(SelectAccountDialogFragment.TAG) == null)) {
++                SelectAccountDialogFragment.show(
++                    getFragmentManager(), this,
++                    R.string.dialog_new_contact_account,
++                    AccountListFilter.ACCOUNTS_CONTACT_WRITABLE_WITHOUT_SIM, args);
++            }
++            return false;
++        } else if(resId == R.string.import_from_account) {
++            SelectAccountDialogFragment.show(
++                    getFragmentManager(), this,
++                    R.string.dialog_import_account,
++                    AccountListFilter.ACCOUNTS_CONTACT_WRITABLE_WITHOUT_PHONE, args);
++            return false;
++        } else if(resId == R.string.export_to_account) {
++            SelectAccountDialogFragment.show(
++                    getFragmentManager(), this,
++                    R.string.dialog_export_account,
++                    AccountListFilter.ACCOUNTS_CONTACT_WRITABLE_WITHOUT_PHONE, args);
++            return false;
++        } 
++        AccountSelectionUtil.doImport(getActivity(), resId,
++            (size == 1 ? accountList.get(0) : null), subscriptionId);        
++        return true; // Close the dialog.
++    }
++    //add by qianyan for import/export
++    static CharSequence notiText;
++    static boolean isImport;
++    private void ImportExport(AccountWithDataSet fromaccount, AccountWithDataSet toaccount){
++        String name = SystemProperties.get("ro.lenovo.series", "PHONE");
++        AccountWithDataSet local = new AccountWithDataSet(name, "com.android.localphone", null);
++        int icon;
++        if(fromaccount==null&&toaccount==null)
++            return;
++        if(fromaccount!=null&&toaccount!=null)
++            return;
++        if(fromaccount==null && toaccount!=null) {
++            fromaccount = local;
++            notiText = getString(R.string.exporting_contact_list_title);
++            icon = android.R.drawable.stat_sys_download;
++            isImport = true;
+         } else {
+-            AccountSelectionUtil.doImport(getActivity(), resId,
+-                (size == 1 ? accountList.get(0) : null), subscriptionId);
++            toaccount = local;
++            notiText = getString(R.string.importing_vcard_description, fromaccount.name);
++            icon = android.R.drawable.stat_sys_upload;
++            isImport = false;
+         }
+-        
+-        return true; // Close the dialog.
++         Notification notification = new Notification.Builder(mActivity)
++            .setSmallIcon(icon)
++            .setWhen(0)
++            .setOngoing(false)
++            .setTicker(notiText)
++            .setDefaults(0)  // please be quiet
++            .setPriority(Notification.PRIORITY_LOW)
++            .setColor(mActivity.getColor(
++                    com.android.internal.R.color.system_notification_accent_color))
++             .setContentTitle(notiText)
++            .setVisibility(Notification.VISIBILITY_PUBLIC)
++            .build();
++        doImportExport(fromaccount, toaccount);
++        mNotificationManager.notifyAsUser("ImportExport", 0x123, notification, UserHandle.ALL);
+     }
+ 
++    private void doImportExport(AccountWithDataSet fromaccount, AccountWithDataSet toaccount1) {
++        final String importexportWhere = RawContacts.ACCOUNT_TYPE + "=?  AND " + RawContacts.ACCOUNT_NAME + "=?";
++        final String[] args = new String[]{fromaccount.type, fromaccount.name};
++        final AccountWithDataSet toaccount = toaccount1;
++        Log.i("ImportExport", "start import export thread");
++        new Thread(new Runnable() {
++            public void run() {
++                Cursor contactsCursor = null;
++                try {
++                    ContentResolver mContentResolver = mActivity.getContentResolver();
++                    contactsCursor = mContentResolver.query(Contacts.CONTENT_URI, new String[] {Contacts._ID}, importexportWhere, args, null);
++                    while(contactsCursor.moveToNext()) {
++                        importOneContact(mContentResolver, contactsCursor.getLong(0), toaccount);
++                    }
++                    Message msg = new Message();
++                    if(isImport) {
++                        msg.what = 1;
++                    } else {
++                        msg.what = 0;
++                    }
++                    msg.arg1 = 1;
++                    handler.sendMessage(msg);
++                } catch(Exception e){
++                    Message msg = new Message();
++                    if(isImport) {
++                        msg.what = 1;
++                    } else {
++                        msg.what = 0;
++                    }
++                    msg.arg1 = 0;
++                    handler.sendMessage(msg);
++                }finally {
++                    if (contactsCursor != null) {
++                        contactsCursor.close();
++                    }
++                    isProcess = false;
++                }
++            }
++        }).start();
++    }
++    private void importOneContact(ContentResolver cr, long contactid, AccountWithDataSet toaccount) {
++        ContentResolver mContentResolver = cr;
++        EntityIterator entityIterator = null;
++        Uri uri = RawContactsEntity.CONTENT_URI;
++        String selection = Data.CONTACT_ID + "=?";
++        long contactId = contactid;
++        String[] selectionArgs = new String[] {String.valueOf(contactId)};
++        final Map<String, List<ContentValues>> contentValuesListMap =
++                new HashMap<String, List<ContentValues>>();
++        Cursor dataResult;
++
++        //insert one list
++        final ArrayList<ContentProviderOperation> operationList =
++            new ArrayList<ContentProviderOperation>();
++        ContentProviderOperation.Builder builder =
++            ContentProviderOperation.newInsert(RawContacts.CONTENT_URI);
++        builder.withValue(RawContacts.ACCOUNT_NAME, toaccount.name);
++        builder.withValue(RawContacts.ACCOUNT_TYPE, toaccount.type);
++        operationList.add(builder.build());
++        try {
++            entityIterator = RawContacts.newEntityIterator(mContentResolver.query(
++                            uri, null, selection, selectionArgs, null));
++            Cursor data = mContentResolver.query(
++                            uri, null, selection, selectionArgs, null);
++            while (entityIterator.hasNext()) {
++                Entity entity = entityIterator.next();
++                for (NamedContentValues namedContentValues : entity.getSubValues()) {
++                    ContentValues contentValues = namedContentValues.values;
++                    String key = contentValues.getAsString(Data.MIMETYPE);
++                    if("vnd.android.cursor.item/group_membership".equals(key))
++                        continue;
++                    contentValues.remove(Data._ID);
++                    if (key != null) {
++                        List<ContentValues> contentValuesList =
++                                contentValuesListMap.get(key);
++                            builder = ContentProviderOperation.newInsert(Data.CONTENT_URI);
++                            builder.withValueBackReference(Data.RAW_CONTACT_ID, 0);
++                            builder.withValues(contentValues);
++                            operationList.add(builder.build());
++                    }
++                }
++            }
++            Log.i("ImportExport", "test contentValues operationList=" + operationList);
++            mContentResolver.applyBatch(ContactsContract.AUTHORITY, operationList);
++        } catch (RemoteException e) {
++            Log.e("ImportExport", String.format("%s: %s", e.toString(), e.getMessage()));
++        } catch (OperationApplicationException e) {
++            Log.e("ImportExport", String.format("%s: %s", e.toString(), e.getMessage()));
++        }finally {
++            if (entityIterator != null) {
++                entityIterator.close();
++            }
++        }
++        
++     }
++    //end
+     /**
+      * Called when an account is selected on {@link SelectAccountDialogFragment}.
+      */
+     @Override
+     public void onAccountChosen(AccountWithDataSet account, Bundle extraArgs) {
+-        AccountSelectionUtil.doImport(getActivity(), extraArgs.getInt(KEY_RES_ID),
+-                account, extraArgs.getInt(KEY_SUBSCRIPTION_ID));
+-
++        if(extraArgs.getInt(KEY_RES_ID) == R.string.import_from_account) { 
++            ImportExport(account, null);
++            isProcess = true;
++        } else if(extraArgs.getInt(KEY_RES_ID) == R.string.export_to_account) {
++            isProcess = true;
++            ImportExport(null, account);
++        } else {
++            AccountSelectionUtil.doImport(getActivity(), extraArgs.getInt(KEY_RES_ID),
++                    account, extraArgs.getInt(KEY_SUBSCRIPTION_ID));
++        }
+         // At this point the dialog is still showing (which is why we can use getActivity() above)
+         // So close it.
+         dismiss();
+diff --git a/LINUX/android/packages/providers/MediaProvider/src/com/android/providers/media/MtpService.java b/LINUX/android/packages/providers/MediaProvider/src/com/android/providers/media/MtpService.java
+index e018e5e..8c5f7c6 100755
+--- a/LINUX/android/packages/providers/MediaProvider/src/com/android/providers/media/MtpService.java
++++ b/LINUX/android/packages/providers/MediaProvider/src/com/android/providers/media/MtpService.java
+@@ -96,7 +96,7 @@ public class MtpService extends Service {
+             synchronized (mBinder) {
+                 Log.d(TAG, "onStorageStateChanged " + path + " " + oldState + " -> " + newState);
+                 //add by qianyan for two mtp storage
+-                if(!oldState.equals(newState) && path.equals("/storage/emulated/0")) {
++                if(!oldState.equals(newState) || !path.equals("/storage/emulated/0")) {
+                     if (Environment.MEDIA_MOUNTED.equals(newState)) {
+                         volumeMountedLocked(path);
+                     } else if (Environment.MEDIA_MOUNTED.equals(oldState)) {
+diff --git a/LINUX/android/system/vold/Ext4Crypt.cpp b/LINUX/android/system/vold/Ext4Crypt.cpp
+old mode 100644
+new mode 100755
+index c337dbb..e223518
+--- a/LINUX/android/system/vold/Ext4Crypt.cpp
++++ b/LINUX/android/system/vold/Ext4Crypt.cpp
+@@ -582,12 +582,15 @@ static int e4crypt_set_user_policy(const char *mount_path, const char *user_hand
+ int e4crypt_create_new_user_dir(const char *user_handle, const char *path) {
+     SLOGD("e4crypt_create_new_user_dir(\"%s\", \"%s\")", user_handle, path);
+     if (mkdir(path, S_IRWXU | S_IRWXG | S_IXOTH) < 0) {
++        SLOGD("errno mkdir = %d", errno);
+         return -1;
+     }
+     if (chmod(path, S_IRWXU | S_IRWXG | S_IXOTH) < 0) {
++        SLOGD("errno chmod = %d", errno);
+         return -1;
+     }
+     if (chown(path, AID_SYSTEM, AID_SYSTEM) < 0) {
++        SLOGD("errno chown = %d", errno);
+         return -1;
+     }
+     if (e4crypt_crypto_complete(DATA_MNT_POINT) == 0) {
+-- 
+2.1.3
+

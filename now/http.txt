@@ -1,0 +1,47 @@
+10.31.99.57
+10.31.99.49
+组内SVN:http://10.31.99.17/btc/Brewster_doc/Android/03_Team Management/01_System_SH
+sparkl:http://10.31.99.17/btc/Brewster_doc/Project/Spark
+http://10.31.99.17/btc/Brewster_doc/Project/Phoebe/03_Requirement/01_Customer/PRD
+
+lesson learn
+http://10.31.99.17/btc/Brewster_doc/Project/Phoebe
+
+//添加设置语言
+在LINUX/android/device/qcom/common/common.mk PRODUCT_LOCALES := en_US es_US de_DE后面加zh_CN
+
+//setting的contentprovider
+base/core/java/android/provider
+
+
+//keyevent:
+Z:\lf4701\LINUX\android\frameworks\base\core\java\android\view
+
+
+驱动代码在LINUX\android\kernel\drivers\input\misc
+hal层在LINUX\android\hardware\qcom\sensors
+framework在Z:\lf4701\LINUX\android\frameworks\base\core\java\android\hardware
+
+
+linux\android\frameworks\base\core\java\android\content\Intent.java
+zgw：Z:\lf4701\LINUX\android\frameworks\base\packages\SystemUI\src\com\android\systemui\statusbar\phone\PhoneStatusBarPolicy.java
+
+//m-button
+PhoneWindowManager.java (linux\android\frameworks\base\policy\src\com\android\internal\policy\impl)
+
+//全编时自动编译app
+Z:\lf4701\LINUX\android\build\target\product
+
+
+//权限
+4701:LINUX\android\device\qcom\sepolicy\common\
+system_app.te
+spark:Z:\newsparkL\device\intel\baytrail\sepolicy
+4701:/out/target/common/obj/APPS/CtsSecurityTestCases_intermediates/assets/selinux_policy.xml
+
+\\10.31.99.15\共享临时2\qianyan
+
+
+
+
+

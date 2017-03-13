@@ -1,0 +1,4 @@
+java -jar signapk.jar platform.x509.pem platform.pk8 E:\ASdata\testIO\app\build\outputs\apk\unsignapk.apk signapk.apk
+查看apk签名：
+用解压工具打开apk，解压出META-INF/CERT.RSA，shell中用以下命令：
+keytool -printcert -file META-INF/CERT.RSA

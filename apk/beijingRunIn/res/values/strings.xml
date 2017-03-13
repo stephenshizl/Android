@@ -1,0 +1,38 @@
+<resources>
+
+    <string name="app_name">RunIn</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="test">Test</string>
+    <string name="test_result_title">RunIn测试结果</string>
+    <string name="usb_conn">请连接数据线开始RunIn测试！</string>
+    <string name="old_test">"正在进行电池的老化测试，RunIn测试会在电量在40%-45%之间是开始！"</string>
+
+    <string name="test_2h">2小时测试</string>
+    <string name="test_24h">24小时测试</string>
+    <string name="test_4h">4小时测试</string>
+    <string name="test_8h">8小时测试</string>
+    <string name="test_16h">16小时测试</string>
+    <string name="test_time">RunIn测试时间统计</string>
+    <string name="test_finish">完成</string>
+    <string name="test1">了：</string>
+    <string name="hour">时</string>
+    <string name="minute">分</string>
+    <string name="second">秒</string>
+    <!-- Begin zhang.lu7@byd.com add -->
+    <string name="runin">run-in测试</string>
+    <string name="pvt">pvt测试</string>
+    <string name="ss">ss测试</string>
+    <string name="finalString">final测试</string>
+    <string name="confirm">确定</string>
+    <string name="cancle">取消</string>
+    <string name="invalidString">设定的测试值不能为空</string>
+    <string name="runin_test_time">测试时间：</string>
+    <string name="runin_actual_test_time">实际测试时间：</string>
+    <string name="runin_test_result">测试结果：</string>
+    <string name="vibrator_test">振动测试中......</string>
+    <string name="spkrev_play">开始</string>
+    <string name="spkrev_stop">停止</string>
+    <!-- End -->
+</resources>

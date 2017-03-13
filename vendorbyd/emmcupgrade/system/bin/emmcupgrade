@@ -1,0 +1,48 @@
+#!/system/bin/sh
+info=$(cat /sys/bus/mmc/devices/mmc0:0001/manfid);
+manid="0x000015";
+cid="514531334d42";
+firmware="00000007000000000000000000000000 00000000000000000000000000000000";
+firmwareok="firmware version : 0xd";
+result="ffu_install ret 0";
+if [[ "$info" = "$manid" ]]; then
+    info=$(cat /sys/bus/mmc/devices/mmc0:0001/cid);
+    echo $info;
+    if [[ "${info:6:12}" = "$cid" ]]; then
+        info=$(cat /sys/bus/mmc/devices/mmc0:0001/firmware_version);
+        echo $info;
+        if [[ "$info" = "$firmware" ]]; then
+            info=$(echo 10000000 > /sys/kernel/debug/mmc0/clock && /system/bin/mmc_util_v02_2.bin emmc50v ffu /system/bin/FET_Venice_16GB_P13.bin /dev/block/mmcblk0);
+            echo $info;
+            if [[ $info = *$result* ]]; then
+                info=$(/system/bin/mmc_util_v02_2.bin fwver read /dev/block/mmcblk0);
+                if [[ "$info" = "$firmwareok" ]]; then              
+                    echo 1 > /data/upgrade;
+                else 
+                    echo "fail1";
+                    echo $info;                    
+                    echo 0 > /data/upgrade;
+                fi;    
+            else
+                echo "fail2";            
+                echo 0 > /data/upgrade;
+            fi;
+        else 
+            echo "do not upgrade3";
+            echo $info;
+            echo 1 > /data/upgrade;
+        fi;
+    else 
+        echo "do not upgrade2";
+        echo $info;
+        echo ${info:6:17};
+        echo $cid;
+        echo 1 > /data/upgrade;
+    fi;
+else
+    echo "do not upgrade1";
+    echo $info;
+    echo $manid;
+    echo 1 > /data/upgrade;
+fi;
+done;

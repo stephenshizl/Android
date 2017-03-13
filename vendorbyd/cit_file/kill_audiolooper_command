@@ -1,0 +1,22 @@
+#!/system/bin/sh
+
+LOG_FILE="/data/test/myrun.log";
+info=$(ps | grep "/system/bin/mm-audio-ftm"); 
+echo "$info" ;#> "$LOG_FILE";
+echo "$info" | while read user pid other; do 
+    #echo "readed" >> "$LOG_FILE";
+    if [[ -z "$pid" ]]; then
+        echo "pid is empty! please check it!";
+        #echo "pid is empty! please check it!" >> "$LOG_FILE";
+        continue;
+    fi;
+    #echo "KILL" >> "$LOG_FILE";
+    kill "$pid"; 
+    if [[ $? -eq 0 ]]; then
+        echo "success";
+        #echo "success" >> "$LOG_FILE";
+    else
+        echo "failed";
+        #echo "failed!" >> "$LOG_FILE";
+    fi;
+done;

@@ -1,0 +1,155 @@
+commit 9ff542b24317c38317d9120ce77393a2d60876fe
+Author: yangjie <yang.jie10@byd.com>
+Date:   Tue Aug 25 18:05:42 2015 +0800
+
+    cherry picked from commit: e5f8f32baa96c0f59743aaa62a0e482b9d39096d
+    
+    LF7001Q_C000313[double_tap]
+    
+    Change-Id: Icd930d216e6fd4223bdfc6465a8fcc1eefeff598
+
+diff --git a/LINUX/android/device/qcom/msm8916_32/ft5x06_ts.kl b/LINUX/android/device/qcom/msm8916_32/ft5x06_ts.kl
+index 153959d..23c1d1a 100755
+--- a/LINUX/android/device/qcom/msm8916_32/ft5x06_ts.kl
++++ b/LINUX/android/device/qcom/msm8916_32/ft5x06_ts.kl
+@@ -29,3 +29,4 @@ key 158    BACK
+ key 139    MENU
+ key 172    HOME
+ key 217    SEARCH
++key 589    DOUBLE_TAP
+\ No newline at end of file
+diff --git a/LINUX/android/device/qcom/msm8916_64/ft5x06_ts.kl b/LINUX/android/device/qcom/msm8916_64/ft5x06_ts.kl
+index 153959d..23c1d1a 100755
+--- a/LINUX/android/device/qcom/msm8916_64/ft5x06_ts.kl
++++ b/LINUX/android/device/qcom/msm8916_64/ft5x06_ts.kl
+@@ -29,3 +29,4 @@ key 158    BACK
+ key 139    MENU
+ key 172    HOME
+ key 217    SEARCH
++key 589    DOUBLE_TAP
+\ No newline at end of file
+diff --git a/LINUX/android/frameworks/base/core/java/android/view/KeyEvent.java b/LINUX/android/frameworks/base/core/java/android/view/KeyEvent.java
+old mode 100644
+new mode 100755
+index 0e1406d..f2291a3
+--- a/LINUX/android/frameworks/base/core/java/android/view/KeyEvent.java
++++ b/LINUX/android/frameworks/base/core/java/android/view/KeyEvent.java
+@@ -752,8 +752,11 @@ public class KeyEvent extends InputEvent implements Parcelable {
+     public static final int KEYCODE_SPORT = 260;
+     public static final int KEYCODE_SHOP = 261;
+     //End
+-    //modify by yangjie for LF7001Q_C000215 KEYCODE_HELP  -->  KEYCODE_SHOP
+-    private static final int LAST_KEYCODE = KEYCODE_SHOP;
++    //Add by yangjie LF7001Q_C000313
++    public static final int KEYCODE_DOUBLE_TAP = 262;
++    //End
++    //modify by yangjie for LF7001Q_C000215 KEYCODE_HELP  -->  KEYCODE_DOUBLE_TAP
++    private static final int LAST_KEYCODE = KEYCODE_DOUBLE_TAP;
+ 
+     // NOTE: If you add a new keycode here you must also add it to:
+     //  isSystem()
+@@ -1821,6 +1824,7 @@ public class KeyEvent extends InputEvent implements Parcelable {
+             case KeyEvent.KEYCODE_MEDIA_AUDIO_TRACK:
+             case KeyEvent.KEYCODE_SPORT://add by yangjie LF7001Q_C000215
+             case KeyEvent.KEYCODE_SHOP://add by yangjie LF7001Q_C000215
++            case KeyEvent.KEYCODE_DOUBLE_TAP://add by yangjie LF7001Q_C000313
+                 return true;
+         }
+ 
+@@ -1838,6 +1842,7 @@ public class KeyEvent extends InputEvent implements Parcelable {
+             case KeyEvent.KEYCODE_PAIRING:
+             case KeyEvent.KEYCODE_SPORT://add by yangjie LF7001Q_C000215
+             case KeyEvent.KEYCODE_SHOP://add by yangjie LF7001Q_C000215
++            case KeyEvent.KEYCODE_DOUBLE_TAP://add by yangjie LF7001Q_C000313
+                 return true;
+         }
+         return false;
+diff --git a/LINUX/android/frameworks/base/core/res/res/values/attrs.xml b/LINUX/android/frameworks/base/core/res/res/values/attrs.xml
+index be1b3a3..1e991bc 100755
+--- a/LINUX/android/frameworks/base/core/res/res/values/attrs.xml
++++ b/LINUX/android/frameworks/base/core/res/res/values/attrs.xml
+@@ -1776,6 +1776,7 @@
+         <enum name="KEYCODE_HELP" value="259" />
+         <enum name="KEYCODE_SPORT" value="260" /><!--Add by yangjie LF7001Q_C000215-->
+         <enum name="KEYCODE_SHOP" value="261" /><!--Add by yangjie LF7001Q_C000215-->
++        <enum name="DOUBLE_TAP" value="262" />
+     </attr>
+ 
+     <!-- ***************************************************************** -->
+diff --git a/LINUX/android/frameworks/base/data/keyboards/Generic.kl b/LINUX/android/frameworks/base/data/keyboards/Generic.kl
+old mode 100644
+new mode 100755
+index 90df048..de3c3bd
+--- a/LINUX/android/frameworks/base/data/keyboards/Generic.kl
++++ b/LINUX/android/frameworks/base/data/keyboards/Generic.kl
+@@ -406,7 +406,8 @@ key 484   B                 FUNCTION
+ 
+ key 580   APP_SWITCH
+ key 582   VOICE_ASSIST
+-
++# add by yangjie for double_tap
++key 589   DOUBLE_TAP
+ # Keys defined by HID usages
+ key usage 0x0c006F BRIGHTNESS_UP
+ key usage 0x0c0070 BRIGHTNESS_DOWN
+diff --git a/LINUX/android/frameworks/base/data/keyboards/qwerty.kl b/LINUX/android/frameworks/base/data/keyboards/qwerty.kl
+old mode 100644
+new mode 100755
+index 38b140f..794b103
+--- a/LINUX/android/frameworks/base/data/keyboards/qwerty.kl
++++ b/LINUX/android/frameworks/base/data/keyboards/qwerty.kl
+@@ -58,6 +58,9 @@ key 212   CAMERA
+ key 220   SPORT
+ key 221   SHOP
+ #end
++#add by yangjie for LF7001Q_C000313
++key 589   DOUBLE_TAP
++#end
+ key 16    Q
+ key 17    W
+ key 18    E
+diff --git a/LINUX/android/frameworks/base/policy/src/com/android/internal/policy/impl/PhoneWindowManager.java b/LINUX/android/frameworks/base/policy/src/com/android/internal/policy/impl/PhoneWindowManager.java
+index 3581c71..1c9df7f 100755
+--- a/LINUX/android/frameworks/base/policy/src/com/android/internal/policy/impl/PhoneWindowManager.java
++++ b/LINUX/android/frameworks/base/policy/src/com/android/internal/policy/impl/PhoneWindowManager.java
+@@ -5215,6 +5215,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
+                     msg.sendToTarget();
+                 }
+             }
++            //add by yangjie for LF7001Q_C000313
++            case KeyEvent.KEYCODE_DOUBLE_TAP:
++                result &= ~ACTION_PASS_TO_USER;
++                isWakeKey = true;
++                break;
++            //End
+         }
+ 
+         if (useHapticFeedback) {
+diff --git a/LINUX/android/frameworks/native/include/android/keycodes.h b/LINUX/android/frameworks/native/include/android/keycodes.h
+old mode 100644
+new mode 100755
+index 6d5f725..c63150e
+--- a/LINUX/android/frameworks/native/include/android/keycodes.h
++++ b/LINUX/android/frameworks/native/include/android/keycodes.h
+@@ -305,6 +305,7 @@ enum {
+     AKEYCODE_HELP            = 259,
+     AKEYCODE_SPORT = 260,//Add by yangjie for LF7001Q_C000215
+     AKEYCODE_SHOP = 261,//end
++    AKEYCODE_DOUBLE_TAP  = 262,//Add by yangjie for LF7001Q_C000313
+ 
+     // NOTE: If you add a new keycode here you must also add it to several other files.
+     //       Refer to frameworks/base/core/java/android/view/KeyEvent.java for the full list.
+diff --git a/LINUX/android/frameworks/native/include/input/InputEventLabels.h b/LINUX/android/frameworks/native/include/input/InputEventLabels.h
+old mode 100644
+new mode 100755
+index 57fac36..819cbe9
+--- a/LINUX/android/frameworks/native/include/input/InputEventLabels.h
++++ b/LINUX/android/frameworks/native/include/input/InputEventLabels.h
+@@ -301,6 +301,7 @@ static const InputEventLabel KEYCODES[] = {
+     DEFINE_KEYCODE(HELP),
+     DEFINE_KEYCODE(SPORT),//add by yangjie for LF7001Q_C000215
+     DEFINE_KEYCODE(SHOP),//end
++    DEFINE_KEYCODE(DOUBLE_TAP),//add by yangjie for LF7001Q_C000313
+     { NULL, 0 }
+ };
+ 

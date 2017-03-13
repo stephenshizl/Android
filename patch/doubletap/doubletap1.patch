@@ -1,0 +1,204 @@
+commit 151db66a1b42852727ab0bdcb10c5f68dcc653e1
+Author: yangjie <yang.jie10@byd.com>
+Date:   Tue Aug 25 18:11:26 2015 +0800
+
+    cherry picked from commit: 857fd604a0a5053da5ef4f0ac434f7cc9a5cd8ae
+    
+    doubletap
+    
+    Change-Id: Ib2090813bdc1c7a0b9a8ca25db8fb9af6294e286
+
+diff --git a/LINUX/android/frameworks/base/policy/src/com/android/internal/policy/impl/PhoneWindowManager.java b/LINUX/android/frameworks/base/policy/src/com/android/internal/policy/impl/PhoneWindowManager.java
+index 1c9df7f..b59afb0 100755
+--- a/LINUX/android/frameworks/base/policy/src/com/android/internal/policy/impl/PhoneWindowManager.java
++++ b/LINUX/android/frameworks/base/policy/src/com/android/internal/policy/impl/PhoneWindowManager.java
+@@ -140,6 +140,10 @@ import android.hardware.SensorManager;
+ import android.app.AlertDialog;
+ import android.content.DialogInterface;
+ import android.app.ActivityManager.RunningTaskInfo;
++//Begin Add By yangjie
++import java.io.FileOutputStream;
++//end
++
+ /**
+  * WindowManagerPolicy implementation for the Android phone UI.  This
+  * introduces a new method suffix, Lp, for an internal lock of the
+@@ -203,6 +207,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
+     static public final String SYSTEM_DIALOG_REASON_RECENT_APPS = "recentapps";
+     static public final String SYSTEM_DIALOG_REASON_HOME_KEY = "homekey";
+     static public final String SYSTEM_DIALOG_REASON_ASSIST = "assist";
++    //add by yangjie
++    public static final String DOUBLE_TAP_NODE_NAME = "/sys/bus/i2c/devices/5-0038/double_tap_switch";
++    int mDoubleTapSwitchValues = 0;
++    //end
+ 
+     /**
+      * These are the system UI flags that, when changing, can cause the layout
+@@ -869,6 +877,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
+                     UserHandle.USER_ALL);
+             resolver.registerContentObserver(Settings.System.getUriFor("singlehand_microscreen_enable"),
+                     false, this, UserHandle.USER_ALL);
++           //add by yangjie
++           resolver.registerContentObserver(Settings.System.getUriFor(
++                    Settings.System.TEXT_DOUBLE_CLICK_OPEN_SCREEN), false, this,
++                    UserHandle.USER_ALL);
++           //end
+             updateSettings();
+         }
+ 
+@@ -1802,6 +1815,16 @@ public class PhoneWindowManager implements WindowManagerPolicy {
+                 mImmersiveModeConfirmation.loadSetting(mCurrentUserId);
+             }
+             PolicyControl.reloadFromSetting(mContext);
++            //add by yangjie
++            int doubleTapSwitchValues = Settings.System.getIntForUser(resolver,
++                    Settings.System.TEXT_DOUBLE_CLICK_OPEN_SCREEN, 0, UserHandle.USER_CURRENT);
++            Slog.e(TAG, "updateDoubleTapNode doubleTapSwitchValues = " + doubleTapSwitchValues);
++            if (mDoubleTapSwitchValues != doubleTapSwitchValues) {
++                Slog.e(TAG, "updateDoubleTapNode doubleTapSwitchValues = " + doubleTapSwitchValues);
++                updateDoubleTapNode(doubleTapSwitchValues != 0);
++                mDoubleTapSwitchValues = doubleTapSwitchValues;
++            }
++            //end
+         }
+         if (updateRotation) {
+             updateRotation(true);
+@@ -1821,6 +1844,39 @@ public class PhoneWindowManager implements WindowManagerPolicy {
+             }
+         }
+     }
++    //add by yangjie
++    private void updateDoubleTapNode (boolean doubleTapSwitchOn) {
++        File doubleTapNodeFile = new File(DOUBLE_TAP_NODE_NAME);
++        Slog.e(TAG, "updateDoubleTapNode doubleTapSwitchOn = " + doubleTapSwitchOn);
++        if (doubleTapNodeFile.exists()) {
++            Slog.e(TAG, "updateDoubleTapNode doubleTapNodeFile.exists() ");
++            FileOutputStream fileOutputStream = null;
++            try{
++                 fileOutputStream = new FileOutputStream (doubleTapNodeFile);
++                String  switchValues = null;
++                if (doubleTapSwitchOn) {
++                    switchValues = "1";
++                }else {
++                    switchValues = "0";
++                }
++                Slog.e(TAG, "updateDoubleTapNode switchValues = " + switchValues);
++                fileOutputStream.write(switchValues.getBytes());
++                fileOutputStream.flush();
++            }catch (Exception e){
++                Slog.e(TAG, "updateDoubleTapNode Exception  ", e);
++            }finally {
++                if (fileOutputStream != null) {
++                    try {
++                        fileOutputStream.close();
++                        fileOutputStream = null;
++                    }catch(Exception e){}                    
++                }
++            }            
++             
++        }
++
++    }
++    //end
+ 
+     private void updateWakeGestureListenerLp() {
+         if (shouldEnableWakeGestureLp()) {
+@@ -2673,29 +2729,29 @@ public class PhoneWindowManager implements WindowManagerPolicy {
+         }
+         //End
+         */
+-       //Add by yangjie Spark-L_C000225
+-       if (keyCode == KeyEvent.KEYCODE_SPORT) {
+-       citflag = SystemProperties.get("persist.sys.cit");
+-       Log.i("phonewindown manager", "phonewindown manager citflag:" + citflag);
+-       if(citflag.equals("true")) {
+-               mKeyguardDelegate.setKeyguardEnabled(false); 
++        //Add by yangjie Spark-L_C000225
++        if (keyCode == KeyEvent.KEYCODE_SPORT) {
++            citflag = SystemProperties.get("persist.sys.cit");
++            Log.i("phonewindown manager", "phonewindown manager citflag:" + citflag);
++            if(citflag.equals("true")) {
++                mKeyguardDelegate.setKeyguardEnabled(false); 
++            } else {
++                //result &= ~ACTION_PASS_TO_USER;
++                mPowerManager.goToSleep(event.getEventTime(),
++                PowerManager.GO_TO_SLEEP_REASON_POWER_BUTTON, 0);
++                //isWakeKey = false;
++            }
++        }
++        if (keyCode == KeyEvent.KEYCODE_SHOP) {
++            citflag = SystemProperties.get("persist.sys.cit");
++            if(citflag.equals("true")) {
++                mKeyguardDelegate.setKeyguardEnabled(true);
+             } else {
+-               //result &= ~ACTION_PASS_TO_USER;
+-               mPowerManager.goToSleep(event.getEventTime(),
+-               PowerManager.GO_TO_SLEEP_REASON_POWER_BUTTON, 0);
+-               //isWakeKey = false;
+-           }
+-       }
+-       if (keyCode == KeyEvent.KEYCODE_SHOP) {
+-           citflag = SystemProperties.get("persist.sys.cit");
+-           if(citflag.equals("true")) {
+-               mKeyguardDelegate.setKeyguardEnabled(true);
+-           } else {
+-               //result &= ~ACTION_PASS_TO_USER;
+-       }
++                //result &= ~ACTION_PASS_TO_USER;
++            }
+                
+-    }
+-            //End
++        }
++        //End
+         if (DEBUG_INPUT) {
+             Log.d(TAG, "interceptKeyTi keyCode=" + keyCode + " down=" + down + " repeatCount="
+                     + repeatCount + " keyguardOn=" + keyguardOn + " mHomePressed=" + mHomePressed
+diff --git a/LINUX/android/frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java b/LINUX/android/frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+old mode 100644
+new mode 100755
+index e7eed24..cee9e4d
+--- a/LINUX/android/frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
++++ b/LINUX/android/frameworks/base/services/core/java/com/android/server/power/PowerManagerService.java
+@@ -589,10 +589,12 @@ public final class PowerManagerService extends SystemService
+             resolver.registerContentObserver(Settings.Global.getUriFor(
+                     Settings.Global.THEATER_MODE_ON),
+                     false, mSettingsObserver, UserHandle.USER_ALL);
++            /*
+             //ssc add for doubletap
+             resolver.registerContentObserver(Settings.System.getUriFor(
+                     Settings.System.TEXT_DOUBLE_CLICK_OPEN_SCREEN),
+                     false, mSettingsObserver, UserHandle.USER_ALL);
++            */
+             // Go.
+             readConfigurationLocked();
+             updateSettingsLocked();
+@@ -691,11 +693,13 @@ public final class PowerManagerService extends SystemService
+                 Settings.Global.STAY_ON_WHILE_PLUGGED_IN, BatteryManager.BATTERY_PLUGGED_AC);
+         mTheaterModeEnabled = Settings.Global.getInt(mContext.getContentResolver(),
+                 Settings.Global.THEATER_MODE_ON, 0) == 1;
++        /*delete by yangjie
+         //ssc add for doubeltap
+         mDoubleTapEnable = Settings.System.getIntForUser(resolver,
+                 Settings.System.TEXT_DOUBLE_CLICK_OPEN_SCREEN, 0,
+                 UserHandle.USER_CURRENT);
+         Slog.d(TAG, "mDoubleTapEnable= " + mDoubleTapEnable);
++        */
+         handleDoubleTapFunc(mDoubleTapEnable);
+         final int oldScreenBrightnessSetting = mScreenBrightnessSetting;
+         mScreenBrightnessSetting = Settings.System.getIntForUser(resolver,
+diff --git a/LINUX/android/system/core/rootdir/init.rc b/LINUX/android/system/core/rootdir/init.rc
+old mode 100644
+new mode 100755
+index b761813..708e48c
+--- a/LINUX/android/system/core/rootdir/init.rc
++++ b/LINUX/android/system/core/rootdir/init.rc
+@@ -458,7 +458,7 @@ on boot
+     chown system system /sys/kernel/ipv4/tcp_rmem_max
+     chown root radio /proc/cmdline
+     chmod 0666 /sys/class/input/input1/double_tap
+-
++    chown system system /sys/bus/i2c/devices/5-0038/double_tap_switch
+     # Define default initial receive window size in segments.
+     setprop net.tcp.default_init_rwnd 60
+ 

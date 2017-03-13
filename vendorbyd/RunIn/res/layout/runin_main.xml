@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="400dp">
+        <TextView android:id="@+id/runin"
+        android:text="@string/runin"
+        android:textSize="35sp"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_below="@id/text">
+        <Button android:id="@+id/pvt"
+            android:layout_height="match_parent"
+            android:layout_width="115dp"
+            android:layout_marginLeft="3dp"
+            android:text="@string/pvt"
+            android:textSize="22sp"
+            style="?android:attr/buttonBarButtonStyle"/>
+
+        <Button android:id="@+id/ss"
+            android:layout_height="match_parent"
+            android:layout_width="110dp"
+            android:text="@string/ss"
+            android:layout_marginLeft="10dp"
+            android:textSize="22sp"
+            style="?android:attr/buttonBarButtonStyle"/>
+
+        <Button android:id="@+id/finalTest"
+            android:layout_height="match_parent"
+            android:layout_width="115dp"
+            android:text="@string/finalString"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="3dp"
+            android:textSize="22sp"
+            style="?android:attr/buttonBarButtonStyle"/>
+    </LinearLayout>
+
+</RelativeLayout>

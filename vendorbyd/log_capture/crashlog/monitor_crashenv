@@ -1,0 +1,14 @@
+#!/system/bin/sh
+
+/system/bin/mkdir -p /data/logs/info
+/system/bin/chmod 0770 /data/logs/info
+/system/bin/chown system.system /data/logs/info
+if [ -f /logs/reserved ]; then
+  /system/bin/rm /data/logs/reserved
+fi
+/system/bin/date > /data/logs/info/infosystem.txt
+/system/bin/df >> /data/logs/info/infosystem.txt
+/system/bin/cat /data/logs/history_event >> /data/logs/info/infosystem.txt
+/system/bin/chmod 0660 /data/logs/info/infosystem.txt
+/system/bin/chown system.log /data/logs/info/infosystem.txt
+/system/bin/dd if=/dev/zero of=/data/logs/reserved bs=1024 count=20

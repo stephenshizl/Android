@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bt_label">Bluetooth Test</string>
+    <string name="bt_help">Help:\n1. Wait until the test is completed.\n2. Set the test results manually.</string>
+    <string name="bt_absent">Can\'t scan Bluetooth hardware.</string>
+    <string name="bt_detected">"Detected Bluetooth hardware!"</string>
+    <string name="bt_checking_status">Detecting Bluetooth status...</string>
+    <string name="bt_status">"Bluetooth status is: "</string>
+    <string name="bt_enabled">"Open"</string>
+    <string name="bt_disabled">"Close"</string>
+    <string name="bt_enabling">"Turning on Bluetooth..."</string>
+    <string name="bt_disabling">"Turning off Bluetooth..."</string>
+    <string name="bt_success">"Operation Successed."</string>
+    <string name="bt_fail">"Operation failed."</string>
+    <string name="bt_in_test">"Sorry！Wait until the test is complete！"</string>
+    <string name="bt_finished">"The test is completed."</string>
+    <string name="title_paired_devices">Paired devices</string>
+    <string name="title_other_devices">Other paired devices</string>
+    <string name="button_scan">Scanning for Bluetooth devices</string>
+    <string name="none_paired">No devices can be paired</string>
+    <string name="scanning">Scanning for Bluetooth devices...</string>
+    <string name="scan_fail">Fail to scan for Bluetooth devices</string>
+    <string name="select_device">Select a device to connect</string>
+    <string name="none_found">Can\'t scan for any Bluetooth device</string>
+    <string name="pair_test">Paired devices</string>
+    <string name="bt_not_enabled_leaving">Bluetooth device is not available, ending the test.</string>
+    <string name="pair_visible">Bluetooth devices is visible</string>
+    <string name="set_result">Set the test results manually!</string>
+    <string name="bt_get_mac">"Getting Bluetooth device's physical address..."</string>
+</resources>

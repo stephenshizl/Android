@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="bottom"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/status_bar"
+        android:visibility="gone"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="@string/status_initialized" >
+    </TextView>
+ <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="0.2dp"
+        android:background="#6c6a6a" >
+    </TextView>
+    <LinearLayout
+        android:id="@+id/bottom_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingTop="5dp"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/btn_pass"
+            android:layout_width="50dp"
+     		android:layout_height="40dp"
+            android:background="@color/green"
+            android:enabled="false"
+            android:text="@string/button_pass"/>
+
+        <Button
+            android:id="@+id/btn_fail"
+            android:layout_marginLeft="10dp"
+            android:layout_width="50dp"
+     		android:layout_height="40dp"
+            android:background="@color/red"
+            android:text="@string/button_fail" />
+    </LinearLayout>
+
+</LinearLayout>

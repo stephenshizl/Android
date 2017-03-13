@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+      <string name="lcd">LCD</string> 
+      <string name="brightness">Brightness</string> 
+      <string name="light">Light</string> 
+      <string name="led">LED</string> 
+      <string name="touch">Touch</string> 
+      <string name="multipoint">MultiPoint</string> 
+      <string name="battery">Battery</string> 
+      <string name="sim">SIM</string> 
+      <string name="sd">SDCard</string> 
+      <string name="earphone">Earphone</string> 
+      <string name="vibrator">Vibratro</string> 
+      <string name="frontcamera">FrontCamera</string> 
+      <string name="camera">BackCamera</string> 
+      <string name="proximity">Proximity</string> 
+      <string name="compass">Compass</string> 
+      <string name="acceleromte">Acceleromte</string> 
+      <string name="gyroscope">Gyroscope</string> 
+      <string name="key">Key</string> 
+      <string name="wifi">WLAN</string> 
+      <string name="bluetooth">Bluetooth</string> 
+      <string name="gps">GPS</string> 
+      <string name="speaker">Speaker</string>
+      <string name="audio">Audio</string>
+      <string name="backlight">Backlight</string>
+</resources>

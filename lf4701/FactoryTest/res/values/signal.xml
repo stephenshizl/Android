@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+     <string name="signal_label">手机信号测试</string>
+   <string name="phone_signal">手机信号测试</string>
+   <string name="current_signal">手机当前信号是：</string>
+    <string name="signal_help">帮助：\n1.确认手机信号是否在规格范围内.\n2.测试完成，请设置测试结果!</string>
+
+</resources>

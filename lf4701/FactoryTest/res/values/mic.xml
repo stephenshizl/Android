@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="mic_label">录音测试</string>
+    <string name="mic1_label">主麦克风测试</string>
+    <string name="mic2_label">副麦克风测试</string>
+    <string name="mic_help">"帮助:\n1. 点击开始按钮进行录音来测试麦克风."</string>
+    <string name="mic_start">开始</string>
+    <string name="mic_recording"><b>正在录音</b></string>
+    <string name="mic_playing"><b>正在播放</b></string>
+    <string name="mic_hs_with_mic">请拔下耳机并使用麦克风!</string>
+    <string name="mic_hs_with_in_mic">请插入耳机使用麦克风!</string>
+    <string name="mic_hs_without_mic">当前的语音设备：耳机 (OK)</string>
+    <string name="mic_no_hs">当前的语音设备: 扬声器 (OK)</string>
+    <string name="mic_hint">select the number you heard</string>
+    
+</resources>

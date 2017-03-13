@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    > 
+    <com.marvell.factorytest.LockPatternView
+    android:id="@+id/auto_touchview"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    </com.marvell.factorytest.LockPatternView>
+    
+<!-- del by maoxunlei for change auto touch style to full screen -->
+<!-- add by maoxunlei for change auto touch style to not full screen -->
+<!--    <LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_gravity="bottom">
+    <Button
+    android:id="@+id/touch_success"
+    android:layout_width="238dip"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:text="@string/auto_success">
+    </Button>
+    <Button
+    android:id="@+id/touch_fail"
+    android:layout_width="238dip"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:text="@string/auto_fail">
+    </Button>
+    
+    </LinearLayout>  -->
+</LinearLayout>

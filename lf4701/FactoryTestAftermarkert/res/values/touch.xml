@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="touch_label">Touch test</string>
+    <string name="touch_help">"Help:\n1. Tap the screen to start the test\n2. Place your finger to the square on left up corner\n3. Keep your finger on screen and draw the line by following UI guiding\n4. After the test, Test result is set automatically"</string>
+</resources>

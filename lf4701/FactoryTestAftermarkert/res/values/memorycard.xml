@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="memorycard_label">SD Card test</string>
+    <string name="memorycard_help">Help:\n1.Insert the SD card .\n2.Set the test result after test completed."</string>
+    <string name="mc_test"><font style="color:blue"><b>12345</b><br/>1212121</font></string>
+    <string name="sd_mounted">SD card has been loaded!</string>
+    <string name="sd_eject">SD card is being removed!</string>
+    <string name="sd_removed">SD card has been removed!</string>
+    <string name="sd_unmountable">SD card can not be loaded!</string>
+    <string name="sd_unmounted">SD card is not loaded into its mount point!</string>
+    <string name="sd_no_fs">SD card is not compatible or blank!</string>
+    <string name = "sd_not_present"></string>
+    <string name = "sd_present_rw">Detected SD card, the property is read-write!</string>
+    <string name = "sd_present_shared">SD card is operating in UMS mode!</string>
+    <string name = "sd_read_only">Detected SD card, the property is read-only!</string>
+    <string name = "sd_unavaliable">External memory card not in use </string>
+    <string name = "insert_sd_card">Insert the SD card ,tested again...</string>
+    <string name = "sd_test_start">Begin testing...</string>
+    <string name = "sd_test_complete">The test is completed.</string>
+    <string name="external_sd">SD memory card,</string> 
+    <string name="internal_sd">Internal memory,</string> 
+    <string name="memory_available">remaining space:</string> 
+    <string name="available">Gb available</string> 
+ <!--  The total amount of storage space for some storage partition.  For example, this is listed under both the "Internal phone storage" section and the "SD card" section 
+  --> 
+    <string name="memory_size">Total space:</string> 
+    <string name="unit"> Gb </string>
+        
+</resources>

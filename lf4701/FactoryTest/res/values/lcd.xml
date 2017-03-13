@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="lcd_label">LCD测试</string>
+    <string name="lcd_help">帮助:\n1. 点击屏幕开始测试.\n2. 点击来改变屏幕颜色.\n3. 返回并人工设置测试结果. </string>
+    <string name="lcd_tap_to_start">请点击屏幕开始LCD测试!</string>
+       <string name="lcd_tap_to_finish">测试完成，请设置测试结果!</string>
+
+</resources>

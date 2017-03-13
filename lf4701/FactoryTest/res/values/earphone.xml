@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="auto_ear_hook">1. Headset key test, insert the headset and press the headset hook button:</string>
+    <string name="auto_ear_hook_pass">1. Headset key test: PASS</string>
+    <string name="auto_hook">HEADSET HOOK</string>
+    <string name="auto_ear_mic">2. Headset microphone to the headset earpiece test:</string>
+    <string name="auto_ear_mic_pass">2.Headset microphone to the headset earpiece test: PASS</string>
+    <string name="auto_mic_info">Please click on the Record button to start recording, click the Stop button finished recording, sound effects from the headset earpiece inspection</string>
+    <string name="ear_record">Recording</string>
+    <string name="ear_stop">stop</string>
+    <string name="auto_ear_channel">3. Headphone left and right channels test:</string>
+    <string name="auto_ear_channel_pass">3. Headphone left and right channel test：PASS</string>
+    <string name="btn_channel">Left and right channels</string>
+    <string name="auto_ear_info">Please test the headset functions</string>
+    <string name="yes">PASS</string>
+    <string name="no">fail</string>
+    <string name="headset_recording">recording...</string>
+    <string name="headset_playing">playing...</string>
+    <string name="headset_replay_end">Recording finished playing!</string>
+    <string name="headset_confirm">Recording Playback successful yet？</string>
+    <string name="insert_headset">Please insert the headset, and then start the test!</string>  
+    <string name="auto_key_music">Music keys</string>
+    <string name="auto_ear_input">Please insert the headset:</string>
+    <string name="auto_fm_hint">Please check the radio function</string>
+    <string name="auto_ear_hint">Please check the headset button functions</string>    
+    <string name="auto_ear_hook_ok">Headset key test：pass</string>
+    <string name="ok">OK</string>
+</resources>

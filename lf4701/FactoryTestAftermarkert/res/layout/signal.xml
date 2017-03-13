@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/LinearLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        style="@style/help"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:text="@string/signal_help" />
+
+   <LinearLayout
+       android:id="@+id/linearLayout1"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_weight="0.98"
+       android:orientation="vertical" >
+       <TextView
+            android:id="@+id/wait_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/info_value"
+            android:gravity="center_vertical"/>
+        <TextView
+            android:id="@+id/current_network"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/info_value"
+            android:gravity="center_vertical"/>
+        <TextView
+            android:id="@+id/signal_current"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/info_value"
+            android:gravity="center_vertical"/>
+    </LinearLayout>
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/bottom_bar" />
+</LinearLayout>

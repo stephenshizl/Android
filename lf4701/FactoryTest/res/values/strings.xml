@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="test">你好</string>
+ <string name="app_name">CIT</string>
+ <string name="auto_app_name">自动CIT</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="ishavemenuconfig">Dont have menu config file</string>
+    <string name="menuconfigerro">Menu configuration file in the wrong format </string>
+    <string name="menuerro">Menu configuration file doesnt exist or in the wrong format </string>
+    <string name="failresult">FAIL</string>
+    <string name="successresult">PASS</string>
+    <string name="touchpress">Please click the Screen</string>
+    
+    <!--Begin add by liugang for CIT 20130805 -->    
+    <string name="audioloop_label">AudioLoop</string>
+    <string name="backlight_label">Backlight</string>
+    <string name="lcdresolution_label">LcdResolutionTest</string>
+    <string name="zero">zero</string>
+    <string name="one">one</string>
+    <string name="two">two</string>
+    <string name="three">three</string>
+    <string name="four">four</string>
+    <string name="five">five</string>
+    <string name="six">six</string>
+    <string name="seven">seven</string>
+    <string name="eight">eight</string>
+    <string name="nine">nine</string>
+    <string name="mic_fail">It is not clear</string>
+    <string name="lcdcontrast_label">LCDContrastTest</string>
+    <string name="twenty">20%</string>
+    <string name="fifty">50%</string>
+    <string name="eighty">80%</string>
+    <string name="hundred">100%</string>
+    <string name="tts_result">"数字选择不正确或分贝值不够，请重新测试"</string>
+    <string name="runin_fail">Runin测试失败，无法进行CIT测试</string>
+    <!--End add -->
+</resources>

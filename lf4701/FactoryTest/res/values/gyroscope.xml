@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="gyroscope_label">陀螺仪传感器测试</string>
+    <string name="gyroscope_checking_status">正在检测陀螺仪传感器状态...</string>
+    <string name="gyroscope_exist">检测到陀螺仪传感器.</string>
+    <string name="gyroscope_not_exist">没有检测到陀螺仪传感器.</string>
+    <string name="gyroscope_get_info">获取陀螺仪传感器信息:</string>
+    <string name="gyroscope_success">"操作成功."</string>
+    <string name="gyroscope_fail">"操作失败."</string>
+    <string name="gyroscope_finished">"测试完成."</string>
+    <string name="gyroscope_help2">帮助:\n1. 请等待直到测试结束.\n2. 请人工设置返回结果.</string>
+    <string name="gyroscope_x">"X: "</string>
+    <string name="gyroscope_y">"Y: "</string>
+    <string name="gyroscope_z">"Z: "</string>
+    <string name="gyroscope_help">帮助:\n1. 快速晃动手机.\n2. 陀螺仪传感器的 X, Y, Z坐标值是实时更新的.\n2. 请人工设置返回结果.</string>
+
+</resources>

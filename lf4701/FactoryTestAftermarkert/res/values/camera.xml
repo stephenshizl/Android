@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="camera_label">Rear camera test</string>
+    <string name="camera_help">Help:\n1.Wait until image can be seen on the screen\n2.Tap the screen to take a picture\n3.Set the test result manually</string>
+    <string name="frontcamera_label">Front camera test</string>
+
+    <string name="takepic">Take pic</string>
+    <string name="picture_resolution">Resolution</string>
+    <string name="auto_fail">Fail</string>
+    <string name="camera_back">Back</string>
+    <string name="auto_success">Success</string>
+    <string name="auto_focus">Focus</string>
+</resources>

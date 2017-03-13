@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="button_pass">通过</string>
+    <string name="button_fail">失败</string>
+    <string name="na">"未知"</string>
+
+</resources>

@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.tools.cit"
+    android:sharedUserId="android.uid.system" >
+
+    <!-- SD memory--> 
+    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE"/>        
+    <uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE" />    
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />    
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />    
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />    
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+
+    <!-- FMradio -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+
+    <!-- Vibrator -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.HARDWARE_TEST" />
+
+    <!-- Mic -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- SIM -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <!-- Camera -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
+    <!-- WiFi -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_CHECKIN_PROPERTIES" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" />
+
+    <!-- Call -->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
+    <!-- GPS -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Bluetooth -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <!-- uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" / -->
+
+
+    <!-- UMS -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.DEVICE_POWER" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/icon"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.Black">>
+    <!--
+         This tells the system about the custom library used by the
+         application, so that it can be properly loaded and linked
+         to the app when the app is initialized.
+    -->
+    <uses-library android:name="com.tools.fmmanager" />
+        <receiver android:name="FactoryTestStarter" >
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SECRET_CODE" />
+
+                <data
+                    android:host="7388"
+                    android:scheme="android_secret_code" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".PhoneInfo"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
+
+        </activity>
+       
+        <activity
+            android:name=".AutoHomeActivity"
+            android:label="@string/auto_app_name"
+            android:screenOrientation="portrait"
+            android:icon="@drawable/icon" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".HomeActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Touch -->
+        <activity
+            android:name=".TouchTest"
+            android:label="@string/touch_label"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TouchTest2"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+
+        <!-- SignalTest -->
+        <activity
+            android:name=".SignalTest"
+            android:label="@string/signal_label"
+            android:screenOrientation="portrait"
+            android:configChanges="mcc|mnc" />       
+        <!--ThreeColorTest-->
+    <activity
+            android:name=".ThreeColorTest"
+            android:label="@string/three_color_label"
+            android:screenOrientation="portrait"/>
+            
+    <!-- SD APP-->
+        <activity   
+             android:name=".SDTest"
+             android:label="@string/memorycard_label" 
+             android:screenOrientation="portrait"
+             android:configChanges="mcc|mnc">
+
+        </activity>
+       <!-- LCD -->
+        <activity
+            android:name=".LCDTest"
+            android:label="@string/lcd_label"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".LCDTest2"
+            android:screenOrientation="portrait"/>
+
+        <!-- Charge -->
+        <activity
+            android:name=".ChargeTest"
+            android:label="@string/charge_label"
+            android:screenOrientation="portrait"/>
+
+        <!-- Charge2 -->
+        <activity
+            android:name=".ChargeTest2"
+            android:label="@string/charge_label"
+            android:screenOrientation="portrait"/>
+
+        <!-- Memory Card -->
+        <activity
+            android:name=".MemoryCardTest"
+            android:label="@string/memorycard_label"
+            android:screenOrientation="portrait">
+        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+        </activity>
+
+        <!-- Speaker -->
+        <activity
+            android:name=".TopspeakerTest"
+            android:label="@string/speaker_label"
+            android:screenOrientation="portrait" />
+             <!-- Speaker2 -->
+        <activity
+            android:name=".BottomspeakerTest"
+            android:label="@string/speaker_label"
+            android:screenOrientation="portrait"/>
+
+
+        <!-- Earpiece -->
+        <activity
+            android:name=".EarpieceTest"
+            android:label="@string/ear_label"
+            android:screenOrientation="portrait" />
+
+        <!-- Headset -->
+        <activity
+            android:name=".HeadsetTest"
+            android:label="@string/headset_label"
+            android:screenOrientation="portrait" />
+
+        <!-- Mic -->
+        <activity
+            android:name=".MicTest"
+            android:label="@string/mic_label"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".EveryMicTest"
+            android:label="@string/mic_label"
+            android:screenOrientation="portrait"/>
+         <activity
+            android:name=".AudioLoop"
+            android:label="@string/audio_label"
+            android:screenOrientation="portrait"/>
+        <!-- Mic1 -->
+        <activity
+            android:name=".EarAudioTest"
+            android:label="@string/mic2_label"
+            android:screenOrientation="portrait"/>
+
+        <!-- Mic2 -->
+        <activity
+            android:name=".InternalAudioTest"
+            android:label="@string/mic1_label"
+            android:screenOrientation="portrait" />
+
+        <!-- Vibrator -->
+        <activity
+            android:name=".VibratorTest"
+            android:label="@string/vibrate_label"
+            android:screenOrientation="portrait"/>
+
+        <!-- Proximity -->
+        <activity
+            android:name=".ProximityTest"
+            android:label="@string/proximity_label"
+            android:screenOrientation="portrait"/>
+
+
+        <!-- Light -->
+        <activity
+            android:name=".LightTest"
+            android:label="@string/light_label"
+            android:screenOrientation="portrait"/>
+
+        <!-- Camera -->
+        <activity
+            android:name=".CameraTest"
+            android:label="@string/camera_label"
+            android:screenOrientation="portrait"/>
+
+        <!-- FrontCamera -->
+        <activity
+            android:name=".FrontCameraTest"
+            android:label="@string/frontcamera_label"
+            android:screenOrientation="portrait"/>
+
+        <!-- SIM -->
+        <activity
+            android:name=".SIMTest"
+            android:label="@string/sim_label"
+            android:screenOrientation="portrait"
+            android:configChanges="mcc|mnc" />
+
+        <!-- Accelerometer -->
+        <activity
+            android:name=".AccelerometerTest"
+            android:label="@string/accelerometer_label"
+            android:screenOrientation="portrait" />
+
+        <!-- WiFi -->
+        <activity
+            android:name=".WiFiTest"
+            android:label="@string/wifi_label"
+            android:screenOrientation="portrait"
+            android:configChanges="mcc|mnc" />
+
+        <!-- Compass -->
+        <activity
+            android:name=".CompassTest"
+            android:label="@string/compass_label"
+            android:screenOrientation="portrait"/>
+ 
+        <!-- GPS -->
+        <activity
+            android:name=".GPSTest"
+            android:label="@string/gps_label"
+            android:screenOrientation="portrait"/>
+
+        <!-- Bluetooth -->
+        <activity
+            android:name=".BluetoothTest"
+            android:label="@string/bt_label"
+            android:screenOrientation="portrait" />
+
+        <!-- Gyroscope -->
+        <activity
+            android:name=".GyroscopeTest"
+            android:label="@string/gyroscope_label"
+            android:screenOrientation="portrait"/>
+
+
+        <!-- FlashLight -->
+        <activity
+            android:name=".FlashLightTest"
+            android:label="@string/flashlight_label"
+            android:screenOrientation="portrait" />
+
+        <!-- Key -->
+        <activity
+            android:name=".KeyTest"
+            android:label="@string/key_label"
+            android:screenOrientation="portrait"/>
+            
+        <!-- Begin add by liugang for W101HM 20130806 -->         
+            
+        <!-- BackLightTest -->
+        <activity
+            android:name=".BackLightTest"
+            android:label="@string/backlight_label"
+            android:screenOrientation="portrait"/>                  
+        <!--End add -->
+        
+        
+           <activity
+            android:name=".MulitestPointTest"
+            android:label="@string/key_label"
+            android:screenOrientation="portrait"/>
+           
+           <activity
+            android:name=".AwakeTest"
+            android:label="@string/key_label"
+            android:screenOrientation="portrait"/>
+            
+        <!-- LcdResolutionTest -->    
+        <activity
+            android:name=".LcdResolutionTest"
+            android:label="@string/lcdresolution_label"
+            android:screenOrientation="portrait"/>                  
+        <!--End add -->    
+          
+        <!-- MyTTS -->  
+        <activity
+            android:name=".MyTTS"
+            android:label="@string/lcdresolution_label"
+            android:screenOrientation="portrait" />                  
+        <!--End add -->    
+        
+        <!-- LCDContrastTest -->
+        <activity
+            android:name=".LCDContrastTest"
+            android:label="@string/lcdcontrast_label"
+            android:screenOrientation="portrait"/>                  
+        <!--End add -->                 
+        
+        <provider
+            android:name="com.tools.util.TestResultProvider"
+            android:authorities="com.tools.providers.factorytest" />
+            
+        <activity
+            android:name=".NcitTP"
+            android:screenOrientation="portrait"/>                  
+        <activity
+            android:name=".NcitTP2"
+            android:screenOrientation="portrait"/>   
+
+             <activity
+            android:name=".AutoEarphone"
+            android:label="@string/audio" >
+        </activity>
+         <activity
+            android:name=".AutoLED" 
+            android:label="@string/led">
+        </activity>
+         <activity
+            android:name=".AutoBacklight" 
+            android:screenOrientation="portrait"
+            android:label="@string/auto_backlight">
+        </activity>
+         <activity
+            android:name=".SpeakerTightness" 
+            android:screenOrientation="portrait"
+            android:label="@string/speaker_label">
+        </activity>
+        <service android:name=".GpsServer"></service>
+    </application>
+
+</manifest>

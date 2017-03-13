@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="accelerometer_label">Acceleration Sensor</string>
+    <string name="accelerometer_help">Help:\n1.Parameters X, Y and Z of sensor are shown in real time.\n2.Rotate the device.\n3.Once the absolute deviation of X,Y,Z >= 3.0.Test result will pass automatically.</string>
+    <string name="accelerometer_x">"X: "</string>
+    <string name="accelerometer_y">"Y: "</string>
+    <string name="accelerometer_z">"Z: "</string>
+    <string name="accelerometer_checking_status">Acceleration sensor is detecting...</string>
+    <string name="accelerometer_exist">Acceleration sensor has detected.</string>
+    <string name="accelerometer_not_exist">Can\'t get acceleration sensor.</string>
+    <string name="accelerometer_get_info">Get acceleration sensor information:</string>
+    <string name="accelerometer_success">"Operation Successed."</string>
+    <string name="accelerometer_fail">"Operation failed."</string>
+    <string name="accelerometer_finished">"The test is completed."</string>
+    <string name="accelerometer_help2">Help:\n1. Wait until the test is completed.\n2. Set the test results manually.</string>
+    <string name="sensor_name">Sensor name: </string>
+    <string name="sensor_power">Sensor power: </string>
+    <string name="sensor_vendor">Sensor manufacturers: </string>
+
+</resources>

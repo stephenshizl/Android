@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="charge_label">Battery test</string>
+    <string name="charge_help">Help:\n1. Connect the USB cable, Battery status shows \'Charging\'.\n2.Remove the USB cable, Battery status shows \'Discharging\'.</string>
+    <string name="battery_status">"Battery status: "</string>
+    <string name="battery_dead">"Machine dead"</string>
+    <string name="battery_status_charging">"Charging"</string>
+    <string name="battery_status_discharging">"Discharging"</string>
+    <string name="battery_status_full">"Full"</string>
+    <string name="battery_status_not_charging">"No charge"</string>
+    <string name="battery_status_unknown">"unknown"</string>
+    <string name="battery_level">"Battery level: "</string>
+    <string name="battery_capacity">"Battery capacity: "</string>
+    <string name="health">"Battery Health Indication: "</string>
+    <string name="battery_technology">"Battery technology: "</string>
+    <string name="power_plugged">"Charging method: "</string>
+    <string name="power_plugged_ac">"AC Charging"</string>
+    <string name="power_plugged_usb">"USB Charging"</string>
+    <string name="charge_plugged">Insert the USB or power cord</string>
+    <string name="current">"Electric current : "</string>
+    <string name="temperature">"Battery temperature : "</string>
+    <string name="battery_info_temperature_units">&#176;C</string>
+    <string name="voltage">"Battery voltage : "</string>
+    <string name="battery_info_voltage_units">"V"</string>
+    <string name="battery_info_current_units">"mA"</string>
+    <string name="boot_time">"Boot time : "</string>
+    <string name="voltage_spec">"(Reference limit:3.4V - 4.35V)"</string>
+    <string name="current_spec">"(Reference limit:-1300mA - -125mA(Charging spec))"</string>
+    <string name="temp_spec">"(Reference limit :\n0&#176;C - 60&#176;C Charging spec)\n-20&#176;C - 60&#176;C(Discharge spec))"</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="three_color_label">三色灯测试</string>
+    <string name="three_color_help">帮助:\n1. 请点击屏幕的文字. \n2. 观察指示灯的颜色直到指示灯熄灭.</string>
+    <string name="red">红</string>
+    <string name="green">绿</string>
+    <string name="blue">蓝</string>
+    <string name="multicolor_notification">测试结束</string>
+</resources>

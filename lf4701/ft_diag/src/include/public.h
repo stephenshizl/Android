@@ -1,0 +1,1 @@
+#include <stdio.h>int find_inputNum(char *name);

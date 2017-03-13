@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+ 	<string name="phoneinfo_label">Software Version</string>
+    <string name="phoneinfo_auto_test">Automatic test</string>
+    <string name="phoneinfo_manual_test">Manual test</string>
+    <string name="product_name">"Model: "</string>
+    <string name="build_ver">"Build Number: "</string>
+    <string name="build_ver_out">"External version number: "</string>
+    <string name="baseband_ver">"Baseband version: "</string>
+    <string name="hardware">"Hardware model: "</string>
+    <string name="fingureprint">"Fingerprint: "</string>
+    <string name="serial_nu"></string>
+    <string name="imei">"IMEI number: "</string>
+    <string name="last_result">"Recent test results: "</string>
+    <string name="about">"About"</string>
+    <string name="quit">"Quit"</string>
+    <string name="about_title">"About SFTT"</string>
+    <string name="unknow">unknow</string>
+    <string name="about_body">"System functional testing tools
+The version number: 2.0
+Author: Xiang Wang (QAE APSE)
+Email: wangx@marvell.com"</string>
+
+</resources>

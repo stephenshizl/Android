@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="speaker_label">扬声器测试</string>
+    <string name="speaker_help">帮助:\n1. 如果插着耳机请拔出.\n2.系统会播放一首音乐.\n3.音乐播放后，请人工设置测试结果.</string>
+    <string name="speaker_start">开始</string>
+    <string name="speaker_stop">暂停</string>
+    <string name="speaker_mute">静音</string>
+    <string name="speaker_vol_up">音量 +</string>
+    <string name="speaker_vol_down">音量 -</string>
+    <string name="speaker_vol">音量</string>
+    <string name="speaker_hs_plugged">请您拔出耳机来测试扬声器!</string>
+    <string name="speaker_hs_unplugged">当前的语音设备: 扬声器</string>
+    <string name="speaker_title1">顶部扬声器密封性：</string>
+    <string name="speaker_title2">底部扬声器密封性：</string>
+    <string name="speaker_fofintpass">通过</string>
+    <string name="speaker_fofintfail">失败</string>
+    <string name="speaker_helpmifeng">帮助:\n1.系统会播放一段测试密封性的声音.\n2.声音播放完毕，请查看扬声器密封性测试结果，再人工设置测试结果.</string>
+
+</resources>

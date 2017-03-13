@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="flashlight_label">Flash Led test</string>
+    <string name="flashlight_help">Help:\n1. Select "ON" to switch the Flash Led on\n2. Observe the Flash Led is on\n 3. Select "OFF" to switch the Flash Led off.</string>
+    <string name="flashlight_open">Open</string>
+    <string name="flashlight_close">Close</string>
+    <string name="flash_led_notification">Test is complete. Set the test result manually</string>
+</resources>

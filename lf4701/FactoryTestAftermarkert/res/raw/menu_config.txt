@@ -1,0 +1,46 @@
+[parentname=Display]
+[menuname=Brightness,activity=com.tools.customercit/BackLightTest]
+[menuname=Backlight,activity=com.tools.customercit/AutoBacklight]
+[menuname=LCD,activity=com.tools.customercit/LCDTest]
+[menuname=Multicolor Notification Light,activity=com.tools.customercit/ThreeColorTest]
+[menuname=Touchscreen,activity=com.tools.customercit/TouchTest]
+
+[parentname=Power]
+[menuname=Battery,activity=com.tools.customercit/ChargeTest]
+
+[parentname=Slot]
+[menuname=SIM Card,activity=com.tools.customercit/SIMTest]
+[menuname=SD card,activity=com.tools.customercit/MemoryCardTest]
+
+[parentname=Audio]
+[menuname=Audio looper,activity=com.tools.customercit/AudioLoop]
+[menuname=Headset detection,activity=com.tools.customercit/EarpieceTest]
+[menuname=Vibrator,activity=com.tools.customercit/VibratorTest]
+[menuname=Top Spearker Alert,activity=com.tools.customercit/TopspeakerTest]
+[menuname=Bottom Speaker Alert,activity=com.tools.customercit/BottomspeakerTest]
+
+[parentname=Camera]
+[menuname=Front Camera,activity=com.tools.customercit/FrontCameraTest]
+[menuname=Back Camera,activity=com.tools.customercit/CameraTest]
+[menuname=Camera Flash LED,activity=com.tools.customercit/FlashLightTest]
+
+[parentname=Sensor]
+[menuname=Proximity Sensor,activity=com.tools.customercit/ProximityTest]
+[menuname=E-compass Sensor,activity=com.tools.customercit/CompassTest]
+[menuname=Accelerometer,activity=com.tools.customercit/AccelerometerTest]
+[menuname=Gyroscope Sensor,activity=com.tools.customercit/GyroscopeTest]
+[menuname=Light Sensor,activity=com.tools.customercit/LightTest]
+
+[parentname=Key]
+[menuname=Functional Key,activity=com.tools.customercit/KeyTest]
+
+[parentname=Connectivity]
+[menuname=WLAN,activity=com.tools.customercit/WiFiTest]
+[menuname=Bluetooth,activity=com.tools.customercit/BluetoothTest]
+
+[parentname=Network]
+[menuname=Cellular Radio Functionality,activity=com.tools.customercit/SignalTest]
+[menuname=GPS,activity=com.tools.customercit/GPSTest]
+
+[parentname=SW Version]
+[menuname=Software Version,activity=com.tools.customercit/PhoneInfo]

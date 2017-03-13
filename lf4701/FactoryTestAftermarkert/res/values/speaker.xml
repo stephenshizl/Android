@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="topspeaker_label">Top Speaker</string>
+    <string name="bottomspeaker_label">Bottom Speaker</string>
+    <string name="speaker_help">Help:\n1.Unplug the earphones.\n2.System will play a musical.\n3.Set the test result after test completed</string>
+    <string name="speaker_start">START</string>
+    <string name="speaker_stop">STOP</string>
+    <string name="speaker_mute">MUTE</string>
+    <string name="speaker_vol_up">Volume +</string>
+    <string name="speaker_vol_down">Volume -</string>
+    <string name="speaker_vol">Volume</string>
+    <string name="speaker_hs_plugged">Please unplug the earphones to test the speakers!</string>
+    <string name="speaker_hs_unplugged">Current voice equipment: Speaker</string>
+
+</resources>

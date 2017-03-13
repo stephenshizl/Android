@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="proximity_label">距离传感器测试</string>
+    <string name="proximity_help">帮助:\n1. 请把您的手靠近距离传感器2次.\n2. 测试结果将自动保存.</string>
+    <string name="proximity_distance">"ADC值: "</string>
+    <string name="proximity_checking_status">正在检测距离传感器状态...</string>
+    <string name="proximity_exist">检测到距离传感器.</string>
+    <string name="proximity_not_exist">没有检测到距离传感器.</string>
+    <string name="proximity_get_info">获取距离传感器信息:</string>
+    <string name="proximity_success">"操作成功."</string>
+    <string name="proximity_fail">"操作失败."</string>
+    <string name="proximity_finished">"测试完成."</string>
+    <string name="proximity_help2">帮助:\n1. 请等待直到测试完成.\n2. 测试结果将自动保存.</string>
+    <string name="proximity_in_test">"对不起!请等待直到测试完成!"</string>
+    <string name="proximity_cover">"(有遮挡)"</string>
+</resources>

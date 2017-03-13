@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="key_label">Key Test</string>
+    <string name="key_help">Help:\n1. Operate with the Functional Keys as instructed and observe the functionality accordingly\n2. After an individual key test, the result is shown automatically according to key functionality, and it continues to the next test\n3. Insert headsets with volume +/- buttons to test AC1/AC2 Volume+/-. If the headset is not supporting the 3-buttons operator can judge the test as \‘FAIL\’(should not be an issue).</string>
+    <string name="key_power">Power Button (long press and then lift)</string>
+    <string name="key_headset_hook2">AC2 Headset Hook Button</string>
+    <string name="key_headset_hook1">AC1 Headset Hook Button</string>
+    <string name="key_vol_button">Press the Scroll wheel</string>
+    <string name="key_vol_up">Volume Scroll up (+) </string>
+    <string name="key_vol_down">Volume Scroll down (-) </string>
+    <string name="key_m_button">Press the M-Button</string>
+    <string name="key_ac1_up">AC1 Volume+ </string>
+    <string name="key_ac1_down">AC1 Volume- </string>
+    <string name="key_ac2_up">AC2 Volume+</string>
+    <string name="key_ac2_down">AC2 Volume-</string>
+</resources>

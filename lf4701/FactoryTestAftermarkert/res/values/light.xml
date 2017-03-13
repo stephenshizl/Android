@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="light_label">Light Sensor</string>
+    <string name="light_help">Help:\n1. Read the Brightness level from UI,>=300lux will display strong, &#060;300lux will display weak.\n2. Place you hand between the phone and any light source\n3. Observe the changes in values\n4. Move your hand away and observe the changes in values\n5. Set the test result manually</string>
+    <string name="light_level">"Brightness level: "</string>
+    <string name="light_checking_status">Detecting light sensor status...</string>
+    <string name="light_exist">Light sensor has detected.</string>
+    <string name="light_not_exist">Can\'t detect light sensor.</string>
+    <string name="light_get_info">Get light sensor information:</string>
+    <string name="light_success">"Operation Successed."</string>
+    <string name="light_fail">"Operation failed."</string>
+    <string name="light_finished">"The test is completed."</string>
+    <string name="light_help2">Help:\n1. Wait until the test is completed.\n2. Set the test result manually.</string>
+    <string name="light_in_test">"Sorry！Wait until the test is complete！"</string>
+    <string name="light_action">Light intensity: </string>
+    <string name="light_strong">Strong</string>
+    <string name="light_weak">Weak</string>
+
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="compass_label">罗盘传感器测试</string>
+    <string name="compass_help">帮助:\n1. 首先划\'8\'字校准，再旋转手机来测试指南针. \n2. 请人工设置返回结果.</string>
+    <string name="compass_not_present">指南针不存在.</string>
+    <string name="compass_checking_status">正在检测方向传感器状态...</string>
+    <string name="compass_exist">检测到方向传感器.</string>
+    <string name="compass_not_exist">没有检测到方向传感器.</string>
+    <string name="compass_get_info">正在获取方向传感器信息:</string>
+    <string name="compass_success">"操作成功."</string>
+    <string name="compass_fail">"操作失败."</string>
+    <string name="compass_finished">"测试完成."</string>
+    <string name="compass_help2">帮助:\n1. 请等到测试完成.\n2. 请人工设置返回结果.</string>
+    <string name="direction1">北</string>
+    <string name="direction2">东北</string>
+    <string name="direction3">东</string>
+    <string name="direction4">东南</string>
+    <string name="direction5">南</string>
+    <string name="direction6">西南</string>
+    <string name="direction7">西</string>
+    <string name="direction8">西北</string>
+
+</resources>

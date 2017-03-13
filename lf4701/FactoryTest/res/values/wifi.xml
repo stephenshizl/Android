@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="wifi_label">WiFi测试</string>
+    <string name="wifi_help">帮助:\n1.请提前配置测试热点.\n2. 等待直到测试完成.\n3. 测试结果将自动保存.</string>
+    <string name="wifi_checking_status">正在检测WiFi状态...</string>
+    <string name="wifi_status">"WiFi状态为: "</string>
+    <string name="wifi_enabled">"打开"</string>
+    <string name="wifi_disabled">"关闭"</string>
+    <string name="wifi_enabling">"正在打开WiFi..."</string>
+    <string name="wifi_disabling">"正在关闭WiFi..."</string>
+    <string name="wifi_success">"操作成功."</string>
+    <string name="wifi_fail">"操作失败."</string>
+    <string name="wifi_in_test">"对不起!请等待直到测试完成!"</string>
+    <string name="wifi_finished">"测试完成."</string>
+    <string name="wifi_scan">"正在扫描WiFi..."</string>
+    <string name="wifi_scan_failed">"扫描失败"</string>
+    <string name="wifi_get_mac">"正在获取WiFi物理地址..."</string>
+    <string name="wifi_scan_none">没有扫描到任何无线设备.</string>
+
+</resources>

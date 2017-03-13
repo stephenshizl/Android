@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="headset_label">耳机测试</string>
+    <string name="headset_help">帮助:\n1. 请插入您的耳机.\n2.系统会随机播放一首音乐.\n3.播放结束后，请选择测试结果</string>
+    <string name="hs_start">开始</string>
+    <string name="hs_stop">暂停</string>
+    <string name="hs_mute">静音</string>
+    <string name="hs_vol_up">音量 +</string>
+    <string name="hs_vol_down">音量 -</string>
+    <string name="hs_vol">音量</string>
+    <string name="hs_plug_in">请插入您的耳机!</string>
+    <string name="hs_plugged">当前语音设备为: 耳机</string>
+    <string name="hs_right">当前声道为右声道</string>
+    <string name="hs_left">当前声道为左声道</string>
+    <string name="hs_over">测试结束，请选择测试结果</string>
+    <string name="hs_again">选择失败，重新测试！</string>
+    <string name="headset_choice1">男声   +  男声</string>
+    <string name="headset_choice2">男声   +  女声</string>
+    <string name="headset_choice3">男声   +  童声</string> 
+    <string name="headset_choice4">女声   +  女声</string> 
+    <string name="headset_choice5">女声   +  男声</string> 
+    <string name="headset_choice6">女声   +  童声</string> 
+    <string name="headset_choice7">童声   +  童声</string> 
+    <string name="headset_choice8">童声   +  男声</string>
+    <string name="headset_choice9">童声   +  女声</string>
+    
+    
+
+</resources>

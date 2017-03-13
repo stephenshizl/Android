@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auto_backlight">Backlight</string>
+    <string name="auto_backlight_test">After a moment, Screen backlight is switched OFF for 3 seconds. Please wait</string>
+    <string name="auto_backlight_notify">The Screen backlight is switched ON again, set test result manually</string>
+    <!-- Appearance of the button in the view of BlackLight -->
+    <string name="offBlack">Off the backlight</string>
+    <!-- Begin,Sang Mingxin,20100724,Add for keyboard backlight -->
+    <string name="offKey">Button lights off</string>
+    <string name="onKey">Button lights on</string>
+</resources>

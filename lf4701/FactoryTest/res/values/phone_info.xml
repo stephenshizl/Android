@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+ 
+    <string name="phoneinfo_auto_test">自动\n测试</string>
+    <string name="phoneinfo_manual_test">手动\n测试</string>
+    <string name="product_name">"型号: "</string>
+    <string name="build_ver">"内部版本号: "</string>
+    <string name="build_ver_out">"外部版本号: "</string>
+    <string name="baseband_ver">"基带版本: "</string>
+    <string name="hardware">"硬件型号: "</string>
+    <string name="fingureprint">"指纹: "</string>
+    <string name="serial_nu"></string>
+    <string name="imei">"IMEI号: "</string>
+    <string name="last_result">"最近一次测试结果: "</string>
+    <string name="about">"关于"</string>
+    <string name="quit">"退出"</string>
+    <string name="about_title">"关于 SFTT"</string>
+    <string name="unknow">未知</string>
+    <string name="about_body">"系统功能测试工具
+版本号: 2.0
+作者: Xiang Wang (QAE APSE)
+Email: wangx@marvell.com"</string>
+
+</resources>

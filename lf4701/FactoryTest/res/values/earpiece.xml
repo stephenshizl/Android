@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="ear_label">耳机测试</string>
+    <string name="ear_help">帮助:\n1.请将耳机依次插入AC1/AC2耳机孔进行测试.\n</string>
+    <string name="ear_start">开始</string>
+    <string name="earphone_stop">暂停</string>
+    <string name="ear_no_hs"></string>
+    <string name="ear_hs_plugged_right_mic">当前语音设备为: 右耳机（带麦）</string>
+    <string name="ear_hs_plugged_right_nomic">当前语音设备为: 右耳机（不带麦）</string>
+    <string name="ear_hs_plugged_left_mic">当前语音设备为: 左耳机（带麦）</string>
+    <string name="ear_hs_plugged_left_nomic">当前语音设备为: 左耳机（不带麦）</string>
+    <string name="ear_hs_unplugged">请插入耳机来测试耳机!</string>
+
+</resources>

@@ -1,0 +1,11 @@
+bugreport会dump执行命令时时的系统状态（非常全），并保存环形logbuffer中的log以及最近的kernel log。对于分析一些系统性问题和性能问题很有帮助。
+
+附件是我用最新代码编译的用于解析Bugreport的可视化工具Chkbugreport。
+使用方法：
+1、	bug发生时迅速执行如下命令抓取bugreport：
+adb bugreport > bugreport.txt（开始执行时手机会震动一下，执行结束也会震动一下，过程大概持续30s）
+2、解析bugreport
+java –jar Chkbugreport.jar bugreport.txt
+执行命令结束后会生成html文件，使用chrome浏览器打开即可。
+
+该工具可以应付大多数情况，但有些时候还是要我们去bugreport.txt中自己找线索，切勿过度依赖。

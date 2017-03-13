@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="touch_label">触摸测试</string>
+    <string name="touch_help">"帮助:\n1. 点击屏幕开始测试.\n2. 根据屏幕提示画口和划X.\n3. 返回并设置测试结果."</string>
+    <string name="touch_tap_to_start">请点击屏幕开始触摸测试!</string>
+
+</resources>

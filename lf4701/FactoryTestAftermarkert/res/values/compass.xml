@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="compass_label">Compass Sensor</string>
+   <string name="compass_help">Help:\n1.Rotating \'8\' for calibration first, then rotate the device.\n2.Check the value of direction angle.\n3.Set the test result manually.</string>
+    <string name="compass_not_present">Compass does not exist.</string>
+    <string name="compass_checking_status">Detecting orientation sensor status...</string>
+    <string name="compass_exist">Detected the orientation sensor.</string>
+    <string name="compass_not_exist">Can\'t get the orientation sensor.</string>
+    <string name="compass_get_info">Get orientation sensor information:</string>
+    <string name="compass_success">"Operation Successed."</string>
+    <string name="compass_fail">"Operation failed."</string>
+    <string name="compass_finished">"The test is completed."</string>
+    <string name="compass_help2">Help:\n1. Wait until the test is completed.\n2. Set the test results manually.</string>
+    <string name="direction1">North</string>
+    <string name="direction2">Northeast</string>
+    <string name="direction3">East</string>
+    <string name="direction4">Southeast</string>
+    <string name="direction5">South</string>
+    <string name="direction6">Southwest</string>
+    <string name="direction7">West</string>
+    <string name="direction8">Northwest</string>
+
+</resources>

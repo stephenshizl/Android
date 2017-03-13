@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="gyroscope_label">Gyroscope Sensor</string>
+    <string name="gyroscope_checking_status">Detecting gyro sensor status...</string>
+    <string name="gyroscope_exist">Detected gyro sensor.</string>
+    <string name="gyroscope_not_exist">can\'t detect gyro sensor.</string>
+    <string name="gyroscope_get_info">Get gyro sensor information:</string>
+    <string name="gyroscope_success">"Operation Successed."</string>
+    <string name="gyroscope_fail">"Operation failed."</string>
+    <string name="gyroscope_finished">"The test is completed."</string>
+    <string name="gyroscope_help2">Help:\n1. Wait until the test is completed.\n2.Set the test results manually</string>
+    <string name="gyroscope_x">"X: "</string>
+    <string name="gyroscope_y">"Y: "</string>
+    <string name="gyroscope_z">"Z: "</string>
+    <string name="gyroscope_help">Help:\n1.Parameters X, Y and Z of sensor are shown in real time.\n2.Rotate the device.\n3.Once the absolute deviation of X,Y,Z >= 3.0.Test result will pass automatically. </string>
+
+</resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="proximity_label">Proximity Sensor</string>
+    <string name="proximity_help">Help:\n1.Take your hand closer to Proximity sensor, ADC value: xx (Reference detected ADC value >= 50).\n2.Take your hand away from Proximity sensor, ADC value: xx(Reference undetected ADC value &#060; 50).\n3.Set the test result manually.</string>
+    <string name="proximity_distance">"ADC value: "</string>
+    <string name="proximity_checking_status">Detecting distance sensor status...</string>
+    <string name="proximity_exist">Distance sensor has detected.</string>
+    <string name="proximity_not_exist">Can\'t detect Distance sensor.</string>
+    <string name="proximity_get_info">Get Distance sensor information:</string>
+    <string name="proximity_success">"Operation Successed."</string>
+    <string name="proximity_fail">"Operation failed."</string>
+    <string name="proximity_finished">"The test is completed."</string>
+    <string name="proximity_help2">Help:\n1.Take your hand closer to Proximity sensor, ADC value: xx (Reference detected ADC value >= 50).\n2.Take your hand away from Proximity sensor, ADC value: xx(Reference undetected ADC value &#060; 50).\n3.Set the test result manually.</string>
+    <string name="proximity_in_test">"Sorry！Wait until the test is complete！"</string>
+    <string name="proximity_cover">"(Detected)"</string>
+</resources>

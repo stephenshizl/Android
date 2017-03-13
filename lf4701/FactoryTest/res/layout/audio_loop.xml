@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_marginLeft="5dp"
+     android:layout_marginTop="5dp"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:orientation="vertical">"
+<TextView
+      style="@style/help"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:text="@string/audio_help" />
+<LinearLayout 
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_marginTop="5dp"
+     android:gravity="center"
+     android:orientation="horizontal">
+ <Button 
+     android:id="@+id/ac2"
+     android:layout_width="wrap_content"
+     android:layout_height="40dp"
+     android:text="@string/ac2"/>   
+ <TextView 
+     android:id="@+id/txt_ac2"
+     android:layout_marginLeft="5dp"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="@string/txtnottest"/>
+</LinearLayout>    
+<LinearLayout 
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:gravity="center"
+     android:orientation="horizontal">
+ <Button 
+     android:id="@+id/topmicac2"
+     android:layout_width="wrap_content"
+     android:layout_height="40dp"
+     android:text="@string/topmicac2"/>   
+ <TextView 
+     android:id="@+id/txt_topmicac2"
+     android:layout_marginLeft="5dp"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="@string/txtnottest"/>
+</LinearLayout>    
+   
+<LinearLayout 
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:gravity="center"
+     android:orientation="horizontal">
+ <Button 
+     android:id="@+id/bottommicac2"
+     android:layout_width="wrap_content"
+     android:layout_height="40dp"
+     android:text="@string/bottommicac2"/>   
+ <TextView 
+     android:id="@+id/txt_bottommicac2"
+     android:layout_marginLeft="5dp"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="@string/txtnottest"/>
+</LinearLayout>    
+<LinearLayout 
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:gravity="center"
+     android:orientation="horizontal">
+ <Button 
+     android:id="@+id/ac1"
+     android:layout_width="wrap_content"
+     android:layout_height="40dp"
+     android:text="@string/ac1"/>   
+ <TextView 
+     android:id="@+id/txt_ac1"
+     android:layout_marginLeft="5dp"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="@string/txtnottest"/>
+</LinearLayout>    
+<LinearLayout 
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:gravity="center"
+     android:orientation="horizontal">
+ <Button 
+     android:id="@+id/topmicac1"
+     android:layout_width="wrap_content"
+     android:layout_height="40dp"
+     android:text="@string/topmicac1"/>   
+ <TextView 
+     android:id="@+id/txt_topmicac1"
+     android:layout_marginLeft="5dp"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="@string/txtnottest"/>
+</LinearLayout>    
+<LinearLayout 
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:gravity="center"
+     android:orientation="horizontal">
+ <Button 
+     android:id="@+id/bottommicac1"
+     android:layout_width="wrap_content"
+     android:layout_height="40dp"
+     android:text="@string/bottommicac1"/>   
+ <TextView 
+     android:id="@+id/txt_bottommicac1"
+     android:layout_marginLeft="5dp"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="@string/txtnottest"/>
+</LinearLayout> 
+
+<LinearLayout 
+     android:visibility="gone"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:gravity="center"
+     android:orientation="horizontal">
+ <Button 
+     android:id="@+id/topmicbottomspeaker"
+     android:layout_width="wrap_content"
+     android:layout_height="40dp"
+     android:text="@string/topmicbottomspeaker"/>   
+ <TextView 
+     android:id="@+id/txt_topmicbottomspeaker"
+     android:layout_marginLeft="5dp"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="@string/txtnottest"/>
+</LinearLayout>    
+<LinearLayout
+     android:visibility="gone"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:gravity="center"
+     android:orientation="horizontal">
+ <Button 
+     android:id="@+id/bottommictopspeaker"
+     android:layout_width="wrap_content"
+     android:layout_height="40dp"
+     android:text="@string/bottommictopspeaker"/>   
+ <TextView 
+     android:id="@+id/txt_bottommictopspeaker"
+     android:layout_marginLeft="5dp"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:text="@string/txtnottest"/>
+</LinearLayout><LinearLayout 
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_weight="1"
+     android:orientation="horizontal">
+
+</LinearLayout>        
+ <include
+     android:layout_width="fill_parent"
+     android:layout_height="wrap_content"
+     layout="@layout/bottom_bar" />
+</LinearLayout>

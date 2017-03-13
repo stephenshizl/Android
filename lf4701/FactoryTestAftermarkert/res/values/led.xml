@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+ <string name="auto_led">LED test</string>
+     <string name="open_led">Open LED lights</string>
+     <string name="close_led">Close LED lights</string>
+
+</resources>

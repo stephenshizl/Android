@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="pass_saved">Save the result as pass.</string>
+    <string name="fail_saved">Save the result as fail.</string>
+    <string name="status_initialized">Initialize.</string>
+    <string name="was_pass">Result is pass.</string>
+    <string name="was_fail">Result is fail.</string>
+    <string name="warning">Warning</string>
+    <string name="exit_warning">Test result is not saved.\n Exit or not?</string>
+
+</resources>

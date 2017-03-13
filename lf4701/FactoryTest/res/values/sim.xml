@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="sim_label">SIM卡测试</string>
+    <string name="sim_help">帮助:\n1. 请插入SIM卡进行测试.\n2.测试完成后，请设置测试结果 ."</string>
+    <string name="sim_status">"SIM卡状态: "</string>
+    <string name="sim_sn">"SIM SN号: "</string>
+    <string name="phone_no">"SIM卡号码: "</string>
+    <string name="operator_name">"运营商: "</string>
+    <string name="network_type">"网络类型: "</string>
+    <string name="phone_type">"手机类型: "</string>
+    <string name="sim_ready">"SIM卡可用"</string>
+    <string name="sim_absent">"SIM卡不可用"</string>
+    <string name="sim_absent_msg">"SIM卡不可用"</string>
+    <string name="phone_type_unknown">"未知"</string>
+    <string name="n2etwork_type">"网络类型: "</string>
+    <string name="n3etwork_type">"网络类型: "</string>
+    <string name="n4etwork_type">"网络类型: "</string>
+    <string name="n5etwork_type">"网络类型: "</string>
+    <string name="sim_checking_status">正在检测SIM卡状态...</string>
+    <string name="sim_imsi">SIM IMSI号: </string>
+    <string name="sim_finished">"测试完成."</string>
+    <string name="sim_fail">"操作失败."</string>
+    <string name="sim1_label">SIM1卡测试</string>
+    <string name="sim2_label">SIM2卡测试</string>
+    <string name="sim_remove">没有检测到SIM卡</string>
+
+</resources>

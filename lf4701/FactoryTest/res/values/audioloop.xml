@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="audio_label">"录音测试"</string>
+    <string name="audio_help">"帮助:\n1、请先插入耳机\n2、再逐一进行测试"</string>
+    <string name="ac1">"AC1麦->耳机听筒"</string>
+    <string name="ac2">"AC2麦->耳机听筒"</string>
+    <string name="topmicac1">"顶部MIC->AC1听筒"</string>
+    <string name="topmicac2">"顶部MIC->AC2听筒"</string>
+    <string name="bottommicac1">"底部MIC->AC1听筒"</string>
+    <string name="bottommicac2">"底部MIC->AC2听筒"</string>
+    <string name="topmicbottomspeaker">"顶部MIC->底部扬声器"</string>
+    <string name="bottommictopspeaker">"底部MIC->顶部扬声器"</string>
+    <string name="txtnottest">"未测试"</string>
+    <string name="txttip">"\n2.请拔出耳机\n2、对着麦克风说话听到声音后返回通过"</string>
+    <string name="txttipac1">"1、请插入左耳机\n2、对着麦克风说话听到声音后返回通过"</string>
+    <string name="txttipac2">"1、请插入右耳机\n2、对着麦克风说话听到声音后返回通过"</string>
+    <string name="audiook">"成功"</string>
+    <string name="audiono">"失败"</string>
+</resources>

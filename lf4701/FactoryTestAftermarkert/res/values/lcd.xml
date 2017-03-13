@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="lcd_label">LCD test</string>
+    <string name="lcd_help">Help:\nTo run the test..\n1. Tap the screen to start the test.\n2. Tap the screen to change the screen color. </string>
+    <string name="lcd_tap_to_start">Click the screen to start LCD test!</string>
+    <string name="lcd_tap_to_finish">Test completed. Was the test successful?</string>
+
+</resources>

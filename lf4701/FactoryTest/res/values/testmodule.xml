@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="pass_saved">结果保存为通过.</string>
+    <string name="fail_saved">结果保存为失败.</string>
+    <string name="status_initialized">初始化.</string>
+    <string name="was_pass">结果为通过.</string>
+    <string name="was_fail">结果为失败.</string>
+    <string name="warning">警告</string>
+    <string name="exit_warning">测试结果并未保存.\n是否退出?</string>
+
+</resources>

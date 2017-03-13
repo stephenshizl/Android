@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="light_label">光传感器测试</string>
+    <string name="light_help">帮助:\n1. 请遮住光传感器的部分区域（前置摄像头区域).\n2.如果亮度级>=300lux,则\"光线强度\"为强,否则为弱.\n3. 测试结果将自动保存.</string>
+    <string name="light_level">"亮度级: "</string>
+    <string name="light_checking_status">正在检测光传感器状态...</string>
+    <string name="light_exist">检测到光传感器.</string>
+    <string name="light_not_exist">没有检测到光传感器.</string>
+    <string name="light_get_info">获取光传感器信息:</string>
+    <string name="light_success">"操作成功."</string>
+    <string name="light_fail">"操作失败."</string>
+    <string name="light_finished">"测试完成."</string>
+    <string name="light_help2">帮助:\n1. 请等待直到测试结束.\n2. 测试结果将自动保存.</string>
+    <string name="light_in_test">"对不起!请等到测试完成!"</string>
+    <string name="light_action">光线强弱: </string>
+    <string name="light_strong">强</string>
+    <string name="light_weak">弱</string>
+
+</resources>

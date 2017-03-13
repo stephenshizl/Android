@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="gps_label">GPS</string>
+    <string name="gps_help">Help:\n1. Wait for GPS positioning...</string>
+    <string name="open_gps">Open GPS</string>
+    <string name="gps_satellite_no">"The number of satellites detected: "</string>
+    <string name="gps_longitude">"Longitude: "</string>
+    <string name="gps_latitude">"Latitude: "</string>
+    <string name="gps_altitude">"Altitude: "</string>
+    <string name="gps_accuracy">"Accuracy: "</string>
+    <string name="gps_working">GPS is available, positioning...</string>
+    <string name="gps_not_working">"GPS does not exist or not work! Please try to open the GPS."</string>
+    <string name="init_time_100millisecond">00:00:0(Reference time:1mins)</string>
+    <string name="gps_timeout">GPS positioning time is too long.</string>
+    <string name="gps_checking_status">"Detecting the GPS device status..."</string>
+    <string name="gps_provider_status">"GPS device status is: "</string>
+    <string name="gps_provider_enabled">"Available"</string>
+    <string name="gps_provider_disabled">"Unavailable"</string>
+    <string name="gps_provider_open">"Openning GPS devices..."</string>
+    <string name="gps_success">"Operation Successed."</string>
+    <string name="gps_fail">"Operation failed."</string>
+    <string name="gps_in_test">"Sorry！Wait until the test is complete！"</string>
+    <string name="gps_finished">"The test is completed."</string>
+    <string name="gps_register_location">"Create location-based service listeners..."</string>
+    <string name="gps_register_nmea">"Create nmea listener..."</string>
+    <string name="gps_receive_nmea">"Receiving nmea..."</string>
+    <string name="gps_searchtime">"(Reference time:1mins)"</string>
+    <string name="gps_ok">"Locate Successed"</string>
+
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="camera_label">后置摄像头测试</string>
+    <string name="camera_help">帮助:\n1. 如果您能看到图像, 请设置测试结果为通过, 否则为失败.\n2.点击屏幕中央确认是否能拍照</string>
+    <string name="frontcamera_label">前置摄像头测试</string>
+    <string name="picture_resolution">分辨率</string>
+    <string name="takepic">takepic</string>
+    <string name="auto_fail">fail</string>
+    <string name="camera_back">back</string>
+    <string name="auto_success">success</string>
+    <string name="auto_focus">focus</string>
+</resources>

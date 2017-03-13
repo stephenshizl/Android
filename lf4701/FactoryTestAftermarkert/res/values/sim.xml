@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="sim_label">SIM Card test</string>
+    <string name="sim_help">Help:\n1.Insert the SIM card.\n2.Set the test result after test completed."</string>
+    <string name="sim_status">"SIM card status: "</string>
+    <string name="sim_sn">"SIM SN number: "</string>
+    <string name="phone_no">"SIMcard number: "</string>
+    <string name="operator_name">"Operators: "</string>
+    <string name="network_type">"Network type: "</string>
+    <string name="phone_type">"Phone type: "</string>
+    <string name="sim_ready">"SIM card is available"</string>
+    <string name="sim_absent">"SIM card is available"</string>
+    <string name="sim_absent_msg">"SIM card is unavailable"</string>
+    <string name="phone_type_unknown">"unknown"</string>
+    <string name="n2etwork_type">"Network type: "</string>
+    <string name="n3etwork_type">"Network type: "</string>
+    <string name="n4etwork_type">"Network type: "</string>
+    <string name="n5etwork_type">"Network type: "</string>
+    <string name="sim_checking_status">Detecting SIM card status...</string>
+    <string name="sim_imsi">SIM IMSI number: </string>
+    <string name="sim_finished">"The test is completed.."</string>
+    <string name="sim_fail">"Operation failed."</string>
+    <string name="sim1_label">SIM1 card test</string>
+    <string name="sim2_label">SIM2 card test</string>
+    <string name="sim_remove">Can\'t detect SIM card.</string>
+
+</resources>

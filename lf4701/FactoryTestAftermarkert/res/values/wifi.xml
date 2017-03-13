@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="wifi_label">WiFi test</string>
+    <string name="wifi_help">Help:\n1. Wait until the test is completed.\n2. Set the test result manually.</string>
+    <string name="wifi_checking_status">Detecting wifi status...</string>
+    <string name="wifi_status">"WiFi status is: "</string>
+    <string name="wifi_enabled">"Open"</string>
+    <string name="wifi_disabled">"Close"</string>
+    <string name="wifi_enabling">"Openning WiFi..."</string>
+    <string name="wifi_disabling">"Closing WiFi..."</string>
+    <string name="wifi_success">"Operation Successed."</string>
+    <string name="wifi_fail">"Operation failed."</string>
+    <string name="wifi_in_test">"Sorry！Wait until the test is complete！"</string>
+    <string name="wifi_finished">"The test is completed."</string>
+    <string name="wifi_scan">"Scanning WiFi..."</string>
+    <string name="wifi_scan_failed">"Fail to scan"</string>
+    <string name="wifi_get_mac">"Getting WiFi physical address..."</string>
+    <string name="wifi_scan_none">Can not scan any wireless devices.</string>
+    <string name="wifi_scan_comment">Nr\tchannel\tFrequency\tsignal\t\tHotspot</string>
+
+</resources>

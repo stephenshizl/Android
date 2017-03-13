@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="headset_label">Headphone test</string>
+    <string name="headset_help">Help:\n1.Insert your headset.\n2.System will play a musical randomly.\n3.Select the test result after playing</string>
+    <string name="hs_start">START</string>
+    <string name="hs_stop">PAUSE</string>
+    <string name="hs_mute">MUTE</string>
+    <string name="hs_vol_up">Volume +</string>
+    <string name="hs_vol_down">Volume -</string>
+    <string name="hs_vol">Volume</string>
+    <string name="hs_plug_in">Insert your headset!</string>
+    <string name="hs_plugged">Current voice equipment: Headphone</string>
+    <string name="hs_right">Current channel is right channel</string>
+    <string name="hs_left">Current channel is left channel</string>
+    <string name="hs_over">Set the test result after end of the test</string>
+    <string name="hs_again">Select fails, re-test!</string>
+    <string name="headset_choice1">Male   + Male  </string>
+    <string name="headset_choice2">Male   + Female</string>
+    <string name="headset_choice3">Male   + Child </string> 
+    <string name="headset_choice4">Female + Female</string> 
+    <string name="headset_choice5">Female + Male  </string> 
+    <string name="headset_choice6">Female + Child  </string> 
+    <string name="headset_choice7">Child  + Child </string> 
+    <string name="headset_choice8">Child  + Male  </string>
+    <string name="headset_choice9">Child  + Female</string>     
+
+</resources>

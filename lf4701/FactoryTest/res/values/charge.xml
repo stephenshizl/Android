@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="charge_label">充电测试</string>
+    <string name="charge_help">帮助:\n1. 请插入USB或电源线.\n2. 测试结果将自动保存.</string>
+    <string name="battery_status">"电池状态: "</string>
+    <string name="battery_dead">"死机"</string>
+    <string name="battery_status_charging">"正在充电"</string>
+    <string name="battery_status_discharging">"正在放电"</string>
+    <string name="battery_status_full">"已充满"</string>
+    <string name="battery_status_not_charging">"没有充电"</string>
+    <string name="battery_status_unknown">"未知"</string>
+    <string name="battery_level">"电池电量: "</string>
+    <string name="battery_capacity">"电池等级: "</string>
+    <string name="health">"电池健康指示: "</string>
+    <string name="battery_technology">"技术: "</string>
+    <string name="power_plugged">"充电方式: "</string>
+    <string name="power_plugged_ac">"AC充电中"</string>
+    <string name="power_plugged_usb">"USB充电中"</string>
+    <string name="charge_plugged">请插入USB或电源线</string>
+    <string name="current">"电流："</string>
+    <string name="temperature">"电池温度："</string>
+    <string name="battery_info_temperature_units">"℃"</string>
+    <string name="voltage">"电池电压："</string>
+    <string name="battery_info_voltage_units">"μV"</string>
+    <string name="battery_info_current_units">"μA"</string>
+    <string name="boot_time">"已开机时间："</string>
+    
+
+</resources>

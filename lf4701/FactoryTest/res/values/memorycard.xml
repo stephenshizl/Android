@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="memorycard_label">SD卡测试</string>
+    <string name="memorycard_help">帮助:\n1. 请插入SD卡进行测试.\n2.测试完成后，请设置测试结果 ."</string>
+    <string name="mc_test"><font style="color:blue"><b>12345</b><br/>1212121</font></string>
+    <string name="sd_mounted">SD卡已经被加载!</string>
+    <string name="sd_eject">SD卡正在被移除!</string>
+    <string name="sd_removed">SD卡已经被移除!</string>
+    <string name="sd_unmountable">SD卡不能被加载!</string>
+    <string name="sd_unmounted">SD卡没有加载到它的挂载点!</string>
+    <string name="sd_no_fs">SD卡不兼容或空白!</string>
+    <string name = "sd_not_present"></string>
+    <string name = "sd_present_rw">检测到SD卡,属性为可读写!</string>
+    <string name = "sd_present_shared">SD卡正工作在UMS模式!</string>
+    <string name = "sd_read_only">检测到SD卡但属性为只读!</string>
+    <string name = "sd_unavaliable">没有检测到SD卡.</string>
+    <string name = "insert_sd_card">请插入SD卡再进行测试...</string>
+    <string name = "sd_test_start">开始测试...</string>
+    <string name = "sd_test_complete">测试完成.</string>
+    <string name="external_sd">External SD:</string> 
+    <string name="internal_sd">Internal SD:</string> 
+    <string name="memory_available">可用空间:</string> 
+ <!--  The total amount of storage space for some storage partition.  For example, this is listed under both the "Internal phone storage" section and the "SD card" section 
+  --> 
+    <string name="memory_size">总空间:</string> 
+    <string name="unit"> Mb</string>
+        
+</resources>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        style="@style/help"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/headset_help" />
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/txt_headset_info"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="25sp"/>
+       <TextView
+        android:id="@+id/headset_test_log"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textSize="25sp"
+        android:textColor="@color/dark_yellow" />
+
+        <Button
+            android:id="@+id/btn_start"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:text="@string/hs_start"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+        </LinearLayout>
+    </LinearLayout>
+  <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+     <LinearLayout
+        android:id="@+id/headset_choice_1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+       <Button
+            android:id="@+id/headset_choice1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:text="@string/headset_choice1"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+       <Button
+            android:id="@+id/headset_choice2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:text="@string/headset_choice2"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+        <Button
+            android:id="@+id/headset_choice3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:text="@string/headset_choice3"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/headset_choice_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+       <Button
+            android:id="@+id/headset_choice4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:text="@string/headset_choice4"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+       <Button
+            android:id="@+id/headset_choice5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:text="@string/headset_choice5"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+        <Button
+            android:id="@+id/headset_choice6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:text="@string/headset_choice6"
+            android:textSize="28sp"
+            android:textStyle="bold" />      
+    </LinearLayout>
+     <LinearLayout
+        android:id="@+id/headset_choice_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+       <Button
+            android:id="@+id/headset_choice7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:text="@string/headset_choice7"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+       <Button
+            android:id="@+id/headset_choice8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:text="@string/headset_choice8"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+        <Button
+            android:id="@+id/headset_choice9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="6dp"
+            android:text="@string/headset_choice9"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+    </LinearLayout>  
+    <include
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/bottom_bar" />
+</LinearLayout>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="audio_label">"Audio looper"</string>
+    <string name="audio_help">"Help:\n1.Connect the headsets to AC1 or AC2 audio connector according which looper to be tested.\n2.Tap each looper to start test.\n3.In each looper talk to input and can hear from output.\n4.Set test result manually"</string>
+    <string name="ac1">"AC1 looptest (headset: mic to speaker)"</string>
+    <string name="ac2">"AC2 looptest (headset: mic to speaker)"</string>
+    <string name="topmicac1">"Top Mic => AC1"</string>
+    <string name="topmicac2">"Top Mic => AC2"</string>
+    <string name="bottommicac1">"Bottom Mic => AC1"</string>
+    <string name="bottommicac2">"Bottom Mic => AC2"</string>
+    <string name="topmicbottomspeaker">"Top Mic => Bottomspeaker"</string>
+    <string name="bottommictopspeaker">"Bottom Mic => Topspeaker"</string>
+    <string name="txtnottest">"nottest"</string>
+    <string name="txttip">"Help:\n1. Please Unplug the earphone2. Speak into the microphone,set the result pass when hear the sounds"</string>
+    <string name="txttipac1">"Help:\n1. Please insert the left earphone\n2. Speak into the microphone,set the result pass when hear the sounds"</string>
+    <string name="txttipac2">"Help:\n1. Please insert the right earphone\n2. Speak into the microphone,set the result pass when hear the sounds"</string>
+    <string name="audiook">"OK"</string>
+    <string name="audiono">"NO"</string>
+
+
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="vibrate_label">振动测试</string>
+    <string name="vibrate_help">"帮助:\n1. 触摸屏幕来测试振动."</string>
+    <string name="touch_to_vibrate">请触摸屏幕来测试振动!</string>
+    <string name="vibrate_not_exist">没有检测到振动器</string>
+
+</resources>

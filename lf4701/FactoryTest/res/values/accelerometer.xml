@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="accelerometer_label">加速度传感器测试</string>
+    <string name="accelerometer_help">帮助:\n1. 加速度传感器的 X, Y, Z坐标值是实时更新的.\n2.x,y,z变化绝对值>=3时自动完成测试.</string>
+    <string name="accelerometer_x">"X: "</string>
+    <string name="accelerometer_y">"Y: "</string>
+    <string name="accelerometer_z">"Z: "</string>
+    <string name="accelerometer_checking_status">正在检测加速度传感器状态...</string>
+    <string name="accelerometer_exist">检测到加速度传感器.</string>
+    <string name="accelerometer_not_exist">没有检测到加速度传感器.</string>
+    <string name="accelerometer_get_info">获取加速度传感器信息:</string>
+    <string name="accelerometer_success">"操作成功."</string>
+    <string name="accelerometer_fail">"操作失败."</string>
+    <string name="accelerometer_finished">"测试完成."</string>
+    <string name="accelerometer_help2">帮助:\n1. 请等待直到测试完成.\n2. 测试结果将自动保存.</string>
+    <string name="sensor_name">传感器名称: </string>
+    <string name="sensor_power">传感器功率: </string>
+    <string name="sensor_vendor">传感器厂商: </string>
+
+</resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="gps_label">GPS测试</string>
+    <string name="gps_help">帮助:\n1. 请等待GPS进行定位...</string>
+    <string name="open_gps">打开GPS</string>
+    <string name="gps_satellite_no">"检测到的卫星数量: "</string>
+    <string name="gps_longitude">"经度: "</string>
+    <string name="gps_latitude">"纬度: "</string>
+    <string name="gps_altitude">"海拔: "</string>
+    <string name="gps_accuracy">"精度: "</string>
+    <string name="gps_working">GPS可用,正在定位...</string>
+    <string name="gps_not_working">"GPS不存在或无法正常工作！请尝试打开GPS."</string>
+    <string name="init_time_100millisecond">00:00:0</string>
+    <string name="gps_timeout">GPS定位时间过长.</string>
+    <string name="gps_checking_status">"正在检测GPS设备状态..."</string>
+    <string name="gps_provider_status">"GPS设备状态为: "</string>
+    <string name="gps_provider_enabled">"可用"</string>
+    <string name="gps_provider_disabled">"不可用"</string>
+    <string name="gps_provider_open">"正在打开GPS设备..."</string>
+    <string name="gps_success">"操作成功."</string>
+    <string name="gps_fail">"操作失败."</string>
+    <string name="gps_in_test">"对不起!请等待直到测试完成!"</string>
+    <string name="gps_finished">"测试完成."</string>
+    <string name="gps_register_location">"创建位置服务监听器..."</string>
+    <string name="gps_register_nmea">"创建nmea监听器..."</string>
+    <string name="gps_receive_nmea">"正在接收nmea..."</string>
+    <string name="gps_ok">"定位完成"</string>
+
+</resources>

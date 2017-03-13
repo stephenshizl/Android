@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="key_label">Key测试</string>
+    <string name="key_help">帮助:\n1. 请按下列顺序按键.</string>
+    <string name="key_power">电源键（长按然后抬起）</string>
+    <string name="key_headset_hook2">AC2耳机按键</string>
+    <string name="key_headset_hook1">AC1耳机按键 </string>
+    <string name="key_vol_button">滚轮</string>
+    <string name="key_vol_up">音量上</string>
+    <string name="key_vol_down">音量下</string>
+    <string name="key_m_button">M-BUTTON</string>
+    <string name="key_ac1_up">AC1 音量上</string>
+    <string name="key_ac1_down">AC1 音量下</string>
+    <string name="key_ac2_up">AC2 音量上</string>
+    <string name="key_ac2_down">AC2 音量下</string>
+</resources>

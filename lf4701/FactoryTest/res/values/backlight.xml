@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+     <string name="auto_backlight">背光</string>  
+    <string name="auto_backlight_test">背景灯将先灭屏 3 秒后再亮屏</string>
+    <string name="offBlack">关闭背景灯</string>
+    <!-- Begin,Sang Mingxin,20100724,Add for keyboard backlight -->
+    <string name="offKey">按键灯关</string>
+    <string name="onKey">按键灯开</string>
+
+</resources>

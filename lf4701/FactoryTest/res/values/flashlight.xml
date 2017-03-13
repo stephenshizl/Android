@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="flashlight_label">闪光灯测试</string>
+    <string name="flashlight_help">帮助:\n1. 单击打开按钮来测试闪光灯.\n2. 观察闪光灯的状态并手动设置测试结果.</string>
+    <string name="flashlight_open">打开</string>
+    <string name="flashlight_close">关闭</string>
+
+</resources>

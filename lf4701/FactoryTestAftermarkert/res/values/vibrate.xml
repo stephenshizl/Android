@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="vibrate_label">Vibration test</string>
+    <string name="vibrate_help">"Help:\n1. Tap the screen to start the vibration test\n2. Set the test result manually"</string>
+    <string name="touch_to_vibrate">Tap the screen to switch vibration on</string>
+    <string name="vibrate_completed">Did you feel the vibration? Set the test result manually</string>
+    <string name="vibrate_not_exist">Vibrator can not be detected</string>
+
+</resources>

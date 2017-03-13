@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="three_color_label">Multicolor Notification light test</string>
+    <string name="three_color_help">Help:\nTo run the test.. \n1. Tap the screen to start the test.\n2. Tap the colored text and check the color of indicator LED changes accordingly.</string>
+    <string name="red">RED</string>
+    <string name="green">GREEN</string>
+    <string name="blue">BLUE</string>
+    <string name="multicolor_notification">Test is complete. Set the test result manually</string>
+</resources>

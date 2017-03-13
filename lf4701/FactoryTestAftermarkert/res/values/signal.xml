@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+   <string name="signal_label">Cellphone signal test</string>
+   <string name="phone_signal">Cellphone signal test</string>
+   <string name="current_signal">Current cellphone signal :</string>
+   <string name="network_forbidden">(Forbidden)</string>
+   <string name="network_query_error">Error while searching for networks.</string>
+   <string name="network_query_longtime">Searching for networks time out.</string>   
+   <string name="signal_help">Help:\n1. List all cells with network modes that are available\n2. Refer the Network mode (2G, 3G, 4G) to other devices in same environment \n3. Refer the phone signal to other devices in same environment \n4. Set Test result manually</string>
+
+</resources>

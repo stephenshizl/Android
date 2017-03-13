@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="mic_label">Audio Test</string>
+    <string name="mic1_label">Main Microphone Test</string>
+    <string name="mic2_label">Vice Microphone Test</string>
+    <string name="mic_help">"Help:\n1. Click the Start button to test the microphone recording."</string>
+    <string name="mic_start">START</string>
+    <string name="mic_recording"><b>Recording</b></string>
+    <string name="mic_playing"><b>Playing</b></string>
+    <string name="mic_hs_with_mic">Unplug the headphones and use microphone!</string>
+    <string name="mic_hs_with_in_mic">Insert the headset microphone!</string>
+    <string name="mic_hs_without_mic">Current voice equipment: Headphone(OK)</string>
+    <string name="mic_no_hs">Current voice equipment: Speaker (OK)</string>
+    <string name="mic_hint">select the number you heard</string>
+    
+</resources>

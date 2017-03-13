@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bt_label">蓝牙测试</string>
+    <string name="bt_help">帮助:\n1. 请等待直到测试完成.\n2. 测试结果将自动保存.</string>
+    <string name="bt_absent">"没有检测到蓝牙硬件."</string>
+    <string name="bt_detected">"检测到蓝牙硬件!"</string>
+    <string name="bt_checking_status">正在检测蓝牙状态...</string>
+    <string name="bt_status">"蓝牙状态为: "</string>
+    <string name="bt_enabled">"开启"</string>
+    <string name="bt_disabled">"关闭"</string>
+    <string name="bt_enabling">"正在开启蓝牙..."</string>
+    <string name="bt_disabling">"正在关闭蓝牙..."</string>
+    <string name="bt_success">"操作成功."</string>
+    <string name="bt_fail">"操作失败."</string>
+    <string name="bt_in_test">"对不起！请等到测试完成！"</string>
+    <string name="bt_finished">"测试完成."</string>
+    <string name="title_paired_devices">配对设备</string>
+    <string name="title_other_devices">其它可配对设备</string>
+    <string name="button_scan">扫描蓝牙设备</string>
+    <string name="none_paired">没有设备可配对</string>
+    <string name="scanning">正在扫描蓝牙设备...</string>
+    <string name="scan_fail">扫描蓝牙设备失败</string>
+    <string name="select_device">选择设备进行连接</string>
+    <string name="none_found">没有扫描到任何蓝牙设备</string>
+    <string name="pair_test">配对设备</string>
+    <string name="bt_not_enabled_leaving">蓝牙设备不可用，正离开测试.</string>
+    <string name="pair_visible">使蓝牙设备可见</string>
+    <string name="set_result">请人工设置测试结果!</string>
+    <string name="bt_get_mac">"正在获取蓝牙设备物理地址..."</string>
+</resources>

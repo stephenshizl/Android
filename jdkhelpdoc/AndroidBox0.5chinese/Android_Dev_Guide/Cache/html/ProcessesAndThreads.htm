@@ -1,0 +1,1206 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=gb2312">
+<meta name=Generator content="Word2Chm Addin (v1.4.7.4)">
+<link rel="stylesheet" href="Word2Chm.css" type="text/css">
+
+<title> Processes and Threads</title>
+</head>
+<body lang=ZH-CN link="#006699" vlink=purple style='text-justify-trim:punctuation' >      
+<div class=WordSection1 style='layout-grid:15.6pt'>
+
+<p class=MsoNormal align=center style='text-align:center'><b><span
+style='font-size:18.0pt;font-family:"Calibri","sans-serif"'>Processes and
+Threads</span></b></p>
+
+<p class=MsoNormal align=center style='text-align:center'><span
+>译者署名：</span><span style='font-family:"Calibri","sans-serif"'>
+</span><span >呆呆大虾</span></p>
+
+<p class=MsoNormal align=center style='text-align:center'><span
+>译者微博：</span><span style='font-family:"Calibri","sans-serif"'>
+<span><a target="_blank" href="http://weibo.com/popapa">http://weibo.com/popapa</a> </span></span></p>
+
+<p class=MsoNormal align=center style='text-align:center'><span
+>版本：</span><span style='font-family:"Calibri","sans-serif"'>Android
+3.2 r1</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><span
+style='font-family:"Calibri","sans-serif"'>&nbsp;</span></p>
+
+<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0 align=left
+ width=311 style='width:233.05pt;border-collapse:collapse;border:none;
+ margin-left:6.75pt;margin-right:6.75pt'>
+ <tr style='height:35.6pt'>
+  <td width=311 valign=top style='width:233.05pt;border:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt;height:35.6pt'>
+  <p class=MsoNormal align=left style='text-align:left'><b><span
+  style=';color:#7BB026'>快速查看</span></b></p>
+  <p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+  text-indent:0cm;background:white'><span style='font-size:10.0pt;
+  font-family:Symbol;color:#333333'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span><span style=';color:#333333'>默认情况下，每个应用程序运行在各自的进程中，应用程序中的所有组件也都运行在其中。</span></p>
+  <p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+  text-indent:0cm;background:white'><span style='font-size:10.0pt;
+  font-family:Symbol;color:#333333'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span></span><span style='font-family:"Calibri","sans-serif";
+  color:#333333'>activity</span><span style=';color:#333333'>中所有运行缓慢的、阻塞的操作都应该运行在新建的线程中，以免减缓用户界面运行速度。</span></p>
+  <p class=MsoNormal><b><span style=';color:#7BB026'>在本文中</span></b></p>
+  <p class=MsoNormal style='text-indent:21.0pt;background:white'><span
+  style='font-family:"Calibri","sans-serif";color:#333333'><a
+  href="1.htm#Process"><span style=';color:#CC6600'><span
+ >进<span>程</span></span></span></a></span></p>
+  <p class=MsoNormal style='margin-left:21.0pt;text-indent:21.0pt;background:
+  white'><span style='font-family:"Calibri","sans-serif";color:#333333'><a
+  href="1.htm#Process_life"><span style=';color:#CC6600'><span
+ >进程的生<span>命<span>周期</span></span></span></span></a></span></p>
+  <p class=MsoNormal style='text-indent:21.0pt;background:white'><span
+  style='font-family:"Calibri","sans-serif";color:#333333'><a
+  href="1.htm#Thread"><span style=';color:#CC6600'><span
+ >线<span>程</span></span></span></a></span></p>
+  <p class=MsoNormal style='margin-left:21.0pt;text-indent:21.0pt;background:
+  white'><u><span style='font-family:"Calibri","sans-serif";
+  color:#CC6600'><a href="1.htm#worker_thread"><span
+  style=';color:#CC6600'><span>工<span>作<span
+ >线<span>程</span></span></span></span></span></a></span></u></p>
+  <p class=MsoNormal style='margin-left:21.0pt;text-indent:21.0pt;background:
+  white'><span style='font-family:"Calibri","sans-serif";color:#333333'><a
+  href="1.htm#Thread_safe_method"><span style=';
+  color:#CC6600'><span>线程安<span>全<span>的<span
+ >方法</span></span></span></span></span></a></span></p>
+  <p class=MsoNormal style='text-indent:21.0pt;background:white'><span
+  style='font-family:"Calibri","sans-serif";color:#333333'><a
+  href="1.htm#Interprocess_Communication"><span style='font-family:
+  宋体;color:#CC6600'><span>进程间<span>通<span>讯</span></span></span></span></a></span></p>
+  <p class=MsoNormal align=left style='text-align:left'><b><span
+  style='font-family:"Calibri","sans-serif";color:#7BB026'>&nbsp;</span></b></p>
+  </td>
+ </tr>
+</table>
+
+<p class=MsoNormal align=left style='text-align:left'><b><span
+>进程和线程</span></b></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>如果某个应用程序组件是第一次被启动，且这时应用程序也没有其他组件在运行，则</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>Android</span><span
+>系统会为应用程序创建一个包含单个线程的</span><span
+style='font-family:"Calibri","sans-serif"'>linux</span><span style='font-family:
+宋体'>进程。默认情况下，同一个应用程序的所有组件都运行在同一个进程和线程里（叫做</span><span
+style='font-family:"Calibri","sans-serif"'>“main”</span><span style='font-family:
+宋体'>主线程）。如果组件启动时，已经存在应用程序的进程了（因为应用程序的其它组件已经在运行了），则此组件会在已有的进程和线程中启动运行。不过，可以指定组件运行在其他进程里，也可以为任何进程创建额外的线程。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><b><span
+style='font-family:"Calibri","sans-serif"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></b><span
+>本文讨论进程和线程是如何在</span><span style='font-family:
+"Calibri","sans-serif"'>Android</span><span >应用程序中发挥作用的。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><b><span
+style='font-family:"Calibri","sans-serif";color:#7BB026'>&nbsp;</span></b></p>
+
+<p class=MsoNormal align=left style='text-align:left'><span
+style='font-family:"Calibri","sans-serif";color:#333333'>&nbsp;</span></p>
+
+<p class=MsoNormal align=center style='text-align:center'><a name=Process><b><span
+style='font-size:12.0pt;;color:#111111'>进程</span></b></a></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>默认情况下，同一个应用程序内的所有组件都是运行在同一个进程中的，大部分应用程序也不会去改变它。不过，如果需要指定某个特定组件所属的进程，则可以利用</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>manifest </span><span
+>文件来达到目的。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>manifest</span><span
+>文件中的每种组件元素</span><span style='font-family:
+"Calibri","sans-serif"'>——<span style='color:#333333'><a target="_blank" href="http://developer.android.com/guide/topics/manifest/activity-element.html">&lt;activity&gt;</a></span></span><span
+style=';color:#333333'>、</span><span style='font-family:"Calibri","sans-serif";
+color:#333333'> <span><a target="_blank" href="http://developer.android.com/guide/topics/manifest/service-element.html">&lt;service&gt;</a></span></span><span
+style=';color:#333333'>、</span><span style='font-family:"Calibri","sans-serif";
+color:#333333'> <span><a target="_blank" href="http://developer.android.com/guide/topics/manifest/receiver-element.html">&lt;receiver&gt;</a></span></span><span
+style=';color:#333333'>和</span><span style='font-family:
+"Calibri","sans-serif";color:#333333'><a target="_blank" href="http://developer.android.com/guide/topics/manifest/provider-element.html">&lt;provider&gt;</a></span><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>——</span><span
+>都支持定义</span><span style='font-family:"Calibri","sans-serif";
+color:#007000'>android:process</span><span >属性，用于指定组件运行的进程。设置此属性即可实现每个组件在各自的进程中运行，或者某几个组件共享一个进程而其它组件运行于独立的进程。设置此属性也可以让不同应用程序的组件运行在同一个进程中</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>——</span><span
+>实现多个应用程序共享同一个</span><span style='font-family:
+"Calibri","sans-serif"'>Linux</span><span >用户</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>ID</span><span
+>、赋予同样的权限。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'><a target="_blank" href="http://developer.android.com/guide/topics/manifest/application-element.html">&lt;application&gt;</a></span><span
+>元素也支持</span><span style='font-family:"Calibri","sans-serif";
+color:#007000'>android:process</span><span >属性，用于指定所有组件的默认进程。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>如果内存不足，可又有其它为用户提供更紧急服务的进程需要更多内存，</span><span
+style='font-family:"Calibri","sans-serif"'>Android</span><span
+>可能会决定关闭一个进程。在此进程中运行着的应用程序组件也会因此被销毁。当需要再次工作时，会为这些组件重新创建一个进程。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>在决定关闭哪个进程的时候，</span><span style='font-family:
+"Calibri","sans-serif"'>Android</span><span >系统会权衡它们相对用户的重要程度。比如，相对于一个拥有可见</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>activity</span><span
+>的进程，更有可能去关闭一个</span><span style='font-family:
+"Calibri","sans-serif"'>activity</span><span >已经在屏幕上看不见的进程。也就是说，是否终止一个进程，取决于运行在此进程中组件的状态。终止进程的判定规则将在后续内容中讨论。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><span
+style='font-family:"Calibri","sans-serif";color:#333333'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><a name="Process_life"><b><span
+style=';color:#3A3A3A'>进程的生命周期</span></b></a></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>Android</span><span
+style=';color:#333333'>系统试图尽可能长时间地保持应用程序进程，但为了新建或者运行更加重要的进程，总是需要清除过时进程来回收内存。为了决定保留或终止哪个进程，根据进程内运行的组件及这些组件的状态，系统把每个进程都划入一个</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>“</span><span
+style=';color:#333333'>重要性层次结构</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>”</span><span
+style=';color:#333333'>中。重要性最低的进程首先会被清除，</span><span
+style=';color:#333333'>然后是下一个最低的，依此类推，这都是回收系统资源所必需的。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>重要性层次结构共有</span><span style='font-family:
+"Calibri","sans-serif"'>5</span><span >级，以下列表按照重要程度列出了各类进程（第一类进程是<i>最重要</i>的，将最后一个被终止）：</span></p>
+
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left'><b><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>1. </span></b><b><span
+style=';color:#333333'>前台进程</span></b></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>用户当前操作所必须的进程。满足以下任一条件时，进程被视作处于前台：</span></p>
+
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt;layout-grid-mode:char'><span style='font-size:
+10.0pt;font-family:"Courier New";color:#333333'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style=';color:#333333'>其中运行着正与用户交互的</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/app/Activity.html">Activity</a></span><span
+style=';color:#333333'>（</span><span style='font-family:
+"Calibri","sans-serif";color:#333333'>Activity</span><span style='font-family:
+宋体;color:#333333'>对象的</span><span style='font-family:"Calibri","sans-serif";
+color:#333333'> <span><a target="_blank" href="http://developer.android.com/reference/android/app/Activity.html#onResume%28%29">onResume()</a>
+</span></span><span style=';color:#333333'>方法已被调用）</span><span
+style=';color:#333333'>。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt;layout-grid-mode:char'><span style='font-size:
+10.0pt;font-family:"Courier New";color:#333333'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style=';color:#333333'>其中运行着被正与用户交互的</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>绑定的服务</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/app/Service.html">Service</a></span><span
+style=';color:#333333'>。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt;layout-grid-mode:char'><span style='font-size:
+10.0pt;font-family:"Courier New";color:#333333'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style=';color:#333333'>其中运行着</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>“</span><span
+style=';color:#333333'>前台</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>”</span><span
+style=';color:#333333'>服务</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/app/Service.html">Service</a></span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>——</span><span
+style=';color:#333333'>服务以</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/app/Service.html#startForeground(int, android.app.Notification)">startForeground()</a></span><span
+style=';color:#333333'>方式被调用</span><span style=';
+color:#333333'>。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt;layout-grid-mode:char'><span style='font-size:
+10.0pt;font-family:"Courier New";color:#333333'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style=';color:#333333'>其中运行着正在执行生命周期回调方法（</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/app/Service.html#onCreate()">onCreate()</a></span><span
+style=';color:#333333'>、</span><span style='font-family:
+"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/app/Service.html#onStart(android.content.Intent, int)">onStart()</a></span><span
+style=';color:#333333'>或</span><span style='font-family:
+"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/app/Service.html#onDestroy()">onDestroy()</a></span><span
+style=';color:#333333'>）</span><span style=';
+color:#333333'>的服务</span><span style='font-family:"Calibri","sans-serif";
+color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/app/Service.html">Service</a></span><span
+style=';color:#333333'>。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt;layout-grid-mode:char'><span style='font-size:
+10.0pt;font-family:"Courier New";color:#333333'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style=';color:#333333'>其中运行着正在执行</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/content/BroadcastReceiver.html#onReceive(android.content.Context, android.content.Intent)">onReceive()</a></span><span
+style=';color:#333333'>方法的</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/content/BroadcastReceiver.html">BroadcastReceiver</a></span><span
+style=';color:#333333'>。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:21.0pt;text-align:left;
+text-indent:21.0pt'><span >一般而言，任何时刻前台进程都是为数不多的，只有作为最后的策略</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>——</span><span
+>当内存不足以维持它们同时运行时</span><span style='font-family:
+"Calibri","sans-serif"'>——</span><span >才会被终止</span><span
+>。通常，设备这时候已经到了内存分页状态</span><span
+style='font-family:"Calibri","sans-serif"'>(</span><span
+style='font-family:"Calibri","sans-serif"'>memory paging state</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>)</span><span
+>的地步，终止一些前台进程是为了保证用户界面的及时响应。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left'><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left'><b><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>2. </span></b><b><span
+style=';color:#333333'>可见进程</span></b></p>
+
+<p class=MsoNormal align=left style='margin-left:21.0pt;text-align:left;
+text-indent:21.0pt'><span >没有</span><span
+style=';color:#333333'>前台组件、但仍会影响用户在屏幕上所见内容的进程。满足以下任一条件时，进程被认为是可见的：</span></p>
+
+<p class=MsoNormal align=left style='margin-left:42.3pt;text-align:left;
+text-indent:-21.0pt'><span style='font-size:10.0pt;font-family:"Courier New";
+color:#333333'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style=';color:#333333'>其中运行着不在前台的</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/app/Activity.html">Activity</a></span><span
+style=';color:#333333'>，但用户仍然可见到此</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>（</span><span style='font-family:
+"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/app/Activity.html#onPause()">onPause()</a></span><span
+style=';color:#333333'>方法被调用了）。比如以下场合就可能发生这种情况：前台</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>打开了一个对话框，而之前的</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>还允许显示在后面。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:42.3pt;text-align:left;
+text-indent:-21.0pt'><span style='font-size:10.0pt;font-family:"Courier New";
+color:#333333'>o<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style=';color:#333333'>其中运行着被可见（或前台）</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>绑定的服务</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/app/Service.html">Service</a></span><span
+style=';color:#333333'>。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:21.2pt;text-align:left;
+text-indent:21.0pt'><span style=';color:#333333'>可见进程被认为是非常重要的进程，除非无法维持所有前台进程同时运行了，它们是不会被终止的。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left'><b><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>3. </span></b><b><span
+style=';color:#333333'>服务进程</span></b></p>
+
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left;
+text-indent:21.0pt'><span style=';color:#333333'>此进程运行着由</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/content/Context.html#startService(android.content.Intent)">startService()</a></span><span
+style=';color:#333333'>方法启动的服务，它不会升级为上述两级别。尽管服务进程不直接和用户所见内容关联，但他们通常在执行一些用户关心的操作（比如在后台播放音乐或从网络下载数据）。因此，除非内存不足以维持所有前台、可见进程同时运行，系统会保持服务进程的运行。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left'><b><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>4. </span></b><b><span
+style=';color:#333333'>后台进程</span></b></p>
+
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left;
+text-indent:21.0pt'><span style=';color:#333333'>包含目前用户不可见</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>（</span><span style='font-family:
+"Calibri","sans-serif";color:#333333'>Activity</span><span style='font-family:
+宋体;color:#333333'>对象的</span><span style='font-family:"Calibri","sans-serif";
+color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/app/Activity.html#onStop()">onStop()</a></span><span
+style=';color:#333333'>方法已被调用）的进程。这些进程对用户体验没有直接的影响，系统可能在任意时间终止它们，以回收内存供前台进程、可见进程及服务进程使用。通常会有很多后台进程在运行，所以它们被保存在一个</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>LRU</span><span
+style=';color:#333333'>（最近最少使用）列表中，以确保最近被用户使用的</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>最后一个被终止。如果一个</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>正确实现了生命周期方法，并保存了当前的状态，则终止此类进程不会对用户体验产生可见的影响。因为在用户返回</span><span
+style=';color:#333333'>时，</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>会恢复所有可见的状态。关于保存和恢复状态的详细信息，请参阅</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'><a target="_blank" href="http://developer.android.com/guide/topics/fundamentals/activities.html#SavingActivityState">Activities</a></span><span
+style=';color:#333333'>文档。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left'><b><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>5. </span></b><b><span
+style=';color:#333333'>空进程</span></b></p>
+
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left;
+text-indent:21.0pt'><span style=';color:#333333'>不含任何活动应用程序组件的进程。保留这种进程的唯一目的就是用作缓存，以改善下次在此进程中运行组件的启动时间。为了在进程缓存和内核缓存间平衡系统整体资源，系统经常会终止这种进程。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><span
+style='font-family:"Calibri","sans-serif";color:#333333'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>依据进程中目前活跃组件的重要程度，</span><span
+style='font-family:"Calibri","sans-serif"'>Android</span><span
+>会给进程评估一个尽可能高的级别。例如：如果一个进程中运行着一个服务和一个用户可见的</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>activity</span><span
+>，则此进程会被评定为可见进程，而不是服务进程。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>此外，</span><span >一个进程的级别可能会由于其它进程的依赖而被提高</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>——</span><span
+>为其它进程提供服务的进程级别永远不会低于使用此服务的进程。比如：如果</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>A</span><span
+>进程中的</span><span style='font-family:"Calibri","sans-serif"'>content
+provider</span><span >为进程</span><span
+style='font-family:"Calibri","sans-serif"'>B</span><span style='font-family:
+宋体'>中的客户端提供服务，或进程</span><span style='font-family:"Calibri","sans-serif"'>A</span><span
+>中的服务被进程</span><span style='font-family:"Calibri","sans-serif"'>B</span><span
+>中的组件所调用，则</span><span style='font-family:
+"Calibri","sans-serif"'>A</span><span >进程至少被视为与进程</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>B</span><span
+>同样重要。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>因为运行服务的进程级别是高于后台</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>进程的，所以，如果</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>需要启动一个长时间运行的操作，则为其启动一个服务</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'><a target="_blank" href="http://developer.android.com/guide/topics/fundamentals/services.html">service</a></span><span
+style=';color:#333333'>会比</span><span style=';
+color:#333333'>简单地创建一个工作线程更好些</span><span style='font-family:"Calibri","sans-serif";
+color:#333333'>——</span><span style=';color:#333333'>尤其是在此操作时间比</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>本身存在时间还要长久的情况下。比如，一个</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>要把</span><span style=';
+color:#333333'>图片上传至</span><span style='font-family:"Calibri","sans-serif";
+color:#333333'>Web</span><span style=';color:#333333'>网站，就应该创建一个服务来执行之，即使用户离开了此</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>，上传还是会在后台继续运行。</span><span
+style=';color:#333333'>不论</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>发生什么情况，</span><span style='font-family:
+宋体;color:#333333'>使用服务</span><span style=';color:#333333'>可以保证操作至少拥有</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>“</span><span
+style=';color:#333333'>服务进程</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>”</span><span
+style=';color:#333333'>的优先级。同理，上一篇中的广播接收器</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>broadcast receiver</span><span
+style=';color:#333333'>也是使用服务而非线程来处理耗时任务的。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><span
+style='font-family:"Calibri","sans-serif";color:#333333'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><span
+style='font-family:"Calibri","sans-serif";color:#333333'>&nbsp;</span></p>
+
+<p class=MsoNormal align=center style='text-align:center'><a name=Thread><b><span
+style='font-size:12.0pt;;color:#111111'>线程</span></b></a></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>应用程序启动时，系统会为它创建一个名为</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>“main”</span><span
+style=';color:#333333'>的主线程。主线程非常重要，因为它</span><span
+>负责把事件分发给相应的用户界面</span><span style='font-family:
+"Calibri","sans-serif";color:#333333'>widget</span><span
+style='font-family:"Calibri","sans-serif"'>——</span><span style='font-family:
+宋体'>包括屏幕绘图事件。它也是应用程序与</span><span style='font-family:"Calibri","sans-serif";
+color:#333333'>Android UI</span><span style=';color:#333333'>组件包（来自</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/widget/package-summary.html">android.widget</a></span><span
+style=';color:#333333'>和</span><span style='font-family:
+"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/view/package-summary.html">android.view</a></span><span
+style=';color:#333333'>包）进行交互的线程。因此，主线程有时也被叫做</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>系统并不会为每个组件的实例都创建单独的线程。运行于同一个进程中的所有组件都是在</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程</span><span style=';
+color:#333333'>中实例化的，对每个组件的系统调用也都是由</span><span style='font-family:
+"Calibri","sans-serif";color:#333333'>UI</span><span style=';
+color:#333333'>线程</span><span style=';color:#333333'>分发的。因此，对系统回调进行响应的方法（比如报告用户操作的</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/view/View.html#onKeyDown(int, android.view.KeyEvent)">onKeyDown()</a></span><span
+style=';color:#333333'>或生命周期回调方法）总是运行在</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程</span><span style=';
+color:#333333'>中。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>举个例子，当用户触摸屏幕上的按钮时，应用程序的</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程把触摸事件分发给</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>widget</span><span
+style=';color:#333333'>，</span><span style='font-family:
+"Calibri","sans-serif";color:#333333'>widget</span><span style='font-family:
+宋体;color:#333333'>先把自己置为按下状态，再发送一个显示区域已失效（</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>invalidate</span><span
+style=';color:#333333'>）</span><span style=';
+color:#333333'>的请求到事件队列中。</span><span style='font-family:"Calibri","sans-serif";
+color:#333333'>UI</span><span style=';color:#333333'>线程从队列中取出此请求，并通知</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>widget</span><span
+style=';color:#333333'>重绘自己。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>如果应用程序在与用户交互的同时需要执行繁重的任务，单线程模式可能会导致运行性能很低下，除非应用程序的执行时机刚好很合适。如果</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程需要处理每一件事情，那些耗时很长的操作</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>——</span><span
+style=';color:#333333'>诸如访问网络或</span><span style='font-family:
+宋体'>查询数据库等</span><span style='font-family:"Calibri","sans-serif"'>——</span><span
+>将会阻塞整个</span><span style='font-family:"Calibri","sans-serif";
+color:#333333'>UI</span><span style=';color:#333333'>（线程）</span><span
+>。一旦线程被阻塞，所有事件都不能被分发，包括屏幕绘图事件。从用户的角度看来，应用程序看上去像是挂起了。更糟糕的是，</span><span
+style=';color:#333333'>如果</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程被阻塞超过一定时间（目前大约是</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>5</span><span
+style=';color:#333333'>秒钟），用户就会被提示那个可恶的</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>“</span><u><span
+style=';color:#006699'>应用程序没有响应</span></u><u><span
+style='font-family:"Calibri","sans-serif";color:#006699'>”</span></u><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>(ANR)</span><span
+style=';color:#333333'>对话框。如果引起用户不满，他可能就会决定退出并删除这个应用程序。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>此外，</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>Andoid</span><span
+style=';color:#333333'>的</span><span style='font-family:
+"Calibri","sans-serif";color:#333333'>UI</span><span style=';
+color:#333333'>组件包并<i>不是</i>线程安全的。因此不允许从工作线程中操作</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>UI——</span><span
+style=';color:#333333'>只能从</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程中操作用户界面。于是，</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>Andoid</span><span
+style=';color:#333333'>的单线程模式必须遵守两个规则：</span></p>
+
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt'><span style='font-family:"Calibri","sans-serif";
+color:#333333'>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style=';color:#333333'>不要阻塞</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt'><span style='font-family:"Calibri","sans-serif";
+color:#333333'>2.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style=';color:#333333'>不要在</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程之外访问</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>Andoid</span><span
+style=';color:#333333'>的</span><span style='font-family:
+"Calibri","sans-serif";color:#333333'>UI</span><span style=';
+color:#333333'>组件包。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><span
+style='font-family:"Calibri","sans-serif";color:#333333'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><a name="worker_thread"><b><span
+style=';color:#333333'>工作线程</span></b></a></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>根据对以上单线程模式的描述，要想保证程序界面的响应能力，关键是不能阻塞</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程。如果操作不能很快完成，应该让它们在单独的线程中运行（</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>“</span><span
+style=';color:#333333'>后台</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>”</span><span
+style=';color:#333333'>或</span><span style='font-family:
+"Calibri","sans-serif";color:#333333'>“</span><span style=';
+color:#333333'>工作</span><span style='font-family:"Calibri","sans-serif";
+color:#333333'>”</span><span style=';color:#333333'>线程）。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>例如：以下响应鼠标点击的代码实现了在单独线程中下载图片并在</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/widget/ImageView.html">ImageView</a></span><span
+style=';color:#333333'>显示：</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:21.0pt;margin-right:0cm'>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:#000088'>public</span><span
+style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#000088'>void</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> onClick</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>(</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>View</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> v</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>)</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>{</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; </span><span
+style='font-family:"Calibri","sans-serif";color:#000088'>new</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>Thread</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>(</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#000088'>new</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>Runnable</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>()</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>{</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; &nbsp; &nbsp; </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#000088'>public</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#000088'>void</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> run</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>()</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>{</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>Bitmap</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> b </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>=</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>
+loadImageFromNetwork</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>(</span><span style='font-family:"Calibri","sans-serif";
+color:#008800'>&quot;http://example.com/image.png&quot;</span><span
+style='font-family:"Calibri","sans-serif";color:#666600'>);</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+mImageView</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>.</span><span style='font-family:"Calibri","sans-serif";
+color:black'>setImageBitmap</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>(</span><span style='font-family:"Calibri","sans-serif";
+color:black'>b</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>);</span><span style='font-family:"Calibri","sans-serif";
+color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; &nbsp; &nbsp; </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>}</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; </span><span
+style='font-family:"Calibri","sans-serif";color:#666600'>}).</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>start</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>();</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:#666600'>}</span></p>
+
+</div>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>乍</span><span >看起来，这段代码似乎能运行得很好，因为创建了一个新的线程来处理访问网络的操作。可是它违反了单线程模式的第二条规则：</span><i><span
+>不要</span></i><span >在</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>UI</span><span
+>线程之外访问</span><span style='font-family:"Calibri","sans-serif"'>Andoid</span><span
+>的</span><span style='font-family:"Calibri","sans-serif"'>UI</span><span
+>组件包</span><span style='font-family:"Calibri","sans-serif"'>——</span><span
+>以上例子在工作线程里而不是</span><span style='font-family:
+"Calibri","sans-serif"'>UI</span><span >线程里修改了</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/widget/ImageView.html">ImageView</a></span><span
+style=';color:#333333'>。</span><span >这可能导致不明确、不可预见的后果，要跟踪这种情况也是很困难很耗时间的。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>为了解决以上问题，</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>Android</span><span
+style=';color:#333333'>提供了几种途径来从其它线程中访问</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程。下面列出了有助于解决问题的几种方法：</span></p>
+
+<p class=MsoNormal align=left style='margin-left:21.0pt;text-align:left;
+text-indent:0cm'><span style='font-size:10.0pt;font-family:Symbol;
+color:#333333'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style='font-family:"Calibri","sans-serif";
+color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/app/Activity.html#runOnUiThread(java.lang.Runnable)">Activity.runOnUiThread(Runnable)</a></span></p>
+
+<p class=MsoNormal align=left style='margin-left:21.0pt;text-align:left;
+text-indent:0cm'><span style='font-size:10.0pt;font-family:Symbol;
+color:#333333'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style='font-family:"Calibri","sans-serif";
+color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/view/View.html#post(java.lang.Runnable)">View.post(Runnable)</a></span></p>
+
+<p class=MsoNormal align=left style='margin-left:21.0pt;text-align:left;
+text-indent:0cm'><span style='font-size:10.0pt;font-family:Symbol;
+color:#333333'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style='font-family:"Calibri","sans-serif";
+color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/view/View.html#postDelayed(java.lang.Runnable, long)">View.postDelayed(Runnable,
+long)</a></span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><span
+style='font-family:"Calibri","sans-serif";color:#333333'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>比如说，可以使用</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/view/View.html#post(java.lang.Runnable)">View.post(Runnable)</a></span><span
+style=';color:#333333'>方法来修正上面的代码：</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:21.0pt;margin-right:0cm'>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:#000088'>public</span><span
+style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#000088'>void</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> onClick</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>(</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>View</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> v</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>)</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>{</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; </span><span
+style='font-family:"Calibri","sans-serif";color:#000088'>new</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>Thread</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>(</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#000088'>new</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>Runnable</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>()</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>{</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; &nbsp; &nbsp; </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#000088'>public</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#000088'>void</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> run</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>()</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>{</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#000088'>final</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>Bitmap</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> bitmap </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>=</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>
+loadImageFromNetwork</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>(</span><span style='font-family:"Calibri","sans-serif";
+color:#008800'>&quot;http://example.com/image.png&quot;</span><span
+style='font-family:"Calibri","sans-serif";color:#666600'>);</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+mImageView</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>.</span><span style='font-family:"Calibri","sans-serif";
+color:black'>post</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>(</span><span style='font-family:"Calibri","sans-serif";
+color:#000088'>new</span><span style='font-family:"Calibri","sans-serif";
+color:black'> </span><span style='font-family:"Calibri","sans-serif";
+color:#660066'>Runnable</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>()</span><span style='font-family:"Calibri","sans-serif";
+color:black'> </span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>{</span><span style='font-family:"Calibri","sans-serif";
+color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; </span><span style='font-family:"Calibri","sans-serif";
+color:#000088'>public</span><span style='font-family:"Calibri","sans-serif";
+color:black'> </span><span style='font-family:"Calibri","sans-serif";
+color:#000088'>void</span><span style='font-family:"Calibri","sans-serif";
+color:black'> run</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>()</span><span style='font-family:"Calibri","sans-serif";
+color:black'> </span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>{</span><span style='font-family:"Calibri","sans-serif";
+color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; mImageView</span><span style='font-family:
+"Calibri","sans-serif";color:#666600'>.</span><span
+style='font-family:"Calibri","sans-serif";color:black'>setImageBitmap</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>(</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>bitmap</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>);</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+&nbsp; &nbsp; </span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>}</span><span style='font-family:"Calibri","sans-serif";
+color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>});</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; &nbsp; &nbsp; </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>}</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:black'>&nbsp; &nbsp; </span><span
+style='font-family:"Calibri","sans-serif";color:#666600'>}).</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>start</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>();</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+background:#FAFAFA;border:none;padding:0cm'><span style='font-family:
+"Calibri","sans-serif";color:#666600'>}</span></p>
+
+</div>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>以上代码的执行现在是线程安全的了：网络相关的操作在单独的线程里完成，而</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/widget/ImageView.html">ImageView</a></span><span
+style=';color:#333333'>是在</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程里操纵的。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>不过，随着操作变得越来越复杂，这类代码也会变得很复杂很难维护。为了用工作线程完成更加复杂的交互处理，可以考虑在工作线程中用</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/Handler.html">Handler</a></span><span
+style=';color:#333333'>来处理</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程分发过来的消息。当然，最好的解决方案也许就是</span><span
+>继承使用异<span style='color:#333333'>步任务类</span></span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask</a></span><span
+style=';color:#333333'>，此类简化了一些工作线程和</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>交互的操作。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><b><span
+style='font-family:"Calibri","sans-serif";color:#3A3A3A'>&nbsp;</span></b></p>
+
+<p class=MsoNormal align=left style='text-align:left'><b><span
+style=';color:#333333'>使用异步任务</span></b></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>异步任务</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask</a></span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'> </span><span
+style=';color:#333333'>允许以异步的方式对用户界面进行操作。它先阻塞工作线程，再在</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程中呈现结果，在此过程中不需要对线程和</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>handler</span><span
+style=';color:#333333'>进行人工干预。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>要使用异步任务，必须继承</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask</a></span><span
+style=';color:#333333'>类并实现</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html#doInBackground(Params...)">doInBackground()</a></span><span
+style=';color:#333333'>回调方法，该对象将运行于一个后台线程池中。要更新</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>时，须实现</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html#onPostExecute(Result)">onPostExecute()</a></span><span
+style=';color:#333333'>方法来分发</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html#doInBackground(Params...)">doInBackground()</a></span><span
+style=';color:#333333'>返回的结果，由于此方法运行在</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程中，所以就能安全地更新</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>了。然后就可以在</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程中调用</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html#execute(Params...)">execute()</a></span><span
+style=';color:#333333'>来执行任务了。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>例如，可以利用</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask</a></span><span
+style=';color:#333333'>来实现上面的那个例子：</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:21.0pt;margin-right:0cm'>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#000088'>public</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#000088'>void</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> onClick</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>(</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>View</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> v</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>)</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>{</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp; &nbsp;
+</span><span style='font-family:"Calibri","sans-serif";color:#000088'>new</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>DownloadImageTask</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>().</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>execute</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>(</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#008800'>&quot;http://example.com/image.png&quot;</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>);</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>}</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#000088'>private</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#000088'>class</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>DownloadImageTask</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#000088'>extends</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>AsyncTask</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>&lt;</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>String</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>,</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>Void</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>,</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>Bitmap</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>&gt;</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>{</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp; &nbsp;
+</span><span style='font-family:"Calibri","sans-serif";color:#880000'>/**
+The system calls this to perform work in a worker thread and&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#880000'>&nbsp;
+&nbsp; &nbsp; * delivers it the parameters given to AsyncTask.execute() */</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp; &nbsp;
+</span><span style='font-family:"Calibri","sans-serif";color:#000088'>protected</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#660066'>Bitmap</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>
+doInBackground</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>(</span><span style='font-family:"Calibri","sans-serif";
+color:#660066'>String</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>...</span><span style='font-family:"Calibri","sans-serif";
+color:black'> urls</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>)</span><span style='font-family:"Calibri","sans-serif";
+color:black'> </span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>{</span><span style='font-family:"Calibri","sans-serif";
+color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp; &nbsp;
+&nbsp; &nbsp; </span><span style='font-family:"Calibri","sans-serif";
+color:#000088'>return</span><span style='font-family:"Calibri","sans-serif";
+color:black'> loadImageFromNetwork</span><span style='font-family:
+"Calibri","sans-serif";color:#666600'>(</span><span
+style='font-family:"Calibri","sans-serif";color:black'>urls</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>[</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#006666'>0</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>]);</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp; &nbsp;
+</span><span style='font-family:"Calibri","sans-serif";color:#666600'>}</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp; &nbsp;
+&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp; &nbsp;
+</span><span style='font-family:"Calibri","sans-serif";color:#880000'>/**
+The system calls this to perform work in the UI thread and delivers&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#880000'>&nbsp;
+&nbsp; &nbsp; * the result from doInBackground() */</span><span
+style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp; &nbsp;
+</span><span style='font-family:"Calibri","sans-serif";color:#000088'>protected</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'> </span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#000088'>void</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>
+onPostExecute</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>(</span><span style='font-family:"Calibri","sans-serif";
+color:#660066'>Bitmap</span><span style='font-family:"Calibri","sans-serif";
+color:black'> result</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>)</span><span style='font-family:"Calibri","sans-serif";
+color:black'> </span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>{</span><span style='font-family:"Calibri","sans-serif";
+color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp; &nbsp;
+&nbsp; &nbsp; mImageView</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>.</span><span style='font-family:"Calibri","sans-serif";
+color:black'>setImageBitmap</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>(</span><span style='font-family:"Calibri","sans-serif";
+color:black'>result</span><span style='font-family:"Calibri","sans-serif";
+color:#666600'>);</span><span style='font-family:"Calibri","sans-serif";
+color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp; &nbsp;
+</span><span style='font-family:"Calibri","sans-serif";color:#666600'>}</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:black'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+layout-grid-mode:char;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#666600'>}</span></p>
+
+</div>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>现在</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>是安全的，代码也得到简化，因为任务分解成了工作线程内完成的部分和</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程内完成的部分。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>要全面理解这个类的使用，须阅读</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html">AsyncTask</a></span><span
+style=';color:#333333'>的参考文档。以下是关于其工作方式的概述：</span></p>
+
+<p class=MsoNormal align=left style='margin-left:21.0pt;text-align:left;
+text-indent:0cm'><span style='font-size:10.0pt;font-family:Symbol;
+color:#333333'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style=';color:#333333'>可以用</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>generics</span><span
+style=';color:#333333'>来指定参数、进度值和任务最终值的类型。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:21.0pt;text-align:left;
+text-indent:0cm'><span style='font-size:10.0pt;font-family:Symbol;
+color:#333333'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style=';color:#333333'>工作线程中的</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html#doInBackground(Params...)">doInBackground()</a></span><span
+style=';color:#333333'>方法会自动执行。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:21.0pt;text-align:left;
+text-indent:0cm'><span style='font-size:10.0pt;font-family:Symbol;
+color:#333333'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style='font-family:"Calibri","sans-serif";
+color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html#onPreExecute()">onPreExecute()</a></span><span
+style=';color:#007000'>、</span><span style='font-family:
+"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html#onPostExecute(Result)">onPostExecute()</a></span><span
+style=';color:#333333'>和</span><span style='font-family:
+"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html#onProgressUpdate(Progress...)">onProgressUpdate()</a></span><span
+style=';color:#333333'>方法都在</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程中调用。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:21.0pt;text-align:left;
+text-indent:0cm'><span style='font-size:10.0pt;font-family:Symbol;
+color:#333333'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style='font-family:"Calibri","sans-serif";
+color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html#doInBackground(Params...)">doInBackground()</a></span><span
+style=';color:#333333'>的返回值会传给</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html#onPostExecute(Result)">onPostExecute()</a></span><span
+style=';color:#333333'>。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:21.0pt;text-align:left;
+text-indent:0cm'><span style='font-size:10.0pt;font-family:Symbol;
+color:#333333'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style=';color:#333333'>在</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html#doInBackground(Params...)">doInBackground()</a></span><span
+style=';color:#333333'>内的任何时刻，都可以调用</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html#publishProgress(Progress...)">publishProgress()</a></span><span
+style=';color:#333333'>来执行</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程中的</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/AsyncTask.html#onProgressUpdate(Progress...)">onProgressUpdate()</a></span><span
+style=';color:#333333'>。</span></p>
+
+<p class=MsoNormal align=left style='margin-left:21.0pt;text-align:left;
+text-indent:0cm'><span style='font-size:10.0pt;font-family:Symbol;
+color:#333333'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><span style=';color:#333333'>可以在任何时刻、任何线程内取消任务。</span></p>
+
+<div style='border:none;border-left:solid #FFCF00 3.0pt;padding:0cm 0cm 0cm 6.0pt;
+margin-left:21.0pt;margin-right:0cm'>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+border:none;padding:0cm'><b><span style=';color:#333333'>注意：</span></b><span
+style=';color:#333333'>在使用工作线程时，可能遇到的另一个问题是由于</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'><a target="_blank" href="http://developer.android.com/guide/topics/resources/runtime-changes.html"><span
+lang=EN-US ><span>运行配置的改变</span></span></a></span><span
+style=';color:#333333'>（比如用户改变了屏幕方向）导致</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>意外重启，这可能会销毁该工作线程。要了解如何在这种情况下维持任务执行、以及如何在</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>activity</span><span
+style=';color:#333333'>被销毁时正确地取消任务，请参见</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'><a target="_blank" href="http://code.google.com/p/shelves/">Shelves</a></span><span
+style=';color:#333333'>例程的源代码。</span></p>
+
+</div>
+
+<p class=MsoNormal align=left style='text-align:left'><a
+name="Thread_safe_method"><b><span style='font-family:"Calibri","sans-serif";
+color:#333333'>&nbsp;</span></b></a></p>
+
+<p class=MsoNormal align=left style='text-align:left'><b><span
+style=';color:#333333'>线程安全的方法</span></b></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>在某些场合，方法可能会从不止一个线程中被调用，因此这些方法必须是写成线程安全的。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>对于能被远程调用的方法</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>——</span><span
+style=';color:#333333'>比如绑定服务（</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'><a target="_blank" href="http://developer.android.com/guide/topics/fundamentals/bound-services.html">bound
+service</a></span><span style=';color:#333333'>）中的方法，这是理所当然的。如果对</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/IBinder.html">IBinder</a></span><span
+style=';color:#333333'>所实现方法的调用发起于</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/IBinder.html">IBinder</a></span><span
+style=';color:#333333'>所在进程的内部，那么这个方法是执行在调用者的线程中的。但是，如果调用发起于其他进程，那么这个方法将运行于线程池中选出的某个线程中（而不是运行于进程的</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程中），该线程池由系统维护且位于</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/IBinder.html">IBinder</a></span><span
+style=';color:#333333'>所在的进程中。例如，即使一个服务的</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/app/Service.html#onBind(android.content.Intent)">onBind()</a></span><span
+style=';color:#333333'>方法是从服务所在进程的</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程中调用的，实现了</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/app/Service.html#onBind(android.content.Intent)">onBind()</a></span><span
+style=';color:#333333'>的方法对象（比如，实现了</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>RPC</span><span
+style=';color:#333333'>方法的一个子类）仍会从线程池中的线程被调用。因为一个服务可以有不止一个客户端，所以同时可以有多个线程池与同一个</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/IBinder.html">IBinder</a></span><span
+style=';color:#333333'>方法相关联。因此</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/os/IBinder.html">IBinder</a></span><span
+style=';color:#333333'>方法必须实现为线程安全的。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>类似地，内容提供者（</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>content provider</span><span
+style=';color:#333333'>）也能接收来自其它进程的数据请求。尽管</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/content/ContentResolver.html">ContentResolver</a></span><span
+style=';color:#333333'>类、</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/content/ContentProvider.html">ContentProvider</a></span><span
+style=';color:#333333'>类隐藏了进程间通讯管理的细节，</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/content/ContentProvider.html">ContentProvider</a></span><span
+style=';color:#333333'>中响应请求的方法</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>——</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/content/ContentProvider.html#query(android.net.Uri, java.lang.String[], java.lang.String, java.lang.String[], java.lang.String)">query()</a></span><span
+style=';color:#333333'>、</span><span style='font-family:
+"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/content/ContentProvider.html#insert(android.net.Uri, android.content.ContentValues)">insert()</a></span><span
+style=';color:#007000'>、</span><span style='font-family:
+"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/content/ContentProvider.html#delete(android.net.Uri, java.lang.String, java.lang.String[])">delete()</a></span><span
+style=';color:#333333'>、</span><span style='font-family:
+"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/content/ContentProvider.html#update(android.net.Uri, android.content.ContentValues, java.lang.String, java.lang.String[])">update()</a></span><span
+style=';color:#333333'>和</span><span style='font-family:
+"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/content/ContentProvider.html#getType(android.net.Uri)">getType()</a></span><span
+style=';color:#333333'>方法</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>——</span><span
+style=';color:#333333'>是从</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>ContentProvider</span><span
+style=';color:#333333'>所在进程的线程池中调用的，而不是进程的</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif";color:#333333'>UI</span><span
+style=';color:#333333'>线程。因为这些方法可能会从很多线程同时调用，它们也必须实现为线程安全的。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><span
+style='font-family:"Calibri","sans-serif";color:#333333'>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><span
+style='font-family:"Calibri","sans-serif";color:#333333'>&nbsp;</span></p>
+
+<p class=MsoNormal align=center style='text-align:center'><a
+name="Interprocess_Communication"><b><span style='font-size:12.0pt;font-family:
+宋体'>进程间通讯</span></b></a></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>Android</span><span
+>利用远程过程调用（</span><span style='font-family:
+"Calibri","sans-serif"'>remote procedure call</span><span style='font-family:
+宋体'>，</span><span style='font-family:"Calibri","sans-serif"'>RPC</span><span
+>）提供了一种进程间通信（</span><span style='font-family:
+"Calibri","sans-serif"'>IPC</span><span >）机制，通过这种机制，被</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>activity</span><span
+>或其他应用程序组件调用的方法将（在其他进程中）被远程执行，而所有的结果将被返回给调用者。这就要求把方法调用及其数据分解到操作系统可以理解的程度，并将其从本地的进程和地址空间传输至远程的进程和地址空间，然后在远程进程中重新组装并执行这个调用。执行后的返回值将被反向传输回来。</span><span
+lang=EN-US style='font-family:"Calibri","sans-serif"'>Android</span><span
+>提供了执行</span><span style='font-family:"Calibri","sans-serif"'>IPC</span><span
+>事务所需的全部代码，因此只要把注意力放在定义和实现</span><span
+style='font-family:"Calibri","sans-serif"'>RPC</span><span style='font-family:
+宋体'>编程接口上即可。</span></p>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+style=';color:#333333'>要执行</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'>IPC</span><span
+style=';color:#333333'>，应用程序必须用</span><span
+style='font-family:"Calibri","sans-serif";color:#007000'><a target="_blank" href="http://developer.android.com/reference/android/content/Context.html#bindService(android.content.Intent, android.content.ServiceConnection, int)">bindService()</a></span><span
+style=';color:#333333'>绑定到服务上。详情请参阅服务</span><span
+style='font-family:"Calibri","sans-serif";color:#333333'><a target="_blank" href="http://developer.android.com/guide/topics/fundamentals/services.html">Services</a></span><span
+style=';color:#333333'>开发指南。</span></p>
+
+<p class=MsoNormal style='layout-grid-mode:char'><span
+style='font-family:"Calibri","sans-serif"'>&nbsp;</span></p>
+
+<p class=MsoNormal style='layout-grid-mode:char'><span
+style='font-family:"Calibri","sans-serif"'>&nbsp;</span></p>
+
+<p class=MsoNormal style='layout-grid-mode:char'><b><span style='font-family:
+宋体'>补充说明</span></b></p>
+
+<p class=MsoNormal style='text-indent:21.0pt;layout-grid-mode:char'><span
+>本文参考了</span><span style='font-family:"Calibri","sans-serif"'><a target="_blank" href="http://leybreeze.com/?p=532">http://leybreeze.com/?p=532</a></span><span
+>，修正一些重大错误，增加新版本的内容。</span></p>
+
+</div>
+
+      
+</body>
+</html>

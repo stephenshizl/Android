@@ -1,0 +1,1722 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=gb2312">
+<link rel="stylesheet" href="Word2Chm.css" type="text/css">
+<title> adb</title>
+</head>
+<body>   
+<div class=WordSection5 style='layout-grid:15.6pt'><br clear=all
+style='page-break-before:always'>
+
+<p class=MsoNormal align=center style='text-align:center'><a name=adb><b><span
+lang=EN-US style='font-size:18.0pt'>adb</span></b></a></p>
+<p class=MsoNormal align=center style='text-align:center'><span
+>译者署名：</span> <span><a target="_blank" href="http://t.sina.com.cn/wenbin1027"><span style='font-family:
+宋体'><span>移动云</span></span>_<span style='font-family:
+宋体'><span>文斌</span></span></a></span></p>
+<p class=MsoNormal align=center style='text-align:center'><span
+>译者链接：</span><span><a target="_blank" href="http://blog.csdn.net/caowenbin">http://blog.csdn.net/caowenbin</a></span></p>
+<p class=MsoNormal align=center style='text-align:center'><span
+>版本：</span><span>Android 2.3 r1</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>原文</span></b></p>
+<p class=a0 style='text-indent:0cm'><span style='font-family:"Arial","sans-serif"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a target="_blank" href="http://developer.android.com/guide/developing/tools/adb.html">http://developer.android.com/guide/developing/tools/adb.html</a>
+</span></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+<p class=MsoNormal align=left style='text-align:left'><b><span
+style='font-size:12.0pt;font-family:"Arial","sans-serif"'>Android Debug Bridge</span></b></p>
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+lang=EN-US>Android</span><span >调试桥接器，简称</span><span
+lang=EN-US>adb</span><span >，是用于管理模拟器或真机状态的万能工具，采用了客户端</span><span
+lang=EN-US>-</span><span >服务器模型，包括三个部分：</span></p>
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt'><span style='font-family:Wingdings'>l<span
+style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+>客户端部分，运行在开发用的电脑上，可以在命令行中运行</span><span>adb</span><span
+>命令来调用该客户端，像</span><span>ADB</span><span
+>插件和</span><span>DDMS</span><span
+>这样的</span><span>Android</span><span
+>工具也可以调用</span><span>adb</span><span
+>客户端。</span></p>
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt'><span style='font-family:Wingdings'>l<span
+style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+>服务端部分，是运行在开发用电脑上的后台进程，用于管理客户端与运行在模拟器或真机的守护进程通信。</span></p>
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt'><span style='font-family:Wingdings'>l<span
+style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+>守护进程部分，运行于模拟器或手机的后台。</span></p>
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>当启动</span><span>adb</span><span
+>客户端时，客户端首先检测</span><span>adb</span><span
+>服务端进程是否运行，如果没有运行，则启动服务端。当服务端启动时，它会绑定到本地的</span><span
+lang=EN-US>TCP5037</span><span >端口，并且监听从</span><span
+lang=EN-US>adb</span><span >客户端发来的命令——所有的</span><span
+lang=EN-US>adb</span><span >客户端都使用</span><span
+lang=EN-US>5037</span><span >端口与</span><span>adb</span><span
+>服务端通信。</span></p>
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>接下来服务端与所有正在运行的模拟器或手机连接。它通过扫描</span><span>5555-5585</span><span
+>之间的奇数号端口来搜索模拟器或手机，一旦发现</span><span>adb</span><span
+>守护进程，就通过此端口进行连接。需要说明的是，每一个模拟器或手机使用一对有序的端口，偶数号端口用于控制台连接，奇数号端口用于</span><span
+lang=EN-US>adb</span><span >连接，例如：</span></p>
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left;
+text-indent:21.0pt'><span>Emulator 1, console: 5554</span></p>
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left;
+text-indent:21.0pt'><span>Emulator 1, adb: 5555</span></p>
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left;
+text-indent:21.0pt'><span>Emulator 2, console: 5556</span></p>
+<p class=MsoNormal align=left style='margin-left:10.5pt;text-align:left;
+text-indent:21.0pt'><span>Emulator 2, adb: 5557 ...</span></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+>即如果模拟器与</span><span>adb</span><span
+>在</span><span>5555</span><span
+>端口连接，则其与控制台的连接就是</span><span>5554</span><span
+>端口。</span></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+>当服务端与所有的模拟器建立连接之后，就可以使用</span><span>adb</span><span
+>命令来控制或者访问了。因为服务端管理着连接并且可以接收到从多个</span><span>adb</span><span
+>客户端的命令，所以可以从任何一个客户端或脚本来控制任何模拟器或手机设备。</span></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+>下文介绍了可以用来管理模拟器或手机的这些</span><span>adb</span><span
+>命令。如果是在</span><span>Eclipse</span><span
+>并且安装了</span><span>ADT</span><span
+>插件的环境下开发</span><span>Android</span><span
+>应用程序，就不需要从命令行使用</span><span>adb</span><span
+>了，</span><span>ADT</span><span
+>插件已经提供了透明的集成。不过，还是可以在调试等需要的时候直接使用</span><span
+lang=EN-US>adb</span><span >。</span></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+<p class=MsoNormal align=left style='text-align:left'><b><span
+style='font-size:12.0pt;font-family:宋体'>使用</span></b><b><span
+style='font-size:12.0pt'>adb</span></b><b><span style='font-size:12.0pt;
+font-family:宋体'>命令</span></b></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+>从开发用电脑的命令行或脚本文件中使用</span><span>adb</span><span
+>命令的用法是：</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 0cm;
+background:#FAFAFA;margin-left:12.0pt;margin-right:0cm'><pre style='background:
+#FAFAFA;border:none;padding:0cm'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+class=pln><span style='font-family:"Courier New";color:black'>adb </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>[-d|-e|-s &lt;serialNumber&gt;]</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&lt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>command</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;</span></span></pre></div>
+
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+>当使用的时候，程序会调用</span><span>adb</span><span
+>客户端。因为</span><span>adb</span><span
+>客户端不需要关联到任何模拟器，所以如果有多个模拟器或手机正在运行，就需要使用</span><span
+lang=EN-US>-d</span><span >参数指定要操作的是哪一个，更多关于这些选项参数的使用可以参见</span><span
+lang=EN-US><a
+href="../../../Program/Android/Workspace/cnAndroidSDK/trunk/docs/offline/guide/developing/tools/adb.html#directingcommands">Directing
+Commands to a Specific Emulator/Device Instance</a></span><span
+>。</span></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+<p class=MsoNormal align=left style='text-align:left'><b><span
+style='font-size:12.0pt;font-family:宋体'>查询模拟器或手机状态</span></b></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+>了解</span><span>adb</span><span
+>服务端连接的模拟器或手机可以帮助更好的使用</span><span>adb</span><span
+>命令，这可以通过</span><span>devices</span><span
+>命令列举出来：</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 0cm;
+background:#FAFAFA;margin-left:12.0pt;margin-right:0cm'><pre style='background:
+#FAFAFA;border:none;padding:0cm'><span class=pln><span
+style='font-family:"Courier New";color:black'>&nbsp; adb </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>devices</span></span></pre></div>
+
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+>执行结果是</span><span>adb</span><span
+>为每一个设备输出以下状态信息：</span></p>
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt'><span style='font-family:Wingdings'>l<span
+style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+>序列号</span><span>(serialNumber) </span><span
+>—</span> <span >由</span><span
+lang=EN-US>adb</span><span >创建的使用控制台端口号的用于唯一标识一个模拟器或手机设备的字符串，格式是</span>
+<span style='color:#007000'>&lt;</span><span style='font-family:
+宋体;color:#007000'>设备类型</span><span style='color:#007000'>&gt;-&lt;</span><span
+style='font-family:宋体;color:#007000'>端口号</span><span
+style='color:#007000'>&gt;</span><span >，例如：</span> <span
+lang=EN-US style='color:#007000'>emulator-5554</span></p>
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt'><span style='font-family:Wingdings'>l<span
+style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+>状态</span><span>(state) </span><span
+>—</span> <span >连接状态，其值是：</span></p>
+<p class=MsoNormal align=left style='margin-left:63.0pt;text-align:left;
+text-indent:-21.0pt'><span style='font-family:Wingdings'>n<span
+style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+style='color:#007000'>offline</span><span> — </span><span
+>未连接或未响应</span></p>
+<p class=MsoNormal align=left style='margin-left:63.0pt;text-align:left;
+text-indent:-21.0pt'><span style='font-family:Wingdings'>n<span
+style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+style='color:#007000'>device</span><span> —</span><span
+>已经连接到服务商。注意这个状态并不表示</span><span>Android</span><span
+>系统已经完全启动起来，系统启动的过程中已经可以连接</span><span>adb</span><span
+>，但这个状态是正常的可操作状态。</span></p>
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>每一个设备的输出形如：</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 0cm;
+background:#FAFAFA;margin-left:12.0pt;margin-right:0cm'><pre style='background:
+#FAFAFA;border:none;padding:0cm'><span class=pln><span
+style='font-family:"Courier New";color:black'>&nbsp; [serialNumber] [state]</span></span></pre></div>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>下面是</span><span> devices </span><span
+>命令和其执行结果：</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:12.0pt;margin-right:0cm'><pre style='background:
+#FAFAFA;border:none;padding:0cm'><span class=pln><span
+style='font-family:"Courier New";color:black'>$ adb devices</span></span></pre><pre
+style='background:#FAFAFA;border:none;padding:0cm'><span class=typ><span
+lang=EN-US style='font-family:"Courier New";color:#660066'>List</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> of devices attached </span></span></pre><pre
+style='background:#FAFAFA;border:none;padding:0cm'><span class=pln><span
+lang=EN-US style='font-family:"Courier New";color:black'>emulator</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>-</span></span><span
+class=lit><span style='font-family:"Courier New";color:#006666'>5554</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> &nbsp;device</span></span></pre><pre
+style='background:#FAFAFA;border:none;padding:0cm'><span class=pln><span
+lang=EN-US style='font-family:"Courier New";color:black'>emulator</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>-</span></span><span
+class=lit><span style='font-family:"Courier New";color:#006666'>5556</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> &nbsp;device</span></span></pre><pre
+style='background:#FAFAFA;border:none;padding:0cm'><span class=pln><span
+lang=EN-US style='font-family:"Courier New";color:black'>emulator</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>-</span></span><span
+class=lit><span style='font-family:"Courier New";color:#006666'>5558</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> &nbsp;device</span></span></pre></div>
+
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>如果没有模拟器或手机在运行，该状态返回的是</span><span
+style='color:#007000'>no device</span><span >。</span></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+<p class=MsoNormal align=left style='text-align:left'><b><span
+style='font-size:12.0pt;font-family:宋体'>操作指定的模拟器或手机</span></b></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+>如果有多个模拟器或手机正在运行，当使用</span><span>adb</span><span
+>命令的时候就需要指定目标设备，这可以通过使用</span><span>-s</span><span
+>选项参数实现，用法是：</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 0cm;
+background:#FAFAFA;margin-left:11.95pt;margin-right:0cm'><pre style='margin-left:
+0cm;text-indent:18.0pt;background:#FAFAFA;border:none;padding:0cm'><span
+class=pln><span style='font-family:"Courier New";color:black'>adb </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>s </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&lt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>serialNumber</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&lt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>command</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span></pre></div>
+
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+>即可以在</span><span>adb</span><span
+>命令中使用序列号指定特定的目标，前文已经提到的</span><span>devices</span><span
+>命令可以实现查询设备的序列号信息。</span></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+>例如：</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.9pt;margin-right:0cm'><pre style='background:
+#FAFAFA;border:none;padding:0cm'><span class=pln><span
+style='font-family:"Courier New";color:black'>adb </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>s emulator</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>-</span></span><span
+class=lit><span style='font-family:"Courier New";color:#006666'>5556</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> install helloWorld</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>.</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>apk</span></span></pre></div>
+
+<p class=a0>需要注意的是，如果使用了<span style='color:#007000'>-s</span>而没有指定设备的话，<span
+lang=EN-US>adb</span>会报错。</p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>安装应用程序</span></b></p>
+<p class=a0>可以使用<span>adb</span>从开发用电脑中复制应用程序并且安装到模拟器或手机上，使用<span
+lang=EN-US style='color:#007000'>install</span>命令即可，在这个命令中，必须指定待安装的<span
+lang=EN-US>.apk</span>文件的路径：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.9pt;margin-right:0cm'><pre style='background:
+#FAFAFA;border:none;padding:0cm'><span class=pln><span
+style='font-family:"Courier New";color:black'>adb install </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&lt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>path_to_apk</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;</span></span></pre></div>
+
+<p class=a0>关于创建可安装的应用的更多信息，请参见<span><a target="_blank" href="http://developer.android.com/guide/developing/tools/aapt.html">Android
+Asset Packaging Tool</a> (aapt).</span></p>
+<p class=a0>注意，如果使用了安装有<span>ADT</span>插件的<span>Eclipse</span>开发环境，就不需要直接使用<span
+lang=EN-US>adb</span>或<span>aapt</span>命令来安装应用程序了，<span>ADT</span>插件可以自动完成这些操作。</p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>转发端口</span></b></p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>可以使用<span
+lang=EN-US>forward </span>命令转发端口 — 将特定端口上的请求转发到模拟器或手机的不同的端口上。下例是从<span
+lang=EN-US>6100</span>端口转到<span>7100</span>端口：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:12.0pt;margin-right:0cm'><pre style='background:
+#FAFAFA;border:none;padding:0cm'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+class=pln><span style='font-family:"Courier New";color:black'>adb forward tcp</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>:</span></span><span
+class=lit><span style='font-family:"Courier New";color:#006666'>6100</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> tcp</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>:</span></span><span
+class=lit><span style='font-family:"Courier New";color:#006666'>7100</span></span></pre></div>
+
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>也可以使用<span
+lang=EN-US>UNIX</span>命名的<span>socket</span>标识：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:12.0pt;margin-right:0cm'><pre style='background:
+#FAFAFA;border:none;padding:0cm'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+class=pln><span style='font-family:"Courier New";color:black'>adb forward tcp</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>:</span></span><span
+class=lit><span style='font-family:"Courier New";color:#006666'>6100</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span><span
+class=kwd><span style='font-family:"Courier New";color:#000088'>local</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>:</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>logd </span></span></pre></div>
+
+<p class=a0 style='text-indent:0cm'><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>与模拟器或手机传输文件</span></b></p>
+<p class=a0>可以使用<span>adb</span>的<span> pull </span>和<span
+lang=EN-US> push </span>命令从模拟器或手机中复制文件，或者将文件复制到模拟器或手机中。与<span>
+install </span>命令不同，它仅能复制<span>.apk</span>文件到特定的位置，<span>
+pull </span>和<span> push </span>命令可以复制任意文件夹和文件到模拟器或手机的任何位置。</p>
+<p class=a0>从模拟器或手机中复制一个文件或文件夹（递归的）使用：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:12.0pt;margin-right:0cm'><pre style='background:
+#FAFAFA;border:none;padding:0cm'><span class=pln><span
+style='font-family:"Courier New";color:black'>adb pull </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&lt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>remote</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&lt;</span></span><span
+class=kwd><span style='font-family:"Courier New";color:#000088'>local</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;</span></span></pre></div>
+
+<p class=a0>复制一个文件或文件夹（递归的）到模拟器或手机中使用：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:12.0pt;margin-right:0cm'><pre style='background:
+#FAFAFA;border:none;padding:0cm'><span class=pln><span
+style='font-family:"Courier New";color:black'>adb push </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&lt;</span></span><span
+class=kwd><span style='font-family:"Courier New";color:#000088'>local</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&lt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>remote</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;</span></span></pre></div>
+
+<p class=a0>在这个命令中<span style='color:#007000'>&lt;local&gt;</span>和<span
+lang=EN-US style='color:#007000'>&lt;remote&gt;</span>引用的是文件或文件夹的路径，在开发用电脑上的是<span
+lang=EN-US>local</span>，在模拟器或手机上的是<span>remote</span>。</p>
+<p class=a0>例如：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:12.0pt;margin-right:0cm'><pre style='background:
+#FAFAFA;border:none;padding:0cm'><span class=pln><span
+style='font-family:"Courier New";color:black'>adb push foo</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>.</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>txt </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>/</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>sdcard</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>/</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>foo</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>.</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>txt</span></span></pre></div>
+
+<p class=a0 style='text-indent:0cm'><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>adb</span></b><b><span
+style='font-size:12.0pt'>命令列表</span></b></p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>下表列出了所有<span
+lang=EN-US>adb</span>支持的命令及其说明：</p>
+
+<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0 width=567
+ style='margin-left:26.7pt;border-collapse:collapse;border:none'>
+ <tr>
+  <td width=85 valign=top style='width:63.75pt;border:solid black 1.0pt;
+  border-right:solid windowtext 1.0pt;background:#DEE8F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >类别</span></p>
+  </td>
+  <td width=123 valign=top style='width:92.15pt;border:solid black 1.0pt;
+  border-left:none;background:#DEE8F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >命令</span></p>
+  </td>
+  <td width=142 valign=top style='width:106.3pt;border-top:solid black 1.0pt;
+  border-left:none;border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#DEE8F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >说明</span></p>
+  </td>
+  <td width=217 valign=top style='width:163.05pt;border:solid black 1.0pt;
+  border-left:none;background:#DEE8F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >备注</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=85 rowspan=3 style='width:63.75pt;border-top:none;border-left:solid black 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >可选项</span></p>
+  </td>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>-d</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >命令仅对</span><span>USB</span><span
+  >设备有效</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >如果有多个</span><span>USB</span><span
+  >设备就会返回错误</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>-e</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >命令仅对运行中的模拟器有效</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >如果有多个运行中的模拟器就会返回错误</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>-s &lt;serialNumber&gt;</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >命令仅对</span><span>adb</span><span
+  >关联的特定序列号的模拟器或手机有效</span><span>(</span><span
+  >例如</span><span> &quot;emulator-5556&quot;).</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >如果不指定设备就会返回错误</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=85 rowspan=3 style='width:63.75pt;border-top:none;border-left:solid black 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >一般项</span></p>
+  </td>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>devices</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >输出所有关联的模拟器或手机设备列表</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >参见</span> <span><a
+  href="http://developer.android.com/guide/developing/tools/adb.html#devicestatus">Querying
+  for Emulator/Device Instances</a> </span><span >以获得更多信息。</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>help</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >输出</span><span>adb</span><span
+  >支持的命令</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>version</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >输出</span><span>adb</span><span
+  >的版本号</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=85 rowspan=3 style='width:63.75pt;border-top:none;border-left:solid black 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >调试项</span></p>
+  </td>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>logcat [&lt;option&gt;] [&lt;filter-specs&gt;]</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >在屏幕上输出日志信息</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>bugreport</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >为报告</span><span>bug</span><span
+  >，在屏幕上输出</span><span style='color:#007000'>dumpsys</span><span
+  >，</span> <span style='color:#007000'>dumpstate</span><span
+  >和</span> <span style='color:#007000'>logcat</span><span
+  >数据</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>jdwp</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >输出有效的</span><span>JDWP</span><span
+  >进程信息</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >可以使用</span> <span style='color:#007000'>forward
+  jdwp:&lt;pid&gt;</span><span> </span><span style='font-family:
+  宋体'>转换端口以连接到指定的</span><span> JDWP </span><span style='font-family:
+  宋体'>进程，例如：</span></p>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>adb forward tcp:8000 jdwp:472</span></p>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>jdb -attach localhost:8000</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=85 rowspan=3 style='width:63.75pt;border-top:none;border-left:solid black 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >数据项</span></p>
+  </td>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>install &lt;path-to-apk&gt;</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >安装应用程序（用完整路径指定</span><span>.apk</span><span
+  >文件）</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>pull &lt;remote&gt; &lt;local&gt;</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >从开发机</span><span>COPY</span><span
+  >指定的文件到模拟器或手机</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>push &lt;local&gt; &lt;remote&gt;</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >从模拟器或手机</span><span>COPY</span><span
+  >文件到开发机</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=85 rowspan=2 style='width:63.75pt;border-top:none;border-left:solid black 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >端口和网络项</span></p>
+  </td>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>forward &lt;local&gt; &lt;remote&gt;</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >从本地端口转换连接到模拟器或手机的指定端口</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >端口可以使用以下格式表示：</span></p>
+  <p class=MsoNormal style='margin-left:42.0pt;text-indent:-21.0pt'><span
+  style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+  </span></span><span>tcp:&lt;portnum&gt;</span></p>
+  <p class=MsoNormal style='margin-left:42.0pt;text-indent:-21.0pt'><span
+  style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+  </span></span><span>local:&lt;UNIX domain socket name&gt;</span></p>
+  <p class=MsoNormal style='margin-left:42.0pt;text-indent:-21.0pt'><span
+  style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+  </span></span><span>dev:&lt;character device name&gt;</span></p>
+  <p class=MsoNormal style='margin-left:42.0pt;text-indent:-21.0pt'><span
+  style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+  </span></span><span>jdwp:&lt;pid&gt;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>ppp &lt;tty&gt; [parm]...</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >通过</span><span>USB</span><span
+  >运行</span><span>UPP</span></p>
+  <p class=MsoNormal align=center style='margin-left:21.0pt;text-align:center;
+  text-indent:-21.0pt'><span style='font-family:Wingdings'>l<span
+  style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+  style='color:#007000'>&lt;tty&gt;</span><span> —PPP</span><span
+  >流中的</span><span>tty</span><span
+  >。例如</span><span>:<span style='color:#007000'>/dev/omap_csmi_ttyl</span></span><span
+  >。</span></p>
+  <p class=MsoNormal style='margin-left:21.0pt;text-indent:-21.0pt'><span
+  style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+  </span></span><span style='color:#007000'>[parm]...</span><span
+ > — 0</span><span >到多个</span><span
+ >PPP/PPPD </span><span >选项</span><span
+ >, </span><span >例如</span> <span
+  style='color:#007000'>defaultroute, local, notty</span><span
+  >等等。</span></p>
+  <p class=MsoNormal><span >注意不用自动启动</span><span
+ >PPP</span><span >连接</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=85 rowspan=3 style='width:63.75pt;border-top:none;border-left:solid black 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >脚本项</span></p>
+  </td>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>get-serialno</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >输出</span><span>adb</span><span
+  >对象的序列号</span></p>
+  </td>
+  <td width=217 rowspan=2 style='width:163.05pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >参见</span> <span><a
+  href="http://developer.android.com/guide/developing/tools/adb.html#devicestatus">Querying
+  for Emulator/Device Instances</a></span><span >以获得更多信息。</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>get-state</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >输出</span><span>adb</span><span
+  >设备的状态</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>wait-for-device</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >阻塞执行直到设备已经连接，即设备状态是</span> <span
+  style='color:#007000'>device</span><span>.</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >可以在其他命令前加上此项，那样的话</span><span>adb</span><span
+  >就会等到模拟器或手机设备已经连接才会执行命令，例如</span><span>:</span></p>
+  <p class=MsoNormal align=center style='text-align:center'><span><img
+  border=0 width=212 height=33
+  src="image/image002.jpg"></span></p>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >注意该命令并不等待系统完全启动，因此不能追加需要在系统完全启动才能执行的命令，例如</span><span
+  style='color:#007000'>install</span><span> </span><span
+  >命令需要</span><span>Android</span><span
+  >包管理器支持，但它必须在系统完全启动后才有效。下面的命令</span></p>
+  <p class=MsoNormal align=center style='text-align:center'><span><img
+  border=0 width=212 height=31
+  src="image/image003.jpg"></span></p>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >会在模拟器或手机与</span><span>adb</span><span
+  >发生连接后就执行</span><span style='color:#007000'>install</span><span
+  >，但系统还没有完全启动，所以会引起错误。</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=85 rowspan=2 style='width:63.75pt;border-top:none;border-left:solid black 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >服务端项</span></p>
+  </td>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>start-server</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >检测</span><span>adb</span><span
+  >服务进程是否启动，如果没启动则启动它。</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>kill-server</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >终止服务端进程</span></p>
+  </td>
+  <td width=217 style='width:163.05pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=85 rowspan=2 style='width:63.75pt;border-top:none;border-left:solid black 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>Shell</span></p>
+  </td>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>shell</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >在目标模拟器或手机上启动远程</span><span>SHELL</span></p>
+  </td>
+  <td width=217 rowspan=2 style='width:163.05pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >参见</span> <span><a
+  href="http://developer.android.com/guide/developing/tools/adb.html#shellcommands">Issuing
+  Shell Commands</a></span><span >以获得更多信息。</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>shell [&lt;shellCommand&gt;]</span></p>
+  </td>
+  <td width=142 style='width:106.3pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >在目标模拟器或手机上执行</span><span>shellCommand</span><span
+  >然后退出远程</span><span>SHELL</span></p>
+  </td>
+ </tr>
+</table>
+
+<p class=a0 style='text-indent:0cm'><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>执行<span
+lang=EN-US>Shell</span>命令</span></b></p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; Adb</span>提供了<span
+lang=EN-US>shell</span>来在模拟器或手机上运行各种各样的命令，这些命令的二进制形式存在于这个路径中：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.95pt;margin-right:0cm'><pre style='margin-left:
+0cm;text-indent:12.0pt;background:#FAFAFA;border:none;padding:0cm'><span
+class=str><span style='font-family:"Courier New";color:#008800'>/system/</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>bin</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>/...</span></span></pre></div>
+
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>无论是否进入<span
+lang=EN-US>adb</span>远程<span>shell</span>，都可以使用<span>
+shell </span>命令来执。</p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>在未进入远程<span
+lang=EN-US>shell</span>的情况下可以按下述格式执行单条命令：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.95pt;margin-right:0cm'><pre style='margin-left:
+0cm;text-indent:12.0pt;background:#FAFAFA;border:none;padding:0cm'><span
+class=pln><span style='font-family:"Courier New";color:black'>adb </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>[-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>d</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>|-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>e</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>|-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>s </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>{&lt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>serialNumber</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;}]</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> shell </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&lt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>shellCommand</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;</span></span></pre></div>
+
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>启动远程<span
+lang=EN-US>shell</span>使用下面的格式：<span>&nbsp; </span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.95pt;margin-right:0cm'><pre style='margin-left:
+0cm;text-indent:6.0pt;background:#FAFAFA;border:none;padding:0cm'><span
+class=pln><span style='font-family:"Courier New";color:black'>adb </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>[-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>d</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>|-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>e</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>|-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>s </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>{&lt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>serialNumber</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;}]</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> shell</span></span></pre></div>
+
+<p class=a0>退出远程<span>shell</span>时使用<span
+style='color:#007000'>CTRL+D</span><span> </span>或 <span
+style='color:#007000'>exit</span><span> </span>终止会话。</p>
+<p class=a0>以下是可以使用的<span>shell</span>命令的更多信息。</p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>从远程<span
+lang=EN-US>shell</span>检查<span>sqlite3 </span>数据库</span></b></p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>通过远程<span
+lang=EN-US>shell</span>，可以使用<span><a target="_blank" href="http://www.sqlite.org/sqlite.html">sqlite3</a></span>命令行程序来管理由应用程序创建的<span
+lang=EN-US>SQLite</span>数据库。 <span style='color:#007000'>sqlite3</span><span
+lang=EN-US> </span>工具包含很多有用的命令，例如 <span style='color:#007000'>.dump</span><span
+lang=EN-US> </span>用于输出表格的内容，<span style='color:#007000'>.schema</span><span
+lang=EN-US> </span>用于为已经存在的表输出<span> SQL CREATE </span>语句。 并且该工具也提供了联机执行<span
+lang=EN-US>SQLite</span>命令的能力。</p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>使用
+<span style='color:#007000'>sqlite3</span>时，向前文描述的那样进入模拟器的远程<span
+lang=EN-US>shell</span>，然后使用<span style='color:#007000'>sqlite3</span><span
+lang=EN-US> </span>命令。也可以在调用 <span style='color:#007000'>sqlite3</span>时指定数据库的全路径。<span
+lang=EN-US>SQLite3</span>数据库存储在<span style='color:#007000'>/data/data/&lt;package_name&gt;/databases/</span>路径下。</p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>示例<span
+lang=EN-US>:</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.9pt;margin-right:0cm'><pre style='background:
+#FAFAFA;border:none;padding:0cm'><span class=pln><span
+style='font-family:"Courier New";color:black'>$ adb </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>s emulator</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>-</span></span><span
+class=lit><span style='font-family:"Courier New";color:#006666'>5554</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> shell</span></span></pre><pre
+style='background:#FAFAFA;border:none;padding:0cm'><span class=com><span
+lang=EN-US style='font-family:"Courier New";color:#880000'># sqlite3 /data/data/com.example.google.rss.rssexample/databases/rssitems.db</span></span></pre><pre
+style='background:#FAFAFA;border:none;padding:0cm'><span class=typ><span
+lang=EN-US style='font-family:"Courier New";color:#660066'>SQLite</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> version </span></span><span
+class=lit><span style='font-family:"Courier New";color:#006666'>3.3</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>.</span></span><span
+class=lit><span style='font-family:"Courier New";color:#006666'>12</span></span></pre><pre
+style='background:#FAFAFA;border:none;padding:0cm'><span class=typ><span
+lang=EN-US style='font-family:"Courier New";color:#660066'>Enter</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span><span
+class=str><span style='font-family:"Courier New";color:#008800'>&quot;.help&quot;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span><span
+class=kwd><span style='font-family:"Courier New";color:#000088'>for</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> instructions</span></span></pre><pre
+style='background:#FAFAFA;border:none;padding:0cm'><span class=pun><i><span
+lang=EN-US style='font-family:"Courier New";color:#666600'>....</span></i></span><span
+class=pln><i><span style='font-family:"Courier New";color:black'> enter commands</span></i></span><span
+class=pun><i><span style='font-family:"Courier New";color:#666600'>,</span></i></span><span
+class=pln><i><span style='font-family:"Courier New";color:black'> </span></i></span><span
+class=kwd><i><span style='font-family:"Courier New";color:#000088'>then</span></i></span><span
+class=pln><i><span style='font-family:"Courier New";color:black'> quit</span></i></span><span
+class=pun><i><span style='font-family:"Courier New";color:#666600'>...</span></i></span></pre><pre
+style='background:#FAFAFA;border:none;padding:0cm'><span class=pln><span
+lang=EN-US style='font-family:"Courier New";color:black'>sqlite</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>.</span></span><span
+class=kwd><span style='font-family:"Courier New";color:#000088'>exit</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span></pre></div>
+
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>一旦运行了
+<span style='color:#007000'>sqlite3</span>，就可以使用 <span
+style='color:#007000'>sqlite3</span><span> </span>命令，退出并返回远程<span
+lang=EN-US>shell</span>可以使用 <span style='color:#007000'>exit</span><span
+lang=EN-US> </span>或 <span style='color:#007000'>CTRL+D</span>。</p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>使用<span
+lang=EN-US>Monkey</span>进行<span>UI</span>或应用程序测试</span></b></p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; Monkey</span>是运行于模拟器或手机上的一个程序，通过生成伪随机的大量的系统级的用户事件流来模拟操作，包括单击、触摸、手势等。从而为正在开发中的应用程序通过随机响应进行压力测试。</p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>最简单使用<span
+lang=EN-US>monkey</span>的方式是通过下面的命令行，它可以运行指定的应用程序并向其发送<span>500</span>个伪随机事件。</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.9pt;margin-right:0cm'><pre style='background:
+#FAFAFA;border:none;padding:0cm'><span class=pln><span
+style='font-family:"Courier New";color:black'>$ adb shell monkey </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>v </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>p your</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>.</span></span><span
+class=kwd><span style='font-family:"Courier New";color:#000088'>package</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>.</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>name </span></span><span
+class=lit><span style='font-family:"Courier New";color:#006666'>500</span></span></pre></div>
+
+<p class=a0>关于<span>monkey</span>更多的选项及详细信息，请参见<span><a target="_blank" href="http://developer.android.com/guide/developing/tools/monkey.html"
+title=monkey>UI/Application Exerciser Monkey</a></span>。</p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>其他<span
+lang=EN-US>Shell</span>命令</span></b></p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>下表列出了很多有效的<span
+lang=EN-US>adb shell</span>命令，完整的列表可以通过启动模拟器并且使用<span>adb </span>–<span
+lang=EN-US>help</span>命令获取。</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.85pt;margin-right:0cm'><pre style='margin-left:
+0cm;text-indent:12.0pt;background:#FAFAFA;border:none;padding:0cm'><span
+class=pln><span style='font-family:"Courier New";color:black'>adb shell ls </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>/</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>system</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>/</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>bin</span></span></pre></div>
+
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>帮助对于大部分命令是有效的。</p>
+
+<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0 width=482
+ style='margin-left:26.7pt;border-collapse:collapse;border:none'>
+ <tr>
+  <td width=123 valign=top style='width:92.15pt;border:solid black 1.0pt;
+  border-left:solid windowtext 1.0pt;background:#DEE8F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>Shell
+  </span><span >命令</span></p>
+  </td>
+  <td width=132 valign=top style='width:99.25pt;border-top:solid black 1.0pt;
+  border-left:none;border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#DEE8F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >描述</span></p>
+  </td>
+  <td width=227 valign=top style='width:6.0cm;border:solid black 1.0pt;
+  border-left:none;background:#DEE8F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >备注</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:solid windowtext 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>dumpsys</span></p>
+  </td>
+  <td width=132 style='width:99.25pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >在屏幕上显示系统数据</span></p>
+  </td>
+  <td width=227 rowspan=4 style='width:6.0cm;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>The
+  <a target="_blank" href="http://developer.android.com/guide/developing/tools/ddms.html">Dalvik
+  Debug Monitor Service</a> (DDMS) </span><span >工具提供了更易于使用的智能的调试环境。</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:solid windowtext 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>dumpstate</span></p>
+  </td>
+  <td width=132 style='width:99.25pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >将状态输出到文件</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:solid windowtext 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>logcat [&lt;option&gt;]... [&lt;filter-spec&gt;]...</span></p>
+  </td>
+  <td width=132 style='width:99.25pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >输出日志信息</span> </p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:solid windowtext 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>dmesg</span></p>
+  </td>
+  <td width=132 style='width:99.25pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >在屏幕上输出核心调试信息</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:solid windowtext 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>start</span></p>
+  </td>
+  <td width=132 style='width:99.25pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >启动或重新启动模拟器或手机</span></p>
+  </td>
+  <td width=227 style='width:6.0cm;border-top:none;border-left:none;border-bottom:
+  solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.15pt;border-top:none;border-left:solid windowtext 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='color:#007000'>stop</span></p>
+  </td>
+  <td width=132 style='width:99.25pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >停止模拟器或手机</span></p>
+  </td>
+  <td width=227 style='width:6.0cm;border-top:none;border-left:none;border-bottom:
+  solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>&nbsp;</span></p>
+  </td>
+ </tr>
+</table>
+
+<p class=a0 style='text-indent:0cm'><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>使用<span
+lang=EN-US>logcat</span>查看日志</span></b></p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; Android</span>日志系统提供了从众多应用程序和系统程序中收集和查看调试信息的机制，这些信息被收集到一系统循环缓冲区中，可以<span
+lang=EN-US> logcat </span>命令查看和过滤。</p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>使用<span
+lang=EN-US> logcat </span>命令</span></b></p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>查看和跟踪系统日志缓冲区的命令<span
+lang=EN-US style='color:#007000'>logcat</span>的一般用法是：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.85pt;margin-right:0cm'><pre style='margin-left:
+0cm;text-indent:18.0pt;background:#FAFAFA;border:none;padding:0cm'><span
+class=pun><span style='font-family:"Courier New";color:#666600'>[</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>adb</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>]</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> logcat </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>[&lt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>option</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;]</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>...</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>[&lt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>filter</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>spec</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;]</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>...</span></span></pre></div>
+
+<p class=a0>下文介绍过滤器和命令选项，详细内容可参见<span><a target="_blank" href="http://developer.android.com/guide/developing/tools/adb.html#logcatoptions">Listing
+of logcat Command Options</a></span>。</p>
+<p class=a0>可以在开发机中通过远程<span>shell</span>的方式使用<span
+style='color:#007000'>logcat</span>命令查看日志输出：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.95pt;margin-right:0cm'><pre style='margin-left:
+0cm;text-indent:18.0pt;background:#FAFAFA;border:none;padding:0cm'><span
+class=pln><span style='font-family:"Courier New";color:black'>$ adb logcat</span></span></pre></div>
+
+<p class=a0>如果是在远程<span>shell</span>中可直接使用命令：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.95pt;margin-right:0cm'><pre style='margin-left:
+0cm;text-indent:18.0pt;background:#FAFAFA;border:none;padding:0cm'><span
+class=com><span style='font-family:"Courier New";color:#880000'># logcat</span></span></pre></div>
+
+<p class=a0 style='text-indent:0cm'><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>过滤日志输出</span></b></p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>每一条日志消息都有一个标记和优先级与其关联。</p>
+<p class=a0 style='margin-left:42.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span>标记是一个简短的字符串，用于标识原始消息的来源<span style='font-family:"Arial","sans-serif"'>
+(</span>例如<span style='font-family:"Arial","sans-serif"'>&quot;View&quot;
+</span>来源于显示系统<span style='font-family:"Arial","sans-serif"'>)</span>。</p>
+<p class=a0 style='margin-left:42.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span>优先级是下面的字符，顺序是从低到高：</p>
+<p class=a0 style='margin-left:63.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>V</span><span>
+— </span>明细<span style='font-family:"Arial","sans-serif"'> (</span>最低优先级<span
+lang=EN-US style='font-family:"Arial","sans-serif"'>)</span></p>
+<p class=a0 style='margin-left:63.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>D</span><span>
+— </span>调试</p>
+<p class=a0 style='margin-left:63.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>I</span><span>
+— </span>信息</p>
+<p class=a0 style='margin-left:63.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>W</span><span>
+— </span>警告</p>
+<p class=a0 style='margin-left:63.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>E</span><span> —
+</span>错误</p>
+<p class=a0 style='margin-left:63.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>F</span><span>
+— </span>严重错误</p>
+<p class=a0 style='margin-left:63.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>n<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>S</span><span>
+— </span>无记载<span style='font-family:"Arial","sans-serif"'> (</span>最高优先级，没有什么会被记载<span
+lang=EN-US style='font-family:"Arial","sans-serif"'>)</span></p>
+<p class=a0>通过运行<span style='color:#007000'>logcat</span><span
+lang=EN-US> </span>，可以获得一个系统中使用的标记和优先级的列表，观察列表的前两列，给出的格式是<span
+style='color:#007000'>&lt;priority&gt;/&lt;tag&gt;</span>。</p>
+<p class=a0>这里是一个日志输出的消息，优先级是“<span style='font-family:"Arial","sans-serif"'>I</span>”，标记是“<span
+lang=EN-US style='font-family:"Arial","sans-serif"'>ActivityManager</span>”：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.9pt;margin-right:0cm'><pre style='background:
+#FAFAFA;border:none;padding:0cm'><span class=pln><span
+style='font-family:"Courier New";color:black'>I</span></span><span class=pun><span
+lang=EN-US style='font-family:"Courier New";color:#666600'>/</span></span><span
+class=typ><span style='font-family:"Courier New";color:#660066'>ActivityManager</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>(</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> &nbsp;</span></span><span
+class=lit><span style='font-family:"Courier New";color:#006666'>585</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>):</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span><span
+class=typ><span style='font-family:"Courier New";color:#660066'>Starting</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> activity</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>:</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span><span
+class=typ><span style='font-family:"Courier New";color:#660066'>Intent</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>{</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> action</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>=</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>android</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>.</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>intent</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>.</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>action</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>...}</span></span></pre></div>
+
+<p class=a0>如果想要减少输出的内容，可以加上过滤器表达式进行限制，过滤器可以限制系统只输出感兴趣的标记<span
+style='font-family:"Arial","sans-serif"'>-</span>优先级组合。</p>
+<p class=a0>过滤器表达式的格式是<span style='color:#007000'>tag:priority ...</span><span
+lang=EN-US style='font-family:"Arial","sans-serif"'> </span>，其中<span
+lang=EN-US style='color:#007000'>tag</span>是标记， <span
+style='color:#007000'>priority</span>是最小的优先级，<span style='font-family:"Arial","sans-serif"'>
+</span>该标记标识的所有大于等于指定优先级的消息被写入日志。也可以在一个过滤器表达式中提供多个这样的过滤，它们之间用空格隔开。</p>
+<p class=a0>下面给出的例子是仅输出标记为“<span style='font-family:"Arial","sans-serif"'>ActivityManager</span>”并且优先级大于等于“<span
+lang=EN-US style='font-family:"Arial","sans-serif"'>Info</span>”和标记为“<span
+lang=EN-US style='font-family:"Arial","sans-serif"'>MyApp</span>”并且优先级大于等于“<span
+lang=EN-US style='font-family:"Arial","sans-serif"'>Debug</span>”的日志：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.85pt;margin-right:0cm'>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+text-indent:18.0pt;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-size:12.0pt;font-family:"Courier New";color:black'>adb
+logcat </span><span style='font-size:12.0pt;font-family:"Courier New";
+color:#660066'>ActivityManager</span><span style='font-size:12.0pt;
+font-family:"Courier New";color:#666600'>:</span><span
+style='font-size:12.0pt;font-family:"Courier New";color:black'>I </span><span
+lang=EN-US style='font-size:12.0pt;font-family:"Courier New";color:#660066'>MyApp</span><span
+lang=EN-US style='font-size:12.0pt;font-family:"Courier New";color:#666600'>:</span><span
+lang=EN-US style='font-size:12.0pt;font-family:"Courier New";color:black'>D </span><span
+lang=EN-US style='font-size:12.0pt;font-family:"Courier New";color:#666600'>*:</span><span
+lang=EN-US style='font-size:12.0pt;font-family:"Courier New";color:black'>S</span></p>
+
+</div>
+
+<p class=a0>上述表达式最后的<span class=apple-converted-space><span
+style='font-family:"Arial","sans-serif"'>&nbsp;</span></span><code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>*:S</span></code><span style='font-family:"Arial","sans-serif"'>
+</span>用于设置所有标记的日志优先级为<span style='font-family:"Arial","sans-serif"'>S</span>，这样可以确保仅有标记为“<span
+lang=EN-US>View</span>”（译者注：应该为<span>ActivityManager</span>，原文可能是笔误）和“<span
+lang=EN-US>MyApp</span>”的日志被输出，使用<span class=apple-converted-space><span
+lang=EN-US style='font-family:"Arial","sans-serif"'>&nbsp;</span></span><code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>*:S</span></code><span class=apple-converted-space><span
+lang=EN-US style='font-family:"Arial","sans-serif"'>&nbsp;</span></span>是可以确保输出符合指定的过滤器设置的一种推荐的方式，这样过滤器就成为了日志输出的“白名单”。</p>
+<p class=a0>下面的表达是显示所有优先级大于等于“<span class=apple-style-span><span
+style='font-family:"Arial","sans-serif"'>warning</span></span>”的日志：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.95pt;margin-right:0cm'>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+text-indent:18.0pt;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-size:12.0pt;font-family:"Courier New";color:black'>adb
+logcat </span><span style='font-size:12.0pt;font-family:"Courier New";
+color:#666600'>*:</span><span style='font-size:12.0pt;font-family:
+"Courier New";color:black'>W</span></p>
+
+</div>
+
+<p class=a0>如果在开发用电脑上运行<span class=apple-converted-space><span
+style='font-family:"Arial","sans-serif"'>&nbsp;</span></span><code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>logcat</span></code><span class=apple-converted-space><span
+lang=EN-US style='font-family:"Arial","sans-serif"'>&nbsp;</span></span><span
+lang=EN-US style='font-family:"Arial","sans-serif"'> (</span>相对于运行运程<span
+lang=EN-US style='font-family:"Arial","sans-serif"'>shell</span>而言<span
+lang=EN-US style='font-family:"Arial","sans-serif"'>)</span>，也可以通过<code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>ANDROID_LOG_TAGS</span></code>环境变量设置默认的过滤器表达式：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.95pt;margin-right:0cm'>
+
+<p class=MsoNormal align=left style='margin-left:0cm;text-align:left;
+text-indent:18.0pt;background:#FAFAFA;border:none;padding:0cm'><span
+lang=EN-US style='font-size:12.0pt;font-family:"Courier New";color:#000088'>export</span><span
+lang=EN-US style='font-size:12.0pt;font-family:"Courier New";color:black'>
+ANDROID_LOG_TAGS</span><span style='font-size:12.0pt;font-family:
+"Courier New";color:#666600'>=</span><span style='font-size:12.0pt;
+font-family:"Courier New";color:#008800'>&quot;ActivityManager:I MyApp:D
+*:S&quot;</span></p>
+
+</div>
+
+<p class=a0>需要注意的是，如果是在远程<span style='font-family:"Arial","sans-serif"'>shell</span>或是使用<code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>adb shell logcat</span></code><span style='font-family:
+"Arial","sans-serif"'> </span>命令运行<code><span style='font-size:12.0pt;
+font-family:"Calibri","sans-serif";color:#007000'>logcat</span></code><span
+lang=EN-US style='font-family:"Arial","sans-serif"'> </span>，<span
+class=apple-converted-space><span style='font-family:"Arial","sans-serif"'>&nbsp;</span></span><code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>ANDROID_LOG_TAGS</span></code><span class=apple-converted-space><span
+lang=EN-US style='font-family:"Arial","sans-serif"'>&nbsp;</span></span>不会导出到模拟器或手机设备上。</p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>控制日志格式</span></b></p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>日志消息在标记和优先级之外还有很多元数据字段，这些字段可以通过修改输出格式来控制输出结果，<span
+class=apple-converted-space><span style='font-family:"Arial","sans-serif"'>&nbsp;</span></span><code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>-v</span></code><span class=apple-converted-space><span
+lang=EN-US style='font-family:"Arial","sans-serif"'>&nbsp;</span></span>选项加上下面列出的内容可以控制输出字段：</p>
+<p class=a0 style='margin-left:42.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>brief</span><span
+lang=EN-US> — </span>显示优先级<span>/</span>标记和原始进程的<span>PID
+(</span>默认格式<span>)</span></p>
+<p class=a0 style='margin-left:42.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>process</span><span
+lang=EN-US> — </span>仅显示进程<span>PID</span></p>
+<p class=a0 style='margin-left:42.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>tag</span><span
+lang=EN-US> — </span>仅显示优先级<span style='font-family:"Arial","sans-serif"'>/</span>标记</p>
+<p class=a0 style='margin-left:42.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>thread</span><span
+lang=EN-US> — </span>仅显示进程：线程和优先级<span style='font-family:"Arial","sans-serif"'>/</span>标记</p>
+<p class=a0 style='margin-left:42.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>raw</span><span
+lang=EN-US> — </span>显示原始的日志信息，没有其他的元数据字段</p>
+<p class=a0 style='margin-left:42.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>time</span><span
+lang=EN-US> — </span>显示日期，调用时间，优先级<span style='font-family:"Arial","sans-serif"'>/</span>标记，<span
+lang=EN-US style='font-family:"Arial","sans-serif"'>PID</span></p>
+<p class=a0 style='margin-left:42.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>long</span><span
+lang=EN-US> —</span>显示所有的元数据字段并且用空行分隔消息内容</p>
+<p class=a0 style='margin-left:21.0pt;text-indent:0cm'>可以使用<span
+class=apple-converted-space><span style='font-family:"Arial","sans-serif"'>&nbsp;</span></span><code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>-v</span></code>启动<span class=apple-converted-space><span
+lang=EN-US style='font-family:"Arial","sans-serif"'>&nbsp;</span></span><code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>logcat</span></code>来控制日志格式：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.95pt;margin-right:0cm'><pre style='margin-left:
+0cm;text-indent:18.0pt;background:#FAFAFA;border:none;padding:0cm'><span
+class=pun><span style='font-family:"Courier New";color:#666600'>[</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>adb</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>]</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> logcat </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>[-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>v </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&lt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>format</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;]</span></span></pre></div>
+
+<p class=a0 style='margin-left:21.0pt;text-indent:0cm'><span style='font-size:
+10.0pt'>例如使用</span><span class=apple-converted-space><span
+style='font-size:10.0pt;font-family:"Arial","sans-serif"'>&nbsp;</span></span><code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>thread</span></code><span class=apple-converted-space><span
+lang=EN-US style='font-size:10.0pt;font-family:"Arial","sans-serif"'>&nbsp;</span></span><span
+style='font-size:10.0pt'>输出格式：</span></p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.95pt;margin-right:0cm'><pre style='margin-left:
+0cm;text-indent:18.0pt;background:#FAFAFA;border:none;padding:0cm'><span
+class=pln><span style='font-family:"Courier New";color:black'>adb logcat </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>v thread</span></span></pre></div>
+
+<p class=a0 style='margin-left:21.0pt;text-indent:0cm'>注意只能在<span
+class=apple-converted-space><span style='font-family:"Arial","sans-serif"'>&nbsp;</span></span><code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Courier New";color:#007000'>-v</span></code><span
+class=apple-converted-space><span style='font-family:"Arial","sans-serif"'>&nbsp;</span></span>选项中指定一种格式。</p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>Viewing
+Alternative Log Buffers</span></b></p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span><span
+lang=EN-US style='font-family:"Arial","sans-serif"'>Android</span>日志系统为日志消息保持了多个循环缓冲区，而且不是所有的消息都被发送到默认缓冲区，要想查看这些附加的缓冲区，可以使用<code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Courier New";color:#007000'>-b</span></code><span
+class=apple-converted-space><span style='font-family:"Arial","sans-serif"'>&nbsp;</span></span>选项，以下是可以指定的缓冲区：</p>
+<p class=a0 style='margin-left:42.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>radio</span><span
+lang=EN-US> — </span>查看包含在无线<span style='font-family:"Arial","sans-serif"'>/</span>电话相关的缓冲区消息</p>
+<p class=a0 style='margin-left:42.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>events</span><span
+lang=EN-US> — </span>查看事件相关的消息</p>
+<p class=a0 style='margin-left:42.0pt;text-indent:-21.0pt;line-height:normal'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span style='color:#007000'>main</span><span
+lang=EN-US> — </span>查看主缓冲区<span style='font-family:"Arial","sans-serif"'>
+(</span>默认缓冲区<span style='font-family:"Arial","sans-serif"'>)</span></p>
+<p class=a0 style='margin-left:21.0pt;text-indent:0cm'><span>&nbsp;</span><code><span
+lang=EN-US style='font-size:12.0pt'>-</span></code><span
+style='color:#007000'>b</span><span> </span>选项的用法：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.95pt;margin-right:0cm'><pre style='margin-left:
+0cm;text-indent:12.0pt;background:#FAFAFA;border:none;padding:0cm'><span
+class=pun><span style='font-family:"Courier New";color:#666600'>[</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>adb</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>]</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'> logcat </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>[-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>b </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&lt;</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>buffer</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>&gt;]</span></span></pre></div>
+
+<p class=a0 style='margin-left:21.0pt;text-indent:0cm'>例如查看<span>radio</span>缓冲区：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:11.95pt;margin-right:0cm'><pre style='margin-left:
+0cm;text-indent:18.0pt;background:#FAFAFA;border:none;padding:0cm'><span
+class=pln><span style='font-family:"Courier New";color:black'>adb logcat </span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>b radio</span></span></pre></div>
+
+<p class=a0><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>查看<span
+lang=EN-US>stdout</span>和<span>stderr</span></span></b></p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>默认的，<span
+lang=EN-US style='font-family:"Arial","sans-serif"'>Android</span>系统发送<span
+class=apple-converted-space><span style='font-family:"Arial","sans-serif"'>&nbsp;</span></span><code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>stdout</span></code><span class=apple-converted-space><span
+lang=EN-US style='font-family:"Arial","sans-serif"'>&nbsp;</span></span>和<span
+class=apple-converted-space><span style='font-family:"Arial","sans-serif"'>&nbsp;</span></span><code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>stderr</span></code><span class=apple-converted-space><span
+lang=EN-US>&nbsp;</span></span><span>(</span><code><span
+style='font-size:12.0pt;font-family:"Calibri","sans-serif";color:#007000'>System.out</span></code><span
+class=apple-converted-space><span style='font-family:"Arial","sans-serif"'>&nbsp;</span></span>和<span
+class=apple-converted-space><span style='font-family:"Arial","sans-serif"'>&nbsp;</span></span><code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>System.err</span></code><span style='font-family:
+"Arial","sans-serif"'>) </span>输出到<span class=apple-converted-space><span
+lang=EN-US>&nbsp;</span></span><code><span style='font-size:12.0pt;
+font-family:"Calibri","sans-serif";color:#007000'>/dev/null</span></code>。<span
+style='font-family:"Arial","sans-serif"'> </span>在<span
+style='font-family:"Arial","sans-serif"'> Dalvik VM</span>进程，可以将输出复制到日志文件，在这种情况下，系统使用<span
+class=apple-converted-space><span style='font-family:"Arial","sans-serif"'>&nbsp;</span></span><code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>stdout</span></code><span class=apple-converted-space><span
+lang=EN-US style='font-family:"Arial","sans-serif"'>&nbsp;</span></span>和<span
+class=apple-converted-space><span style='font-family:"Arial","sans-serif"'>&nbsp;</span></span><code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>stderr</span></code>标记写入日志，优先级是<code><span
+style='font-size:12.0pt;font-family:"Courier New";color:#007000'>I</span></code>。</p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>要想使用这种方式获得输出，需要停止运行中的模拟器或手机，然后使用命令<span
+class=apple-converted-space><span style='font-family:"Arial","sans-serif"'>&nbsp;</span></span><code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>setprop</span></code><span class=apple-converted-space><span
+lang=EN-US style='font-family:"Arial","sans-serif"'>&nbsp;</span></span>来允许输出重定位，示例如下：</p>
+
+<div style='border:solid #CCCCCC 1.0pt;padding:8.0pt 8.0pt 8.0pt 8.0pt;
+background:#FAFAFA;margin-left:29.8pt;margin-right:0cm'><pre style='margin-left:
+0cm;background:#FAFAFA;border:none;padding:0cm'><span class=pln><span
+lang=EN-US style='font-family:"Courier New";color:black'>$ adb shell stop</span></span></pre><pre
+style='margin-left:0cm;background:#FAFAFA;border:none;padding:0cm'><span
+class=pln><span style='font-family:"Courier New";color:black'>$ adb shell setprop log</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>.</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>redirect</span></span><span
+class=pun><span style='font-family:"Courier New";color:#666600'>-</span></span><span
+class=pln><span style='font-family:"Courier New";color:black'>stdio </span></span><span
+class=kwd><span style='font-family:"Courier New";color:#000088'>true</span></span></pre><pre
+style='margin-left:0cm;background:#FAFAFA;border:none;padding:0cm'><span
+class=pln><span style='font-family:"Courier New";color:black'>$ adb shell start</span></span></pre></div>
+
+<p class=a0>系统会保留这一设置直到模拟器或手机退出，也可以在设备中增加<code><span
+style='font-size:12.0pt;font-family:"Calibri","sans-serif";color:#007000'>/data/local.prop</span></code>以使得这一设备成为默认配置。</p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>Logcat</span></b><b><span
+style='font-size:12.0pt'>命令选项列表</span></b></p>
+
+<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0 width=482
+ style='margin-left:26.7pt;border-collapse:collapse;border:none'>
+ <tr>
+  <td width=123 valign=top style='width:92.1pt;border:solid black 1.0pt;
+  border-left:solid windowtext 1.0pt;background:#DEE8F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >选项</span></p>
+  </td>
+  <td width=359 valign=top style='width:269.4pt;border-top:solid black 1.0pt;
+  border-left:none;border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#DEE8F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >描述</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border-top:none;border-left:solid windowtext 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a0 align=center style='text-align:center;text-indent:0cm'><code><span
+  style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+  color:#007000'>-b&nbsp;&lt;buffer&gt;</span></code></p>
+  </td>
+  <td width=359 style='width:269.4pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >加载不同的缓冲区日志，例如</span><span class=apple-converted-space><span
+ >&nbsp;</span></span><code><span style='font-size:12.0pt;
+  color:#007000'>event</span></code><span class=apple-converted-space><span
+ >&nbsp;</span></span><span >或</span><code><span
+  style='font-size:12.0pt;color:#007000'>radio</span></code><span
+  >。</span><code><span style='font-size:12.0pt;
+  color:#007000'>main</span></code><span class=apple-converted-space><span
+ >&nbsp;</span></span><span >缓冲区是默认项，参见</span><span
+ ><a
+  href="http://developer.android.com/guide/developing/tools/adb.html#alternativebuffers">Viewing
+  Alternative Log Buffers</a>.</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border-top:none;border-left:solid windowtext 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a0 align=center style='text-align:center;text-indent:0cm'><code><span
+  style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+  color:#007000'>-c</span></code></p>
+  </td>
+  <td width=359 style='width:269.4pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >清空（刷新）所有的日志并且退出</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border-top:none;border-left:solid windowtext 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a0 align=center style='text-align:center;text-indent:0cm'><code><span
+  style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+  color:#007000'>-d</span></code></p>
+  </td>
+  <td width=359 style='width:269.4pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >在屏幕上输出日志并退出</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border-top:none;border-left:solid windowtext 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a0 align=center style='text-align:center;text-indent:0cm'><code><span
+  style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+  color:#007000'>-f &lt;filename&gt;</span></code></p>
+  </td>
+  <td width=359 style='width:269.4pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >将日志输出到文件</span><span class=Char5><span
+  style='color:#007000'>&lt;filename&gt;</span></span><span style='font-family:
+  宋体'>，默认输出是</span><span class=Char5><span style='color:#007000'>stdout</span></span><span
+ >.</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border-top:none;border-left:solid windowtext 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a0 align=center style='text-align:center;text-indent:0cm'><code><span
+  style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+  color:#007000'>-g</span></code></p>
+  </td>
+  <td width=359 style='width:269.4pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >输出日志的大小</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border-top:none;border-left:solid windowtext 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a0 align=center style='text-align:center;text-indent:0cm'><code><span
+  style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+  color:#007000'>-n &lt;count&gt;</span></code></p>
+  </td>
+  <td width=359 style='width:269.4pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >设置最大的循环数据</span><span class=Char5><span
+  style='color:#007000'>&lt;count&gt;</span></span><span style='font-family:
+  宋体'>，默认是</span><span>4</span><span >，需要</span><span
+  class=Char5><span style='color:#007000'>-r</span></span><span
+  >选项</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border-top:none;border-left:solid windowtext 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a0 align=center style='text-align:center;text-indent:0cm'><code><span
+  style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+  color:#007000'>-r &lt;kbytes&gt;</span></code></p>
+  </td>
+  <td width=359 style='width:269.4pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >每</span><span class=Char5><span
+  style='color:#007000'>&lt;kbytes&gt;</span></span><span style='font-family:
+  宋体'>循环日志文件，默认是</span><span>16</span><span >，需要</span><span
+  class=apple-converted-space><span>&nbsp;</span></span><code><span
+  style='font-size:12.0pt;font-family:"Courier New";color:#007000'>-f</span></code><span
+  class=apple-converted-space><span>&nbsp;</span></span><span
+  class=apple-converted-space><span >选项</span></span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border-top:none;border-left:solid windowtext 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a0 align=center style='text-align:center;text-indent:0cm'><code><span
+  style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+  color:#007000'>-s</span></code></p>
+  </td>
+  <td width=359 style='width:269.4pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >设置默认的过滤器为无输出</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border-top:none;border-left:solid windowtext 1.0pt;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=a0 align=center style='text-align:center;text-indent:0cm'><code><span
+  style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+  color:#007000'>-v &lt;format&gt;</span></code></p>
+  </td>
+  <td width=359 style='width:269.4pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >设置输出格式，默认的是</span><code><span
+  style='font-size:12.0pt;color:#007000'>brief</span></code><span
+  >，支持的格式列表参见</span><span><a
+  href="http://developer.android.com/guide/developing/tools/adb.html#outputformat">Controlling
+  Log Output Format</a>.</span></p>
+  </td>
+ </tr>
+</table>
+
+<p class=a0 style='text-indent:0cm'><span>&nbsp;</span></p>
+<p class=a0 style='text-indent:0cm'><b><span style='font-size:12.0pt'>停止<span
+lang=EN-US>adb</span>服务</span></b></p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>在某些情况下，可能需要终止然后重启服务端进程，例如<span
+lang=EN-US style='font-family:"Arial","sans-serif"'>adb</span>不响应命令的时候，可以通过重启解决问题。</p>
+<p class=a0 style='text-indent:0cm'><span>&nbsp;&nbsp;&nbsp; </span>使用<code><span
+lang=EN-US style='font-size:12.0pt;font-family:"Calibri","sans-serif";
+color:#007000'>kill-server</span></code>可以终止服务端，然后使用其他的<span
+style='font-family:"Arial","sans-serif"'>adb</span>命令重启。</p>
+<p class=a0 style='text-indent:0cm'><span style='font-family:"Arial","sans-serif"'>&nbsp;</span></p>
+
+</div>
+
+<span style='font-size:10.5pt;font-family:"Calibri","sans-serif"'><br
+clear=all style='page-break-before:auto'>
+</span>
+
+      
+</body>
+</html>

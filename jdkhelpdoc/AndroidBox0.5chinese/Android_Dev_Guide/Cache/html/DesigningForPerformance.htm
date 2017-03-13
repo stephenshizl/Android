@@ -1,0 +1,337 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=gb2312">
+<meta name=Generator content="Word2Chm Addin (v1.4.7.4)">
+<link rel="stylesheet" href="Word2Chm.css" type="text/css">
+
+<title> Designing for Performance</title>
+</head>
+<body lang=ZH-CN link=blue vlink=purple style='text-justify-trim:punctuation' >      
+<div class=WordSection1 style='layout-grid:15.6pt'>
+
+<p class=MsoNormal align=center style='text-align:center'><a name="OLE_LINK2"></a><a
+name="OLE_LINK1"></a><a name="OLE_LINK7"></a><a name="OLE_LINK6"></a><a
+name="OLE_LINK5"><b><span style='font-size:18.0pt'>Designing for
+Performance</span></b></a></p>
+
+<p class=MsoNormal align=center style='text-align:center'><span
+>译者署名：</span> <a href="mailto:qiongju@gmail.com">qiongju@gmail.com</span></a></p>
+
+<p class=MsoNormal align=center style='text-align:center'><span
+>译者链接：</span><a target="_blank" href="http://admires.iteye.com/">http://admires.iteye.com/</span></a><span> </span></p>
+
+<p class=MsoNormal align=center style='text-align:center'><span
+>版本：</span><span>Android 3.1 r1</span></p>
+
+<p class=MsoNormal style='line-height:23.0pt'><span>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><b><span
+style='font-size:12.0pt;'>原文</span></b></p>
+
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><a target="_blank" href="http://developer.android.com/guide/practices/design/performance.html">http://developer.android.com/guide/practices/design/performance.html</a></span> </span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><b><span
+style='font-size:12.0pt;'>性能优化</span></b></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span>Android</span><span
+>应用程序运行的移动设备受限于其运算能力，存储空间，及电池续航。由此，它必须是高效的。电池续航可能是一个促使你优化程序的原因，即使他看起来已经运行的足够快了。由于续航对用户的重要性，当电量耗损陡增时，意味这用户迟早会发现是由于你的程序。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><a name="OLE_LINK4"></a><a
+name="OLE_LINK3"><span >虽然这份文档主要包含着细微的优化，但这些绝不能成为你软件成败的关键</span></a><span
+>。选择合适的算法和数据结构永远是你最先应该考虑的事情，但这超出这份文档之外。</span></p>
+
+<p class=MsoNormal><span>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><b><span
+style='font-size:12.0pt;'>简介</span></b></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >写出高效的代码有两条基本的原则：</span></p>
+
+<p class=MsoListParagraph style='margin-left:42.0pt;text-indent:-21.0pt'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span >不作没有必要的工作。</span></p>
+
+<p class=MsoListParagraph style='margin-left:42.0pt;text-indent:-21.0pt'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span >尽量避免内存分配。</span></p>
+
+<p class=MsoNormal><span>&nbsp;</span></p>
+
+<p class=MsoNormal align=left style='text-align:left'><b><span
+style='font-size:12.0pt;'>明智的优化</span></b></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >这份文档是关于</span>Android</span><span >规范的细微优化，所以先确保你已经了解哪些代码需要优化，并且知道如何去衡量你所做修改所带来的效果（好或坏）。开发投入的时间是有限的，所以明智的时间规划很重要。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span>(</span><span
+>更多分析和笔记参见总结。</span><span>)</span></p>
+
+<p class=MsoNormal style='text-indent:18.0pt'><span >这份文档同时确保你在算法和数据结构上作出最佳选择的同时，考虑</span>API</span><span >选择所带来的潜在影响。使用合适的数据结构和算法比这里的任何建议都更有价值，优先考虑</span>API</span><span >版本带来的影响有助于你找到更好的实现。（这在类库代码中更为重要，相比应用代码）</span></p>
+
+<p class=MsoNormal style='text-indent:18.0pt'><span>(</span><span
+>如果你需要这样的建议，参见</span><span> Josh Bloch's <em><span
+style='font-family:"Calibri","sans-serif"'>Effective Java</span></em>, item
+47.)</span></p>
+
+<p class=MsoNormal style='text-indent:18.0pt'><span >在优化</span>Android</span><span >程序时，会遇到的一个棘手问题是，保证你的程序能在不同的硬件平台上运行。虚拟机版本和处理器各部相同，因此运行在之上的速度也大不一样。但这并且不是简单的</span>A</span><span >比</span><span>B</span><span
+>快或慢，并能在设备间做出排列。特别的，模拟器上只能评测出一小部分设备上体现的东西。有无</span>JIT</span><span >的设备间也存在着巨大差异，在</span>JIT</span><span >设备上好的代码有时候会在无</span>JIT</span><span >的设备上表现的并不好。</span></p>
+
+<p class=MsoListParagraph style='margin-left:18.0pt;text-indent:0cm'><span
+>如果你想知道一个程序在设备上的具体表现，就必须在上面进行测试。</span></p>
+
+<p class=MsoNormal><span>&nbsp;</span></p>
+
+<p class=MsoNormal><b><span style='font-size:12.0pt;'>避免创建不必要的对象</span></b></p>
+
+<p class=MsoNormal style='text-indent:18.0pt'><span >对象创建永远不会是免费的。每个线程的分代</span>GC</span><span >给零时对象分配一个地址池以降低分配开销，但往往内存分配比不分配需要的代价大。</span></p>
+
+<p class=MsoNormal style='text-indent:18.0pt'><span >如果在用户界面周期内分配对象，就会强制一个周期性的垃圾回收，给用户体验增加小小的停顿间隙。</span>Gingerbread</span><span >中提到的并发回收也许有用，但不必要的工作应当被避免的。</span></p>
+
+<p class=MsoNormal><span >因此，应该避免不必要的对象创建。下面是几个例子：</span></p>
+
+<p class=MsoListParagraph style='margin-left:39.0pt;text-indent:-18.0pt'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span >如果有一个返回</span><span>String</span><span
+>的方法，并且他的返回值常常附加在一个</span><span>StringBuffer</span><span
+>上，改变声明和实现，让函数直接在其后面附加，而非创建一个短暂存在的零时变量。</span></p>
+
+<p class=MsoListParagraph style='margin-left:39.0pt;text-indent:-18.0pt'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span >当从输入的数据集合中读取数据时，考虑返回原始数据的子串，而非新建一个拷贝</span>.</span><span >这样你虽然创建一个新的对象，但是他们共享该数据的</span>char</span><span >数组。（结果是即使仅仅使用原始输入的一部分，你也需要保证它的整体一直存在于内存中。）</span></p>
+
+<p class=MsoNormal style='margin-left:21.0pt'><span >一个更彻底的方案是将多维数组切割成平行一维数组：</span></p>
+
+<p class=MsoListParagraph style='margin-left:42.0pt;text-indent:-21.0pt'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span>Int</span><span >类型的数组常有余</span>Integer</span><span >类型的。推而广之，两个平行的</span>int</span><span >数组要比一个（</span>int,int</span><span >）型的对象数组高效。这对于其他任何基本数据类型的组合都通用。</span></p>
+
+<p class=MsoListParagraph style='margin-left:42.0pt;text-indent:-21.0pt'><span
+lang=EN-US style='font-family:Wingdings'>l<span style='font:7.0pt "Times New Roman"'>&nbsp;
+</span></span><span >如果需要实现一个容器来存放元组（</span>Foo,Bar</span><span >），两个平行数组</span>Foo[],Bar[]</span><span >会优于一个（</span>Foo,Bar</span><span >）对象的数组。（例外情况是：当你设计</span>API</span><span >给其他代码调用时，应用好的</span>API</span><span >设计来换取小的速度提升。但在自己的内部代码中，尽量尝试高效的实现。）</span></p>
+
+<p class=MsoNormal style='margin-left:21.0pt'><span >通常来讲，尽量避免创建短时零时对象</span>.</span><span >少的对象创建意味着低频的垃圾回收。而这对于用户体验产生直接的影响。</span></p>
+
+<p class=MsoNormal><span>&nbsp;</span></p>
+
+<p class=MsoNormal><b><span style='font-size:12.0pt;'>性能之谜</span></b></p>
+
+<p class=MsoNormal style='text-indent:18.0pt'><span >前一个版本的文档给出了好多误导人的主张，这里做一些澄清：</span></p>
+
+<p class=MsoNormal style='text-indent:18.0pt'><span >在没有</span>JIT</span><span >的设备上，调用方法所传递的对象采用具体的类型而非接口类型会更高效（比如，传递</span><span
+lang=EN-US style='color:#007900'>HashMap</span><span> <span
+style='color:#007900'>map</span></span><span >比</span><span
+lang=EN-US style='color:#007900'>Map map</span><span >调用一个方法的开销小，尽管两个</span>map</span><span >都是</span><span
+style='color:#007900'>HashMap</span><span >）</span>.</span><span >但这并不是两倍慢的情形，事实上，他们只相差</span>6%</span><span >，而有</span><span>JIT</span><span
+>时这两种调用的效率不相上下。</span></p>
+
+<p class=MsoNormal style='text-indent:18.0pt'><span >在没有</span>JIT</span><span >的设备上，缓存后的字段访问比直接访问快大概</span>20%</span><span >。而在有</span><span>JIT</span><span
+>的情况下，字段访问的代价等同于局部访问，因此这里不值得优化，除非你觉得他会让你的代码更易读（对于</span>final ,static</span><span >，及</span>static final </span><span >变量同样适用）</span></p>
+
+<p class=MsoNormal><span>&nbsp;</span></p>
+
+<p class=MsoNormal><b><span style='font-size:12.0pt;'>用静态代替虚拟</span></b></p>
+
+<p class=MsoNormal><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+>如果不需要访问某对象的字段，将方法设置为静态，调用会加速</span><span>15%</span><span
+>到</span><span>20%</span><span
+>。这也是一种好的做法，因为你可以从方法声明中看出调用该方法不需要更新此对象的状态。</span></p>
+
+<p class=MsoNormal><span>&nbsp;</span></p>
+
+<p class=MsoNormal><b><span style='font-size:12.0pt;'>避免内部的</span></b><b><span
+lang=EN-US style='font-size:12.0pt'>Getters/Setters</span></b></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >在源生语言像</span>C++</span><span >中，通常做法是用</span>Getters</span><span >（</span><span
+style='color:#007900'>i=getCount()</span><span >）代替直接字段访问（</span><span
+lang=EN-US style='color:#007900'>i=mCount</span><span >）。这是</span>C++</span><span >中一个好的习惯，因为编译器会内联这些访问，并且如果需要约束或者调试这些域的访问，你可以在任何时间添加代码。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >而在</span>Android</span><span >中，这不是一个好的做法。虚方法调用的代价比直接字段访问高昂许多。通常根据面向对象语言的实践，在公共接口中使用</span>Getters</span><span >和</span><span>Setters</span><span
+>是有道理的，但在一个字段经常被访问的类中宜采用直接访问。</span></p>
+
+<p class=MsoNormal><span >无</span><span>JIT</span><span
+>时，直接字段访问大约比调用</span><span>getter</span><span
+>访问快</span><span>3</span><span
+>倍。有</span><span>JIT</span><span
+>时（直接访问字段开销等同于局部变量访问），要快</span><span>7</span><span
+>倍。在</span><span>Froyo</span><span
+>版本中确实如此，但以后版本可能会在</span><span>JIT</span><span
+>中改进</span><span>Getter</span><span
+>方法的内联。</span></p>
+
+<p class=MsoNormal><span>&nbsp;</span></p>
+
+<p class=MsoNormal><b><span style='font-size:12.0pt;'>对常量使用</span></b><b><span
+lang=EN-US style='font-size:12.0pt'>Static Final</span></b><b><span
+style='font-size:12.0pt;'>修饰符</span></b></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >考虑下面类首的声明：</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span><img border=0
+width=317 height=53 id="图片 1"
+src="image/2011-7-19_1.jpg"></span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >编译器会生成一个类初始化方法</span><span
+lang=EN-US style='color:#007900'>&lt;clinit&gt;</span><span>,</span><span
+>当该类初次被使用时执行，这个方法将</span><span>42</span><span
+>存入</span><span style='color:#007900'>intVal</span><span
+>中，并得到类文件字符串常量</span><span style='color:#007900'>strVal</span><span
+>的一个引用。当这些值在后面被引用时，他们通过字段查找进行访问。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >我们改进实现，采用</span> final</span><span >关键字：</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span><img border=0
+width=395 height=53 id="图片 4"
+src="image/2011-7-19_2.jpg"></span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >类不再需要</span><span
+lang=EN-US style='color:#007900'>&lt;clinit&gt;</span><span style='font-family:
+宋体'>方法，因为常量通过静态字段初始化器进入</span><span>dex</span><span
+>文件中。引用</span><span>intVal</span><span
+>的代码，将直接调用整形值</span><span>42</span><span
+>；而访问</span><span style='color:#007900'>strVal</span><span
+>，也会采用相对开销较小的</span><span>“</span><span
+>字符串常量</span><span>”</span><span
+>（原文：</span><span>“sring constant”</span><span
+>）指令替代字段查找。（这种优化仅仅是针对基本数据类型和</span><span>String</span><span
+>类型常量的，而非任意的引用类型。但尽可能的将常量声明为</span><span
+style='color:#007900'>static final</span><span >是一种好的做法。</span></p>
+
+<p class=MsoNormal><span>&nbsp;</span></p>
+
+<p class=MsoNormal><b><span style='font-size:12.0pt;'>使用改进的</span></b><b><span
+lang=EN-US style='font-size:12.0pt'>For</span></b><b><span style='font-size:
+12.0pt;'>循环语法</span></b></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >改进</span>for</span><span >循环（有时被称为</span>“for-each”</span><span >循环）能够用于实现了</span>iterable</span><span >接口的集合类及数组中。在集合类中，迭代器让接口调用</span>hasNext()</span><span >和</span>next()</span><span >方法。在</span>ArrayList</span><span >中，手写的计数循环迭代要快</span>3</span><span >倍（无论有没有</span><span>JIT</span><span
+>），但其他集合类中，改进的</span><span>for</span><span
+>循环语法和迭代器具有相同的效率。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >这里有一些迭代数组的实现：</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span><img border=0
+width=465 height=442 id="图片 7"
+src="image/2011-7-19_3.jpg"></span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><b><span>zero()</span></b><span
+>是当中最慢的，因为对于这个遍历中的历次迭代，</span><span>JIT</span><span
+>并不能优化获取数组长度的开销。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><b><span>One()</span></b><span
+>稍快，将所有东西都放进局部变量中，避免了查找。但仅只有声明数组长度对性能改善有益。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><b><span>Two()</span></b><span
+>是在无</span><span>JIT</span><span
+>的设备上运行最快的，对于有</span><span>JIT</span><span
+>的设备则和</span><span>one()</span><span
+>不分上下。他采用了</span><span>JDK1.5</span><span
+>中的改进</span><span>for</span><span
+>循环语法。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >结论：优先采用改进</span>for</span><span >循环，但在性能要求苛刻的</span>ArrayList</span><span >迭代中，考虑采用手写计数循环。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span>(</span><span
+>参见</span> <em><span style='font-family:"Calibri","sans-serif"'>Effective
+Java</span></em><span> item 46.)</span></p>
+
+<p class=MsoNormal><span>&nbsp;</span></p>
+
+<p class=MsoNormal><b><span style='font-size:12.0pt;'>在私有内部内中，考虑用包访问权限替代私有访问权限</span></b></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >考虑下面的定义：</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span><img border=0
+width=418 height=309 id="图片 10"
+src="image/2011-7-19_4.jpg"></span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >需要注意的关键是：我们定义的一个私有内部类（</span><span
+lang=EN-US style='color:#007900'>Foo$Inner</span><span >），直接访问外部类中的一个私有方法和私有变量。这是合法的，代码也会打印出预期的</span>“Value is 27”</span><span >。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >但问题是，虚拟机认为从</span><span
+lang=EN-US style='color:#007900'>Foo$Inner</span><span >中直接访问</span>Foo</span><span >的私有成员是非法的，因为他们是两个不同的类，尽管</span>Java</span><span >语言允许内部类访问外部类的私有成员，但是通过编译器生成几个综合方法来桥接这些间隙的。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span><img border=0
+width=467 height=113 id="图片 13"
+src="image/2011-7-19_5.jpg"></span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >内部类会在外部类中任何需要访问</span><span
+lang=EN-US style='color:#007900'>mValue</span><span >字段或调用</span><span
+lang=EN-US style='color:#007900'>doStuff</span><span >方法的地方调用这些静态方法。这意味着这些代码将直接存取成员变量表现为通过存取器方法访问。之前提到过存取器访问如何比直接访问慢，这例子说明，某些语言约会定导致不可见的性能问题。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >如果你在高性能的</span>Hotspot</span><span >中使用这些代码，可以通过声明被内部类访问的字段和成员为包访问权限，而非私有。但这也意味着这些字段会被其他处于同一个包中的类访问，因此在公共</span>API</span><span >中不宜采用。</span></p>
+
+<p class=MsoNormal><span>&nbsp;</span></p>
+
+<p class=MsoNormal><b><span style='font-size:12.0pt;'>合理利用浮点数</span></b></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >通常的经验是，在</span>Android</span><span >设备中，浮点数会比整型慢两倍，在缺少</span>FPU</span><span >和</span><span>JIT</span><span
+>的</span><span>G1</span><span
+>上对比有</span><span>FPU</span><span
+>和</span><span>JIT</span><span
+>的</span><span>Nexus One</span><span
+>中确实如此（两种设备间算术运算的绝对速度差大约是</span><span>10</span><span
+>倍）</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >从速度方面说，在现代硬件上，</span>float</span><span >和</span><span>double</span><span
+>之间没有任何不同。更广泛的讲，</span><span>double</span><span
+>大</span><span>2</span><span style='font-family:
+宋体'>倍。在台式机上，由于不存在空间问题，</span><span>double</span><span
+>的优先级高于</span><span>float</span><span
+>。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >但即使是整型，有的芯片拥有硬件乘法，却缺少除法。这种情况下，整型除法和求模运算是通过软件实现的，就像当你设计</span>Hash</span><span >表，或是做大量的算术那样。</span></p>
+
+<p class=MsoNormal><span>&nbsp;</span></p>
+
+<p class=MsoNormal><b><span >了解并使用类库</span></b></p>
+
+<p class=MsoNormal><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+>选择</span><span>Library</span><span
+>中的代码而非自己重写，除了通常的那些原因外，考虑到系统空闲时会用汇编代码调用来替代</span>library</span><span >方法，这可能比</span>JIT</span><span >中生成的等价的最好的</span>Java</span><span >代码还要好。典型的例子就是</span><span
+lang=EN-US style='color:#007900'>String.indexOf</span><span style='font-family:
+宋体'>，</span><span>Dalvik</span><span >用内部内联来替代。同样的，</span><span
+lang=EN-US style='color:#007900'>System.arraycopy</span><span style='font-family:
+宋体'>方法在有</span><span>JIT</span><span >的</span>Nexus One</span><span >上，自行编码的循环快</span>9</span><span >倍。</span></p>
+
+<p class=MsoNormal><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>(</span><span >参见</span> <em><span
+style='font-family:"Calibri","sans-serif"'>Effective Java</span></em> item 47.)</span></p>
+
+<p class=MsoNormal><span>&nbsp;</span></p>
+
+<p class=MsoNormal><b><span style='font-size:12.0pt;'>合理利用本地方法</span></b></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >本地方法并不是一定比</span>Java</span><span >高效。最起码，</span>Java</span><span >和</span><span>native</span><span
+>之间过渡的关联是有消耗的，而</span><span>JIT</span><span
+>并不能对此进行优化。当你分配本地资源时（本地堆上的内存，文件说明符等），往往很难实时的回收这些资源。同时你也需要在各种结构中编译你的代码（而非依赖</span>JIT</span><span >）。甚至可能需要针对相同的架构来编译出不同的版本：针对</span>ARM</span><span >处理器的</span><span>GI</span><span
+>编译的本地代码，并不能充分利用</span><span>Nexus One</span><span
+>上的</span><span>ARM</span><span
+>，而针对</span><span>Nexus One</span><span
+>上</span><span>ARM</span><span
+>编译的本地代码不能在</span><span>G1</span><span
+>的</span><span>ARM</span><span
+>上运行。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >当你想部署程序到存在本地代码库的</span>Android</span><span >平台上时，本地代码才显得尤为有用，而并非为了</span>Java</span><span >应用程序的提速。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span>(</span><span
+>参见</span> <em><span style='font-family:"Calibri","sans-serif"'>Effective
+Java</span></em><span> item 54.)</span></p>
+
+<p class=MsoNormal><span>&nbsp;</span></p>
+
+<p class=MsoNormal><b><span style='font-size:12.0pt;'>结语</span></b></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >最后：通常考虑的是：先确定存在问题，再进行优化。并且你知道当前系统的性能，否则无法衡量你进行尝试所得到的提升。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >这份文档中的每个主张都有标准基准测试作为支持。你可以在</span><a target="_blank" href="http://code.google.com/p/dalvik/source/browse/#svn/trunk/benchmarks">code.google.com“dalvik”</a></span><span
+>项目中找到基准测试的代码。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >这个标准基准测试是建立在</span>Caliper Java</span><span >标准微基准测试框架之上的。标准微基准测试很难找到正确的路，所以</span>Caliper</span><span >帮你完成了其中的困难部分工作。并且当你会察觉到某些情况的测试结果并想象中的那样（虚拟机总是在优化你的代码的）。我们强烈推荐你用</span>Caliper</span><span >来运行你自己的标准微基准测试。</span></p>
+
+<p class=MsoNormal style='text-indent:21.0pt'><span >同时你也会发现</span>Traceview</span><span >对分析很有用，但必须了解，他目前是不不支持</span>JIT</span><span >的，这可能导致那些在</span>JIT</span><span >上可以胜出的代码运行超时。特别重要的，根据</span>Taceview</span><span >的数据作出更改后，请确保代码在没有</span>Traceview</span><span >时，确实跑的快了。</span></p>
+
+</div>
+
+      
+</body>
+</html>

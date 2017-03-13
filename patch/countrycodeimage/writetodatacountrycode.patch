@@ -1,0 +1,966 @@
+From 0c50362306dfa85172e3f44abd892a2d8576df50 Mon Sep 17 00:00:00 2001
+From: qianyan <echo.qian@byd.com>
+Date: Fri, 25 Nov 2016 13:53:52 +0800
+Subject: [PATCH] write to data/countrycode
+
+Change-Id: I031d29b4754c50cadc611d971b114f0b9fe263a6
+---
+ .../qcom/msm8952_64/generate_countrycode_image.mk  | 21 +----------
+ .../android/device/qcom/msm8952_64/init.target.rc  | 14 +++++++
+ .../src/com/tools/cit/AutoBacklight.java           |  2 +-
+ .../src/com/tools/cit/AutoHomeActivity.java        | 16 ++++----
+ .../src/com/tools/cit/BootReceiver.java            | 21 ++++++-----
+ .../src/com/tools/cit/BottomspeakerTest.java       |  2 +-
+ .../src/com/tools/cit/EveryMicTest.java            |  6 +--
+ .../src/com/tools/cit/FrontCameraTest.java         |  2 +-
+ .../src/com/tools/cit/HomeActivity.java            |  6 +--
+ .../src/com/tools/cit/LittleAutoHomeActivity.java  | 18 ++++-----
+ .../FactoryTest/src/com/tools/cit/MicTest1.java    |  6 +--
+ .../src/com/tools/cit/PcbaAutoHomeActivity.java    | 14 +++----
+ .../FactoryTest/src/com/tools/cit/SarSensor.java   |  4 +-
+ .../src/com/tools/cit/SensorAdjusts.java           | 43 +++++++++++-----------
+ .../src/com/tools/cit/SpeakerTightness.java        | 10 ++---
+ .../src/com/tools/cit/SpkCalibration.java          | 12 +++---
+ .../FactoryTest/src/com/tools/cit/TestModule.java  |  1 +
+ .../src/com/tools/cit/ThreeColorTest.java          |  2 +-
+ .../src/com/tools/cit/TopspeakerTest.java          |  2 +-
+ .../FactoryTest/src/com/tools/cit/TpRawdata.java   |  4 +-
+ LINUX/android/system/core/rootdir/init.rc          |  6 ++-
+ LINUX/android/system/sepolicy/cit_daemon.te        | 19 ++++++++++
+ LINUX/android/system/sepolicy/domain.te            |  1 +
+ LINUX/android/system/sepolicy/file.te              |  4 ++
+ LINUX/android/system/sepolicy/file_contexts        |  8 ++--
+ LINUX/android/system/sepolicy/system_app.te        |  6 ++-
+ LINUX/android/system/sepolicy/system_server.te     |  5 +++
+ LINUX/android/vendor/byd/cit_daemon/cit_daemon.c   | 34 ++++++++---------
+ .../vendor/byd/countrycode/empty/countrycode.mk    |  6 ---
+ 29 files changed, 161 insertions(+), 134 deletions(-)
+ create mode 100755 LINUX/android/system/sepolicy/cit_daemon.te
+ mode change 100644 => 100755 LINUX/android/system/sepolicy/domain.te
+ mode change 100644 => 100755 LINUX/android/system/sepolicy/file.te
+ mode change 100644 => 100755 LINUX/android/system/sepolicy/system_app.te
+ mode change 100644 => 100755 LINUX/android/system/sepolicy/system_server.te
+ delete mode 100755 LINUX/android/vendor/byd/countrycode/empty/countrycode.mk
+
+diff --git a/LINUX/android/device/qcom/msm8952_64/generate_countrycode_image.mk b/LINUX/android/device/qcom/msm8952_64/generate_countrycode_image.mk
+index aa87bc6..ab62c70 100755
+--- a/LINUX/android/device/qcom/msm8952_64/generate_countrycode_image.mk
++++ b/LINUX/android/device/qcom/msm8952_64/generate_countrycode_image.mk
+@@ -3,33 +3,18 @@
+ # Generate countrycode image (countrycode.img)
+ #----------------------------------------------------------------------
+ 
+-TARGET_REGION :=empty
+-# build countrycode when set region
+-ifneq (,$(TARGET_REGION))
+-
+-# countrycode resource dir
+-COUNTRYCODE_DIR := vendor/byd/countrycode/$(TARGET_REGION)
+-
+ # countrycode out image dir
+ TARGET_OUT_COUNTRYCODE_TOTAL := $(PRODUCT_OUT)/countrycode
+-TARGET_OUT_COUNTRYCODE := $(TARGET_OUT_COUNTRYCODE_TOTAL)/$(TARGET_REGION)
+-TARGET_OUT_COUNTRYCODE_CFG := $(TARGET_OUT_COUNTRYCODE)/cfg
++TARGET_OUT_COUNTRYCODE := $(TARGET_OUT_COUNTRYCODE_TOTAL)
+ 
+ # countrycode partition size
+ BOARD_COUNTRYCODEIMAGE_PARTITION_SIZE := 6291456
+ 
+ COUNTRYCODE_PACKAGES :=
+ 
+-include vendor/byd/countrycode/$(TARGET_REGION)/countrycode.mk
+-
+ INSTALLED_COUNTRYCODEIMAGE_TARGET := $(PRODUCT_OUT)/countrycode.img
+ SELINUX_FC := $(TARGET_ROOT_OUT)/file_contexts.bin
+ 
+-define mkdir-countrycode-cfg-files
+-    echo "start mkdir-countrycode-cfg-file"
+-    @mkdir -p $(TARGET_OUT_COUNTRYCODE_CFG)
+-endef
+-
+ define build-countrycodeimage-target
+     $(call pretty,"Target countrycode fs image: $(INSTALLED_COUNTRYCODEIMAGE_TARGET)")
+     @mkdir -p $(TARGET_OUT_COUNTRYCODE)
+@@ -39,11 +24,7 @@ endef
+ 
+ $(INSTALLED_COUNTRYCODEIMAGE_TARGET): cleancountrycode $(MKEXTUSERIMG) $(MAKE_EXT4FS) $(COUNTRYCODE_PACKAGES) $(SELINUX_FC)
+ 	@echo "start generate countrycode image"
+-	$(mkdir-countrycode-cfg-files)
+ 	$(build-countrycodeimage-target)
+-	#@cp vendor/byd/Download.cmd\
+-            #$(PRODUCT_OUT)/Download.cmd
+-endif
+ 
+ .PHONY: cleancountrycode
+ cleancountrycode:
+diff --git a/LINUX/android/device/qcom/msm8952_64/init.target.rc b/LINUX/android/device/qcom/msm8952_64/init.target.rc
+index 6a2ddb5..f526f63 100755
+--- a/LINUX/android/device/qcom/msm8952_64/init.target.rc
++++ b/LINUX/android/device/qcom/msm8952_64/init.target.rc
+@@ -297,3 +297,17 @@ service data_pt_check /system/bin/data_pt_check
+     group system
+     disabled
+ #end
++#begin add by qianyan 
++on property:persist.service.daemon.enable=1
++   start cit_daemon
++on property:persist.service.daemon.enable=0
++   stop cit_daemon
++      
++service cit_daemon /system/bin/cit_daemon
++    class main
++    user root 
++    group root system
++    oneshot 
++    disabled
++#end
++
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/AutoBacklight.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/AutoBacklight.java
+index dd42a7f..c6651de 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/AutoBacklight.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/AutoBacklight.java
+@@ -72,7 +72,7 @@ public class AutoBacklight extends TestModule {
+         final List<String> cmds = new ArrayList<String>();
+         cmds.add("sh");
+         cmds.add("-c");
+-        cmds.add("echo " + command + " > /data/citflag");
++        cmds.add("echo " + command + " > " + PATH);
+         Log.i("autoback test","command lcd:" + command);
+         new Handler().postDelayed(new Runnable(){  
+             public void run() { 
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/AutoHomeActivity.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/AutoHomeActivity.java
+index 3c59f4c..d758ac8 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/AutoHomeActivity.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/AutoHomeActivity.java
+@@ -48,7 +48,7 @@ public class AutoHomeActivity extends Activity {
+     private BaseMenu menuData = new BaseMenu(this);
+     private ArrayList<MenuData> automenuDatas = new ArrayList<MenuData>();
+     private String AUTO_SHARE_NAME = "auto_testresult";
+-    private static final String AUTO_RESULT_PATH = "/data/autoresult.txt";
++    private static final String AUTO_RESULT_PATH = "/data/test/autoresult.txt";
+     String resultPrference = "";
+     MenuAdapter menuAdapter;
+     public static Boolean FLAG = true;
+@@ -218,23 +218,23 @@ public class AutoHomeActivity extends Activity {
+         Log.i("onActivityResult", "onActivityResult resultPrference:" + resultPrference);
+         saveResultToTxt(resultPrference);
+         SystemProperties.set("persist.service.daemon.enable", "1");
+-        runCommand("echo 17 > /data/citflag");
++        runCommand("echo 17 > /data/test/citflag");
+ 
+     }
+     @Override
+     protected void onResume() {
+         super.onResume();
+         try {
+-            Process process1 = Runtime.getRuntime().exec("touch /data/citflag");
+-            Process process2 = Runtime.getRuntime().exec("chmod 777 /data/citflag");
+-            Process process3 = Runtime.getRuntime().exec("touch /data/getsarevent.txt");
+-            Process process4 = Runtime.getRuntime().exec("chmod 777 /data/getsarevent.txt");
++            Process process1 = Runtime.getRuntime().exec("touch /data/test/citflag");
++            Process process2 = Runtime.getRuntime().exec("chmod 777 /data/test/citflag");
++            Process process3 = Runtime.getRuntime().exec("touch /data/test/getsarevent.txt");
++            Process process4 = Runtime.getRuntime().exec("chmod 777 /data/test/getsarevent.txt");
+         } catch (Exception e ) { 
+             e.printStackTrace () ; 
+         }
+         IntentFilter myIntentFilter = new IntentFilter();
+         myIntentFilter.addAction("android.intent.action.LOCALE_CHANGED");
+-        runCommand("echo 0 > /data/citflag");      
++        runCommand("echo 0 > /data/test/citflag");      
+         registerReceiver(mReceiver, myIntentFilter);
+ 
+     }
+@@ -263,7 +263,7 @@ public class AutoHomeActivity extends Activity {
+         recoveryTouchsound();
+         //saveResutlToNV();
+         SystemProperties.set("persist.service.daemon.enable", "0");
+-        runCommand("echo 0 > /data/citflag");
++        runCommand("echo 0 > /data/test/citflag");
+         super.onDestroy();
+     }
+     @Override
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/BootReceiver.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/BootReceiver.java
+index bef959a..94da846 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/BootReceiver.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/BootReceiver.java
+@@ -43,6 +43,7 @@ public class BootReceiver extends BroadcastReceiver{
+     private static MediaPlayer mMediaPlayer;
+     private Handler handler = null;
+     private Message msg = null;
++    private String PATH = "/data/citflag";
+     /*public class MyRunnable implements Runnable{
+         public void run(){
+             copyResToSdcard();
+@@ -56,12 +57,12 @@ public class BootReceiver extends BroadcastReceiver{
+             intent.setClass(ctx, BootService.class);
+             //intent.setClassName(ctx, "com.tools.cit.GpsServer");
+             ctx.startService(intent);
+-            creatSpkfile("/data/spkcalibration_303_imp_acc_low");
+-            creatSpkfile("/data/spkcalibration_304_imp_count");
+-            creatSpkfile("/data/spkcalibration_330_imp_acc_high");
+-            creatSpkfile("/data/spkcalibration_temp");
+-            creatSpkfile("/data/spkcalibration_305_f0");
+-            creatSpkfile("/data/spkcalibration_306_ref_diff");
++            creatSpkfile("/data/test/spkcalibration_303_imp_acc_low");
++            creatSpkfile("/data/test/spkcalibration_304_imp_count");
++            creatSpkfile("/data/test/spkcalibration_330_imp_acc_high");
++            creatSpkfile("/data/test/spkcalibration_temp");
++            creatSpkfile("/data/test/spkcalibration_305_f0");
++            creatSpkfile("/data/test/spkcalibration_306_ref_diff");
+             //copyResToSdcard(ctx);
+             //add Sar
+             String code = SystemProperties.get("ro.product.countrycode", "");
+@@ -80,14 +81,14 @@ public class BootReceiver extends BroadcastReceiver{
+             Log.i(TAG, "FactoryTest onreceive type=" + type);
+             if("write_mmi_flag".equals(type)) {
+                 String mmi = intent.getStringExtra("value");
+-                String command = "echo " + mmi + " > /data/mmiresult; if [[ $? -eq 0 ]]; then am broadcast -a com.mmi.helper.response --es type 'write_mmi_flag' --es value 'pass'; else am broadcast -a com.mmi.helper.response --es type 'write_mmi_flag' --es value 'fail'; fi; chmod 777 /data/mmiresult";
++                String command = "echo " + mmi + " > /data/test/mmiresult; if [[ $? -eq 0 ]]; then am broadcast -a com.mmi.helper.response --es type 'write_mmi_flag' --es value 'pass'; else am broadcast -a com.mmi.helper.response --es type 'write_mmi_flag' --es value 'fail'; fi; chmod 777 /data/test/mmiresult";
+                 runCommand(command);
+             } else if("mic".equals(type)) {
+                 String mic = intent.getStringExtra("value");
+                 if(mic.equals("1")) {
+-                    runCommand("echo 4 > /data/citflag");
++                    runCommand("echo 4 > " + PATH);
+                 } else {
+-                    runCommand("echo " + mic +" > /data/citflag");
++                    runCommand("echo " + mic +" > " + PATH);
+                 }
+                 SystemProperties.set("persist.service.daemon.enable", "1");
+             }
+@@ -149,7 +150,7 @@ public class BootReceiver extends BroadcastReceiver{
+             //SystemProperties.set("persist.service.daemon.enable", "1");
+             //pengchong modify it for factory begin
+             runCommand("setprop persist.sys.factory.recovery 1");
+-            runCommand("echo 21 > /data/citflag && setprop persist.service.daemon.enable 1");
++            runCommand("echo 21 > " + PATH+ " && setprop persist.service.daemon.enable 1");
+             //pengchong modify it for factory end
+             //runCommand("echo 1 > /userstore/recovery && am broadcast -a android.intent.action.MASTER_CLEAR");
+             //saveResultToTxt("1", "/userstore/recovery");
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/BottomspeakerTest.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/BottomspeakerTest.java
+index 805d1f9..08c0d88 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/BottomspeakerTest.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/BottomspeakerTest.java
+@@ -90,7 +90,7 @@ public class BottomspeakerTest extends TestModule {
+         final List<String> cmds = new ArrayList<String>();
+         cmds.add("sh");
+         cmds.add("-c");
+-        cmds.add("echo " + command_speaker + " > /data/citflag");
++        cmds.add("echo " + command_speaker + " > " + PATH);
+         Log.i("command speaker", "command speaker:" + command_speaker);
+         new Handler().postDelayed(new Runnable(){  
+             public void run() { 
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/EveryMicTest.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/EveryMicTest.java
+index 602f6c0..3288721 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/EveryMicTest.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/EveryMicTest.java
+@@ -175,7 +175,7 @@ public class EveryMicTest extends TestModule implements OnClickListener, OnCompl
+    
+  } 
+ 
+-private static final String SIMSTATUS_RESULT_PATH = "/data/simappstatus.txt";
++private static final String SIMSTATUS_RESULT_PATH = "/data/test/simappstatus.txt";
+ public void saveResultToDATA(int result){
+         FileWriter fWriter = null;
+         try {
+@@ -229,7 +229,7 @@ public void saveResultToDATA(int result){
+         final List<String> cmds = new ArrayList<String>();
+         cmds.add("sh");
+         cmds.add("-c");
+-        cmds.add("echo " + command + " > /data/citflag && setprop persist.service.daemon.enable 1");
++        cmds.add("echo " + command + " > " + PATH + " && setprop persist.service.daemon.enable 1");
+         Log.i("mic test","command speaker:" + command);
+         new Handler().postDelayed(new Runnable(){  
+         public void run() { 
+@@ -405,7 +405,7 @@ public void saveResultToDATA(int result){
+         unregisterReceiver(headsetReceiver);
+         // if(wl.isHeld()) wl.release();
+         try {
+-            Process process1 = Runtime.getRuntime().exec("echo 0 > /data/citflag");
++            Process process1 = Runtime.getRuntime().exec("echo 0 > " + PATH);
+         } catch (Exception e ) { 
+             e.printStackTrace () ; 
+         } 
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/FrontCameraTest.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/FrontCameraTest.java
+index 59b8a2c..29fec65 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/FrontCameraTest.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/FrontCameraTest.java
+@@ -56,7 +56,7 @@ public class FrontCameraTest extends TestModule implements OnTouchListener{
+     LinearLayout cameraLayout;
+     int cameraCount = 0;
+ 
+-    private String strCaptureFilePath = "/data/camera_snap.jpg";
++    private String strCaptureFilePath = "/data/test/camera_snap.jpg";
+     private Button btnPass;
+     private TextView tv;
+     /*Add by liugang for W101HM 20130906*/
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/HomeActivity.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/HomeActivity.java
+index 2218de4..490361e 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/HomeActivity.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/HomeActivity.java
+@@ -50,7 +50,7 @@ public class HomeActivity extends Activity {
+     private BaseMenu menuData = new BaseMenu(this);
+     private ArrayList<MenuData> menuDatas = new ArrayList<MenuData>();
+     private String SHARE_NAME = "testresult";
+-    private static final String MANUAL_RESULT_PATH = "/data/manualresult.txt";
++    private static final String MANUAL_RESULT_PATH = "/data/test/manualresult.txt";
+     String resultPrference = "";
+     MenuAdapter menuAdapter;
+     public static Boolean FLAG = true;
+@@ -248,8 +248,8 @@ public class HomeActivity extends Activity {
+     protected void onResume() {
+         super.onResume();
+         try {
+-            Process process1 = Runtime.getRuntime().exec("touch /data/citflag");
+-            Process process2 = Runtime.getRuntime().exec("chmod 777 /data/citflag");
++            Process process1 = Runtime.getRuntime().exec("touch /data/test/citflag");
++            Process process2 = Runtime.getRuntime().exec("chmod 777 /data/test/citflag");
+         } catch (Exception e ) { 
+             e.printStackTrace () ; 
+         }
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/LittleAutoHomeActivity.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/LittleAutoHomeActivity.java
+index 2c5bc76..97e6135 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/LittleAutoHomeActivity.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/LittleAutoHomeActivity.java
+@@ -50,8 +50,8 @@ public class LittleAutoHomeActivity extends Activity {
+     private BaseMenu menuData = new BaseMenu(this);
+     private ArrayList<MenuData> automenuDatas = new ArrayList<MenuData>();
+     private String AUTO_SHARE_NAME = "little_auto_testresult";
+-    private static final String LITTLE_AUTO_RESULT_PATH = "/data/littleautoresult.txt";
+-    private static final String AUTO_RESULT_PATH = "/data/autoresult.txt";
++    private static final String LITTLE_AUTO_RESULT_PATH = "/data/test/littleautoresult.txt";
++    private static final String AUTO_RESULT_PATH = "/data/test/autoresult.txt";
+     String resultPrference = "";
+     MenuAdapter menuAdapter;
+     public static Boolean FLAG = false;
+@@ -217,23 +217,23 @@ public class LittleAutoHomeActivity extends Activity {
+         Log.i("onActivityResult", "onActivityResult resultPrference:" + resultPrference);
+         saveResultToTxt(resultPrference);
+         SystemProperties.set("persist.service.daemon.enable", "1");
+-        runCommand("echo 17 > /data/citflag");
++        runCommand("echo 17 > /data/test/citflag");
+ 
+     }
+     @Override
+     protected void onResume() {
+         super.onResume();
+         try {
+-            Process process1 = Runtime.getRuntime().exec("touch /data/citflag");
+-            Process process2 = Runtime.getRuntime().exec("chmod 777 /data/citflag");
+-            Process process3 = Runtime.getRuntime().exec("touch /data/getsarevent.txt");
+-            Process process4 = Runtime.getRuntime().exec("chmod 777 /data/getsarevent.txt");
++            Process process1 = Runtime.getRuntime().exec("touch /data/test/citflag");
++            Process process2 = Runtime.getRuntime().exec("chmod 777 /data/test/citflag");
++            Process process3 = Runtime.getRuntime().exec("touch /data/test/getsarevent.txt");
++            Process process4 = Runtime.getRuntime().exec("chmod 777 /data/test/getsarevent.txt");
+         } catch (Exception e ) { 
+             e.printStackTrace () ; 
+         }
+         IntentFilter myIntentFilter = new IntentFilter();
+         myIntentFilter.addAction("android.intent.action.LOCALE_CHANGED");
+-        runCommand("echo 0 > /data/citflag");      
++        runCommand("echo 0 > /data/test/citflag");      
+         registerReceiver(mReceiver, myIntentFilter);
+ 
+     }
+@@ -262,7 +262,7 @@ public class LittleAutoHomeActivity extends Activity {
+         recoveryTouchsound();
+         //saveResutlToNV();
+         SystemProperties.set("persist.service.daemon.enable", "0");
+-        runCommand("echo 0 > /data/citflag");
++        runCommand("echo 0 > /data/test/citflag");
+         super.onDestroy();
+     }
+     @Override
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/MicTest1.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/MicTest1.java
+index f116264..e8e0d9b 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/MicTest1.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/MicTest1.java
+@@ -98,7 +98,7 @@ public class MicTest1 extends TestModule {
+    
+  } 
+ 
+-private static final String SIMSTATUS_RESULT_PATH = "/data/simappstatus.txt";
++private static final String SIMSTATUS_RESULT_PATH = "/data/test/simappstatus.txt";
+ public void saveResultToDATA(int result){
+         FileWriter fWriter = null;
+         try {
+@@ -124,7 +124,7 @@ public void saveResultToDATA(int result){
+         final List<String> cmds = new ArrayList<String>();
+         cmds.add("sh");
+         cmds.add("-c");
+-        cmds.add("echo 2 > /data/citflag");
++        cmds.add("echo 2 > " + PATH);
+         new Handler().postDelayed(new Runnable(){  
+         public void run() { 
+             try{
+@@ -155,7 +155,7 @@ public void saveResultToDATA(int result){
+         unregisterReceiver(headsetReceiver);
+         // if(wl.isHeld()) wl.release();
+         try {
+-            Process process1 = Runtime.getRuntime().exec("echo 0 > /data/citflag");
++            Process process1 = Runtime.getRuntime().exec("echo 0 > " + PATH);
+         } catch (Exception e ) { 
+             e.printStackTrace () ; 
+         } 
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/PcbaAutoHomeActivity.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/PcbaAutoHomeActivity.java
+index cbb7d03..8ffef0e 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/PcbaAutoHomeActivity.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/PcbaAutoHomeActivity.java
+@@ -50,8 +50,8 @@ public class PcbaAutoHomeActivity extends Activity {
+     private BaseMenu menuData = new BaseMenu(this);
+     private ArrayList<MenuData> automenuDatas = new ArrayList<MenuData>();
+     private String AUTO_SHARE_NAME = "little_auto_testresult";
+-    private static final String LITTLE_AUTO_RESULT_PATH = "/data/pcbaautoresult.txt";
+-    private static final String AUTO_RESULT_PATH = "/data/pcbaresult.txt";
++    private static final String LITTLE_AUTO_RESULT_PATH = "/data/test/pcbaautoresult.txt";
++    private static final String AUTO_RESULT_PATH = "/data/test/pcbaresult.txt";
+     String resultPrference = "";
+     MenuAdapter menuAdapter;
+     public static Boolean FLAG = false;
+@@ -217,21 +217,21 @@ public class PcbaAutoHomeActivity extends Activity {
+         Log.i("onActivityResult", "onActivityResult resultPrference:" + resultPrference);
+         saveResultToTxt(resultPrference);
+         SystemProperties.set("persist.service.daemon.enable", "1");
+-        runCommand("echo 17 > /data/citflag");
++        runCommand("echo 17 > /data/test/citflag");
+ 
+     }
+     @Override
+     protected void onResume() {
+         super.onResume();
+         try {
+-            Process process1 = Runtime.getRuntime().exec("touch /data/citflag");
+-            Process process2 = Runtime.getRuntime().exec("chmod 777 /data/citflag");
++            Process process1 = Runtime.getRuntime().exec("touch /data/test/citflag");
++            Process process2 = Runtime.getRuntime().exec("chmod 777 /data/test/citflag");
+         } catch (Exception e ) { 
+             e.printStackTrace () ; 
+         }
+         IntentFilter myIntentFilter = new IntentFilter();
+         myIntentFilter.addAction("android.intent.action.LOCALE_CHANGED");
+-        runCommand("echo 0 > /data/citflag");      
++        runCommand("echo 0 > /data/test/citflag");      
+         registerReceiver(mReceiver, myIntentFilter);
+ 
+     }
+@@ -260,7 +260,7 @@ public class PcbaAutoHomeActivity extends Activity {
+         recoveryTouchsound();
+         //saveResutlToNV();
+         SystemProperties.set("persist.service.daemon.enable", "0");
+-        runCommand("echo 0 > /data/citflag");
++        runCommand("echo 0 > /data/test/citflag");
+         super.onDestroy();
+     }
+     @Override
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SarSensor.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SarSensor.java
+index a2d0aca..38a208a 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SarSensor.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SarSensor.java
+@@ -180,7 +180,7 @@ public class SarSensor extends Activity implements SensorEventListener {
+         String eventString = "";
+         char acBuffer[] = new char[30];
+         try {
+-            sarReader = new FileReader("/data/getsarevent.txt");
++            sarReader = new FileReader("/data/test/getsarevent.txt");
+             sarReader.read(acBuffer, 0, 30);
+             for (int i = 0; i < acBuffer.length; i++) {
+                 eventString += acBuffer[i];
+@@ -191,7 +191,7 @@ public class SarSensor extends Activity implements SensorEventListener {
+             Log.e("sarsensor test", "without access to the /data/getsarevent.txt");
+             e.printStackTrace();
+         }
+-        Log.e("sarsensor test", "/data/getsarevent.txt:" + eventString);
++        Log.e("sarsensor test", "/data/test/getsarevent.txt:" + eventString);
+         if(!eventString.equals("")) {
+             SarEvent.setText(R.string.sar_exist);
+             findViewById(R.id.btn_pass).setEnabled(true);
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SensorAdjusts.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SensorAdjusts.java
+index 7a166bf..acd355b 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SensorAdjusts.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SensorAdjusts.java
+@@ -98,13 +98,13 @@ public class SensorAdjusts extends TestModule implements SensorEventListener {
+             switch (id) {
+                 case R.id.shuiping:
+                     if(xg*xg+yg*yg<0.9 && zg>9.6 && zg<9.99) {
+-                        saveResultToTxt(String.valueOf(xg),"/data/adjustsensor_x_xg");
+-                        saveResultToTxt(String.valueOf(yg),"/data/adjustsensor_x_yg");
+-                        saveResultToTxt(String.valueOf(zg),"/data/adjustsensor_x_zg");
++                        saveResultToTxt(String.valueOf(xg),"/data/test/adjustsensor_x_xg");
++                        saveResultToTxt(String.valueOf(yg),"/data/test/adjustsensor_x_yg");
++                        saveResultToTxt(String.valueOf(zg),"/data/test/adjustsensor_x_zg");
+                         
+-                        saveResultToTxt(String.valueOf(x),"/data/adjustsensor_x_x");
+-                        saveResultToTxt(String.valueOf(y),"/data/adjustsensor_x_y");
+-                        saveResultToTxt(String.valueOf(z),"/data/adjustsensor_x_z");
++                        saveResultToTxt(String.valueOf(x),"/data/test/adjustsensor_x_x");
++                        saveResultToTxt(String.valueOf(y),"/data/test/adjustsensor_x_y");
++                        saveResultToTxt(String.valueOf(z),"/data/test/adjustsensor_x_z");
+                         press[0] = true;
+                         Toast.makeText(SensorAdjusts.this, R.string.ajust_toast, 2000).show();
+                         if(press[0]&&press[1]&&press[2]) {
+@@ -120,13 +120,13 @@ public class SensorAdjusts extends TestModule implements SensorEventListener {
+                     break;
+                 case R.id.shuzhi:
+                     if(xg*xg+zg*zg<0.9 && yg>9.6 && yg<9.99) {
+-                        saveResultToTxt(String.valueOf(xg),"/data/adjustsensor_z_xg");
+-                        saveResultToTxt(String.valueOf(yg),"/data/adjustsensor_z_yg");
+-                        saveResultToTxt(String.valueOf(zg),"/data/adjustsensor_z_zg");
++                        saveResultToTxt(String.valueOf(xg),"/data/test/adjustsensor_z_xg");
++                        saveResultToTxt(String.valueOf(yg),"/data/test/adjustsensor_z_yg");
++                        saveResultToTxt(String.valueOf(zg),"/data/test/adjustsensor_z_zg");
+                         
+-                        saveResultToTxt(String.valueOf(x),"/data/adjustsensor_z_x");
+-                        saveResultToTxt(String.valueOf(y),"/data/adjustsensor_z_y");
+-                        saveResultToTxt(String.valueOf(z),"/data/adjustsensor_z_z");
++                        saveResultToTxt(String.valueOf(x),"/data/test/adjustsensor_z_x");
++                        saveResultToTxt(String.valueOf(y),"/data/test/adjustsensor_z_y");
++                        saveResultToTxt(String.valueOf(z),"/data/test/adjustsensor_z_z");
+                         press[1] = true;
+                         Toast.makeText(SensorAdjusts.this, R.string.ajust_toast, 2000).show();
+                         if(press[0]&&press[1]&&press[2]) {
+@@ -142,13 +142,13 @@ public class SensorAdjusts extends TestModule implements SensorEventListener {
+                     break;
+                 case R.id.zuoce:
+                     if(yg*yg+zg*zg<0.9 && xg>9.6 && xg<9.99) {
+-                        saveResultToTxt(String.valueOf(xg),"/data/adjustsensor_y_xg");
+-                        saveResultToTxt(String.valueOf(yg),"/data/adjustsensor_y_yg");
+-                        saveResultToTxt(String.valueOf(zg),"/data/adjustsensor_y_zg");
++                        saveResultToTxt(String.valueOf(xg),"/data/test/adjustsensor_y_xg");
++                        saveResultToTxt(String.valueOf(yg),"/data/test/adjustsensor_y_yg");
++                        saveResultToTxt(String.valueOf(zg),"/data/test/adjustsensor_y_zg");
+                         
+-                        saveResultToTxt(String.valueOf(x),"/data/adjustsensor_y_x");
+-                        saveResultToTxt(String.valueOf(y),"/data/adjustsensor_y_y");
+-                        saveResultToTxt(String.valueOf(z),"/data/adjustsensor_y_z");
++                        saveResultToTxt(String.valueOf(x),"/data/test/adjustsensor_y_x");
++                        saveResultToTxt(String.valueOf(y),"/data/test/adjustsensor_y_y");
++                        saveResultToTxt(String.valueOf(z),"/data/test/adjustsensor_y_z");
+                         press[2] = true;
+                         Toast.makeText(SensorAdjusts.this, R.string.ajust_toast, 2000).show();
+                         if(press[0]&&press[1]&&press[2]) {
+@@ -188,11 +188,12 @@ public class SensorAdjusts extends TestModule implements SensorEventListener {
+                 }
+             }
+         }
++        Log.i("SensorAdjust", "sensor saveresult to file end *****result=" + result + " path=" + path);
+     }
+ 
+     @Override
+     protected void onDestroy() {
+-        deleteData("rm /data/adjust*");
++        deleteData("rm /data/test/adjust*");
+         super.onDestroy();
+     }
+ 
+@@ -265,8 +266,8 @@ public class SensorAdjusts extends TestModule implements SensorEventListener {
+         final List<String> cmds = new ArrayList<String>();
+         cmds.add("sh");
+         cmds.add("-c");
+-        cmds.add("echo " + command + " > /data/citflag && setprop persist.service.daemon.enable 1");
+-        Log.i("autoback test","command lcd:" + command);
++        cmds.add("echo " + command + " > /data/test/citflag && setprop persist.service.daemon.enable 1");
++        Log.i("sensoradjust test","command :" + command);
+         new Handler().postDelayed(new Runnable(){  
+             public void run() { 
+                 try{
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SpeakerTightness.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SpeakerTightness.java
+index 4444b83..03e435a 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SpeakerTightness.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SpeakerTightness.java
+@@ -66,8 +66,8 @@ public class SpeakerTightness extends TestModule {
+         new Handler().postDelayed(new Runnable(){  
+             public void run() { 
+                 try{
+-                   readFofinit("/data/audio_test2", true);
+-                   readFofinit("/data/audio_test1", false);
++                   readFofinit("/data/test/audio_test2", true);
++                   readFofinit("/data/test/audio_test1", false);
+                 } catch (Exception e ) { 
+                     e.printStackTrace ( ) ; 
+                 }
+@@ -164,7 +164,7 @@ public class SpeakerTightness extends TestModule {
+         final List<String> pink_cmds = new ArrayList<String>();
+         pink_cmds.add("sh");
+         pink_cmds.add("-c");
+-        pink_cmds.add("echo 9 > /data/citflag");
++        pink_cmds.add("echo 9 > " + PATH);
+         Log.i("command speaker", "command speaker:" + pink_cmds);
+         new Handler().postDelayed(new Runnable(){  
+             public void run() { 
+@@ -203,8 +203,8 @@ public class SpeakerTightness extends TestModule {
+     @Override
+     protected void onDestroy() {
+         try {
+-            Process process1 = Runtime.getRuntime().exec("rm /data/audio_test1");
+-            Process process2 = Runtime.getRuntime().exec("rm /data/audio_test2");
++            Process process1 = Runtime.getRuntime().exec("rm /data/test/audio_test1");
++            Process process2 = Runtime.getRuntime().exec("rm /data/test/audio_test2");
+         } catch (Exception e ) { 
+             e.printStackTrace () ; 
+         } 
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SpkCalibration.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SpkCalibration.java
+index 3e3da4c..14c7733 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SpkCalibration.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/SpkCalibration.java
+@@ -44,17 +44,17 @@ public class SpkCalibration extends Activity {
+         imp_temp_val = (TextView) findViewById(R.id.imp_temp_val);
+         fo = (TextView) findViewById(R.id.fo);
+         diff = (TextView) findViewById(R.id.diff);
+-        String text = readDatafromFile("/data/spkcalibration_303_imp_acc_low");
++        String text = readDatafromFile("/data/test/spkcalibration_303_imp_acc_low");
+         imp_acc_low_val.setText(text);
+-        text = readDatafromFile("/data/spkcalibration_330_imp_acc_high");
++        text = readDatafromFile("/data/test/spkcalibration_330_imp_acc_high");
+         imp_acc_high_val.setText(text);
+-        text = readDatafromFile("/data/spkcalibration_304_imp_count");
++        text = readDatafromFile("/data/test/spkcalibration_304_imp_count");
+         imp_count_val.setText(text);
+-        text = readDatafromFile("/data/spkcalibration_temp");
++        text = readDatafromFile("/data/test/spkcalibration_temp");
+         imp_temp_val.setText(text);
+-        text = readDatafromFile("/data/spkcalibration_306_ref_diff");
++        text = readDatafromFile("/data/test/spkcalibration_306_ref_diff");
+         diff.setText(text);
+-        text = readDatafromFile("/data/spkcalibration_305_f0");
++        text = readDatafromFile("/data/test/spkcalibration_305_f0");
+         fo.setText(text);
+         closeButton.setOnClickListener(closeOnClickListener);
+     }
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/TestModule.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/TestModule.java
+index ab76e38..79fd347 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/TestModule.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/TestModule.java
+@@ -35,6 +35,7 @@ import android.os.SystemProperties;
+ public abstract class TestModule extends Activity{
+     private WakeLock wl;
+     public static final int RESULT_CODE = 0X11;
++    public static final String PATH = "/data/test/citflag";
+     /**
+      * @param savedInstanceState
+      * @param layout the layout resource ID
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/ThreeColorTest.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/ThreeColorTest.java
+index dc32479..085bbd5 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/ThreeColorTest.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/ThreeColorTest.java
+@@ -165,7 +165,7 @@ public class ThreeColorTest extends TestModule  implements android.view.View.OnC
+         final List<String> cmds = new ArrayList<String>();
+         cmds.add("sh");
+         cmds.add("-c");
+-        cmds.add("echo " + command + " > /data/citflag");
++        cmds.add("echo " + command + " > " + PATH);
+         Log.i("autoback test","command lcd:" + command);
+         new Handler().postDelayed(new Runnable(){
+             public void run() {
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/TopspeakerTest.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/TopspeakerTest.java
+index e4ef09a..4410b97 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/TopspeakerTest.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/TopspeakerTest.java
+@@ -93,7 +93,7 @@ public class TopspeakerTest extends TestModule {
+         final List<String> cmds = new ArrayList<String>();
+         cmds.add("sh");
+         cmds.add("-c");
+-        cmds.add("echo " + command_speaker + " > /data/citflag");
++        cmds.add("echo " + command_speaker + " > " + PATH);
+         Log.i("command speaker", "command speaker:" + command_speaker);
+         new Handler().postDelayed(new Runnable(){  
+             public void run() { 
+diff --git a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/TpRawdata.java b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/TpRawdata.java
+index 528c1c9..474f911 100755
+--- a/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/TpRawdata.java
++++ b/LINUX/android/packages/apps/FactoryTest/src/com/tools/cit/TpRawdata.java
+@@ -31,7 +31,7 @@ import java.io.InputStreamReader;
+ import java.io.File;
+ import android.os.SystemProperties;
+ public class TpRawdata extends TestModule implements OnClickListener {
+-    private static final String FLAG = "/data/rawdataresult.txt";
++    private static final String FLAG = "/data/test/rawdataresult.txt";
+     private static final String TST_PASS = "TEST RESULT : PASS\n";
+     TextView result;
+     Button start,btnPass;
+@@ -88,7 +88,7 @@ public class TpRawdata extends TestModule implements OnClickListener {
+         final List<String> cmds = new ArrayList<String>();
+         cmds.add("sh");
+         cmds.add("-c");
+-        cmds.add("echo '' > /data/rawdataresult.txt && echo 23 > /data/citflag && setprop persist.service.daemon.enable 1");
++        cmds.add("echo '' > /data/test/rawdataresult.txt && echo 23 > " + PATH  + " && setprop persist.service.daemon.enable 1");
+         new Handler().postDelayed(new Runnable(){  
+         public void run() { 
+             try{
+diff --git a/LINUX/android/system/core/rootdir/init.rc b/LINUX/android/system/core/rootdir/init.rc
+index fd29c23..46d6437 100755
+--- a/LINUX/android/system/core/rootdir/init.rc
++++ b/LINUX/android/system/core/rootdir/init.rc
+@@ -331,8 +331,7 @@ on post-fs
+     #lijinghua add
+     chown root system /countrycode
+     chmod 0771 /countrycode
+-    chown root system /countrycode/cfg
+-    chmod 0771 /countrycode/cfg
++    mkdir /countrycode/cfg 0771 root system
+     #lijinghua end
+ on post-fs-data
+     # We chown/chmod /data again so because mount is run as root + defaults
+@@ -457,6 +456,9 @@ on post-fs-data
+     mkdir /data/user 0711 system system
+     mkdir /data/user_de 0711 system system
+     symlink /data/data /data/user/0
++    #add by qianyan test
++    mkdir /data/test 0777 system system
++    #end
+ 
+     mkdir /data/media 0770 media_rw media_rw
+     mkdir /data/media/obb 0770 media_rw media_rw
+diff --git a/LINUX/android/system/sepolicy/cit_daemon.te b/LINUX/android/system/sepolicy/cit_daemon.te
+new file mode 100755
+index 0000000..580af14
+--- /dev/null
++++ b/LINUX/android/system/sepolicy/cit_daemon.te
+@@ -0,0 +1,19 @@
++type cit_daemon, domain;
++type cit_daemon_exec, exec_type, file_type;
++init_daemon_domain(cit_daemon)
++allow cit_daemon cit_daemon:capability { dac_override };
++allow cit_daemon shell_exec:file { execute read open execute_no_trans getattr};
++allow cit_daemon sysfs:file { open  write };
++allow cit_daemon system_file:file { execute_no_trans };
++allow cit_daemon audio_device:dir { search };
++allow cit_daemon audio_device:chr_file { read write open ioctl };
++allow cit_daemon test_data_file:file { getattr write create read open setattr };
++allow cit_daemon test_data_file:dir { getattr search write add_name create read open};
++userdebug_or_eng(`
++allow cit_daemon system_data_file:dir { write add_name getattr search create};
++allow cit_daemon system_data_file:file { open write create write setattr getattr read };
++allow cit_daemon cit_daemon:capability { chown fowner };
++allow cit_daemon system_data_file:dir { read open  };
++allow cit_daemon toolbox_exec:file { execute read open execute_no_trans getattr};
++')
++allow cit_daemon property_socket :sock_file write;
+\ No newline at end of file
+diff --git a/LINUX/android/system/sepolicy/domain.te b/LINUX/android/system/sepolicy/domain.te
+old mode 100644
+new mode 100755
+index 509b477..79e2bb9
+--- a/LINUX/android/system/sepolicy/domain.te
++++ b/LINUX/android/system/sepolicy/domain.te
+@@ -467,6 +467,7 @@ neverallow {
+   -system_app
+   -init
+   -installd # for relabelfrom and unlink, check for this in explicit neverallow
++  userdebug_or_eng(`-cit_daemon')
+ } system_data_file:file no_w_file_perms;
+ # do not grant anything greater than r_file_perms and relabelfrom unlink
+ # to installd
+diff --git a/LINUX/android/system/sepolicy/file.te b/LINUX/android/system/sepolicy/file.te
+old mode 100644
+new mode 100755
+index f0e984d..91136e6
+--- a/LINUX/android/system/sepolicy/file.te
++++ b/LINUX/android/system/sepolicy/file.te
+@@ -116,6 +116,10 @@ type ringtone_file, file_type, data_file_type, mlstrustedobject;
+ # /data/preloads
+ type preloads_data_file, file_type, data_file_type;
+ 
++#add by qianyan
++type test_data_file, file_type, data_file_type;
++#
++
+ # Mount locations managed by vold
+ type mnt_media_rw_file, file_type;
+ type mnt_user_file, file_type;
+diff --git a/LINUX/android/system/sepolicy/file_contexts b/LINUX/android/system/sepolicy/file_contexts
+index 4b033d9..c7b3a55 100755
+--- a/LINUX/android/system/sepolicy/file_contexts
++++ b/LINUX/android/system/sepolicy/file_contexts
+@@ -397,10 +397,12 @@
+ /mnt/runtime(/.*)?          u:object_r:storage_file:s0
+ /storage(/.*)?              u:object_r:storage_file:s0
+ # userstore file
+-/userstore(/.*)?               u:object_r:system_data_file:s0
++/userstore(/.*)?               u:object_r:test_data_file:s0
+ # countrycode file
+ #
+-/countrycode(/.*)?             u:object_r:system_data_file:s0
+-
++/countrycode(/.*)?             u:object_r:test_data_file:s0
++/countrycode/cfg(/.*)?         u:object_r:test_data_file:s0
++/data/test(/.*)?               u:object_r:test_data_file:s0 
++/system/bin/cit_daemon         u:object_r:cit_daemon_exec:s0
+ /system/bin/setup_fs           u:object_r:setup_fs_exec:s0
+ /system/bin/data_pt_check      u:object_r:data_pt_check_exec:s0
+diff --git a/LINUX/android/system/sepolicy/system_app.te b/LINUX/android/system/sepolicy/system_app.te
+old mode 100644
+new mode 100755
+index 2d51c5a1..5edd3ad
+--- a/LINUX/android/system/sepolicy/system_app.te
++++ b/LINUX/android/system/sepolicy/system_app.te
+@@ -48,7 +48,10 @@ allow system_app asec_apk_file:file r_file_perms;
+ 
+ allow system_app servicemanager:service_manager list;
+ allow system_app { service_manager_type -netd_service }:service_manager find;
+-
++#add by qianyan
++allow system_app test_data_file:dir { search write add_name};
++allow system_app test_data_file:file { write getattr read create open};
++#end
+ allow system_app keystore:keystore_key {
+ 	get_state
+ 	get
+@@ -72,5 +75,4 @@ allow system_app keystore:keystore_key {
+ # /sys access
+ allow system_app sysfs_zram:dir search;
+ allow system_app sysfs_zram:file r_file_perms;
+-
+ control_logd(system_app)
+diff --git a/LINUX/android/system/sepolicy/system_server.te b/LINUX/android/system/sepolicy/system_server.te
+old mode 100644
+new mode 100755
+index e74f58c..e6683f0
+--- a/LINUX/android/system/sepolicy/system_server.te
++++ b/LINUX/android/system/sepolicy/system_server.te
+@@ -109,6 +109,11 @@ allow system_server proc_uid_cputime_removeuid:file { w_file_perms getattr };
+ # Write to /proc/sysrq-trigger.
+ allow system_server proc_sysrq:file rw_file_perms;
+ 
++#add by qianyan for countrycode
++allow system_server test_data_file:file { getattr write create read open setattr };
++allow system_server test_data_file:dir { getattr search write add_name create read open};
++#
++
+ # Read /sys/kernel/debug/wakeup_sources.
+ allow system_server debugfs:file r_file_perms;
+ 
+diff --git a/LINUX/android/vendor/byd/cit_daemon/cit_daemon.c b/LINUX/android/vendor/byd/cit_daemon/cit_daemon.c
+index cea3589..0425e7f 100755
+--- a/LINUX/android/vendor/byd/cit_daemon/cit_daemon.c
++++ b/LINUX/android/vendor/byd/cit_daemon/cit_daemon.c
+@@ -31,7 +31,7 @@ static char* command[] = {"",
+ "",
+ "",
+ "",
+-"btconfig /dev/smd3 reset && btconfig /dev/smd3 rawcmd 0x06, 0x03 && btconfig /dev/smd3 rawcmd 0x03, 0x05, 0x02, 0x00, 0x02 && btconfig /dev/smd3 rawcmd 0x03, 0x1A, 0x03 && btconfig /dev/smd3 rawcmd 0x03, 0x20, 0x00 && btconfig /dev/smd3 rawcmd 0x03, 0x22, 0x00 && echo 0 > /data/citflag",
++"btconfig /dev/smd3 reset && btconfig /dev/smd3 rawcmd 0x06, 0x03 && btconfig /dev/smd3 rawcmd 0x03, 0x05, 0x02, 0x00, 0x02 && btconfig /dev/smd3 rawcmd 0x03, 0x1A, 0x03 && btconfig /dev/smd3 rawcmd 0x03, 0x20, 0x00 && btconfig /dev/smd3 rawcmd 0x03, 0x22, 0x00 && echo 0 > /data/test/citflag",
+ ""
+ }; 
+ 
+@@ -40,7 +40,7 @@ static void btwifitest() {
+     char com[1024] = {0};
+     while(1) {
+     FILE *stream;
+-    fd = open("/data/btwifi",O_RDONLY);
++    fd = open("/data/test/btwifi",O_RDONLY);
+     if ( fd >= 0) {
+         read(fd, com, sizeof(com));
+         close(fd);
+@@ -55,23 +55,23 @@ static int play_back(int flag)
+ {
+     if(flag <= 15 || flag == 19) {
+         system(command[flag]);
+-        system("echo 0 > /data/citlog.txt");
++        system("echo 0 > /data/test/citlog.txt");
+     } else if(flag == 17) {
+-        system("echo $(cat /data/autoresult.txt) > /userstore/citresult");
++        system("echo $(cat /data/test/autoresult.txt) > /userstore/citresult");
+         system("chmod 777 /userstore/citresult");
+         system("chown system:system /userstore/citresult");
+         //system("setprop persist.service.daemon.enable 0");
+     }else if(flag ==18){
+-        system("echo $(cat /data/runinflag.txt) > /userstore/runinflag");
++        system("echo $(cat /data/test/runinflag.txt) > /userstore/runinflag");
+         system("chmod 777 /userstore/runinflag");
+         system("chown system:system /userstore/runinflag");
+     }else if(flag == 20) {
+          btwifitest();
+     }else if(flag == 21) {
+         //system("echo $(cat /data/recovery.txt) > /userstore/recovery && chmod 777 /userstore/recovery && chown system:system /userstore/recovery && echo 0 > /data/citflag && setprop persist.service.daemon.enable 0");
+-        system("chmod 777 /userstore/recovery && chown system:system /userstore/recovery && echo 0 > /data/citflag && setprop persist.service.daemon.enable 0");
++        system("chmod 777 /userstore/recovery && chown system:system /userstore/recovery && echo 0 > /data/test/citflag && setprop persist.service.daemon.enable 0");
+     }else if(flag == 22) {
+-        system("cp /data/adjustsensor* /userstore/");
++        system("cp /data/test/adjustsensor* /userstore/");
+         system("chmod 644 /userstore/adjustsensor_x_x&&chmod 644 /userstore/adjustsensor_x_xg");
+         system("chmod 644 /userstore/adjustsensor_x_y&&chmod 644 /userstore/adjustsensor_x_yg");
+         system("chmod 644 /userstore/adjustsensor_x_z&&chmod 644 /userstore/adjustsensor_x_zg");
+@@ -109,7 +109,7 @@ static int  getsarsensor()
+     int flag = 1;
+     FILE *stream;
+ 
+-    fd = open("/data/sarevent.txt",O_RDONLY);
++    fd = open("/data/test/sarevent.txt",O_RDONLY);
+     char com1[80] = {0};
+     char com2[80] = {0};
+     int i = 0;
+@@ -117,7 +117,7 @@ static int  getsarsensor()
+         printf("+++++++++read data/citflag+++++++++\n");
+         read(fd, buffer1, sizeof(buffer1));
+         close(fd);
+-        stream = fopen( "/data/citlog.txt", "w" );
++        stream = fopen( "/data/test/citlog.txt", "w" );
+         int len = strlen(buffer1);
+         for(i = 0; i < len ; i++) {
+             if(buffer1[i] == '\n') buffer1[i] = '\0';
+@@ -136,7 +136,7 @@ static int  getsarsensor()
+           }
+           close(fd);
+           i = i + 1;*/
+-          sprintf(com2, "cat %s > /data/getsarevent.txt;", com1);
++          sprintf(com2, "cat %s > /data/test/getsarevent.txt;", com1);
+           fprintf(stream, "command2:%s...\n", com2);
+           system(com2);
+ 
+@@ -144,11 +144,11 @@ static int  getsarsensor()
+         fclose( stream );
+     } else if ( fd < 0){
+         fprintf(stream, "...fail open sarevent ");// print log
+-        printf("cit_daemon open /data/citflag fail");
++        printf("cit_daemon open /data/test/citflag fail");
+         close(fd);
+-        sprintf(com2, "echo  > /data/getsarevent.txt");
++        sprintf(com2, "echo  > /data/test/getsarevent.txt");
+         system(com2);
+-        system("chmod 777 /data/getsarevent.txt");
++        system("chmod 777 /data/test/getsarevent.txt");
+ 
+     }
+ 
+@@ -164,20 +164,20 @@ int main(void)
+     //pthread_t fm_play_thread;
+     //pthread_create(&fm_play_thread, NULL, play_back, NULL);
+ 
+-    fd = open("/data/citflag",O_RDONLY);
++    fd = open("/data/test/citflag",O_RDONLY);
+     if ( fd >= 0) {
+-        printf("+++++++++read data/citflag+++++++++\n");
++        printf("+++++++++read data/test/citflag+++++++++\n");
+         read(fd, buffer, sizeof(buffer));
+         now = atoi(buffer);
+     } else if ( fd < 0){
+-        printf("cit_daemon open /data/citflag fail");
++        printf("cit_daemon open /data/test/citflag fail");
+     }
+     close(fd);
+     if(now <= 15 || now >= 17) {
+       while(1) {
+          printf("+++++++++begin run command+++++++++\n");
+         //android_printLog(3, "cit_daemon","cit_daemon begin run command");
+-         fd = open("/data/citflag",O_RDONLY);
++         fd = open("/data/test/citflag",O_RDONLY);
+          if ( fd >= 0) {
+             printf("+++++++++file open success+++++++++\n");
+             //android_printLog(3, "cit_daemon","file open success");
+diff --git a/LINUX/android/vendor/byd/countrycode/empty/countrycode.mk b/LINUX/android/vendor/byd/countrycode/empty/countrycode.mk
+deleted file mode 100755
+index db84f7a..0000000
+--- a/LINUX/android/vendor/byd/countrycode/empty/countrycode.mk
++++ /dev/null
+@@ -1,6 +0,0 @@
+-LOCAL_PATH := $(call my-dir)
+-include $(CLEAR_VARS)
+-
+-COUNTRYCODE_PACKAGES :=
+-
+-
+-- 
+2.1.3
+

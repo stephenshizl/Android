@@ -1,0 +1,752 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"><html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=gb2312">
+<meta name=Generator content="Word2Chm Addin (v1.4.7.4)">
+<link rel="stylesheet" href="Word2Chm.css" type="text/css">
+
+<title> Android Supported Media Formats</title>
+</head>
+      
+<div class=WordSection1 style='layout-grid:15.6pt'>
+
+<p class=MsoNormal align=center style='text-align:center'><b><span
+style='font-size:18.0pt'>Android Supported Media Formats</span></b></p>
+<p class=MsoNormal align=center style='text-align:center'><span
+>译者署名：</span> <span>jackeylu</span></p>
+<p class=MsoNormal align=center style='text-align:center'><span
+>译者链接：</span><span><a target="_blank" href="http://jackeylu.wordpress.com">http://jackeylu.wordpress.com</a></span></p>
+<p class=MsoNormal align=center style='text-align:center'><span
+>版本：</span><span>Android 3.1 r1</span></p>
+<p class=MsoNormal align=left style='text-align:left'><b><span
+style='font-size:12.0pt;'>原文</span></b></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a target="_blank" href="http://developer.android.com/guide/appendix/media-formats.html">http://developer.android.com/guide/appendix/media-formats.html</a></span></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>本文档描述了</span><span>Android</span><span
+>平台支持的媒体播放解码器、网络协议。</span></p>
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>作为一名应用软件开发者，你可以自由使用平台上的媒体解码器，这些编解码可以是平台提供，或者是特定设备支持。<b>然而，最好习惯于使用媒体编码配置信息使得应用软件代码编写能够与具体硬件无关</b>。</span></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+<p class=MsoNormal align=center style='text-align:center'><b><span
+style='font-size:14.0pt;'>网络协议</span></b><b><span
+style='font-size:14.0pt'>(Network Protocols)</span></b></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+>可以支持下述网络协议音视频的播放：</span></p>
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt'><span style='font-family:Wingdings'>l<span
+style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+>实时流传输协议</span><span>RTSP (</span><span
+>实时传输协议</span><span>RTP, </span><span
+>会话描述协议</span><span>SDP)</span></p>
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt'><span style='font-family:Wingdings'>l<span
+style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span>Http</span><span
+>流式传输（译者注：串流传输分两种：</span><span>progressive
+streaming</span><span >和</span><span>real time
+streaming</span><span >。</span><span>progressive</span><span
+>好处是透过</span><span>HTTP</span><span
+>来传输，品质较好，只能单点播送</span><span>(Unitcast)</span><span
+>，参见文章</span><span><a target="_blank" href="http://blog.xuite.net/edison901/documents/3753276"><span
+><span>这里</span></span></a></span><span
+>。）</span></p>
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt'><span style='font-family:Wingdings'>l<span
+style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span>HTTP
+Live Streaming</span><span >协议</span><span>(Android
+3.0</span><span >及以上</span><span>) </span><span
+>（译者注：</span><span>HTTP Live Streaming</span><span
+>最初是由苹果公司针对其</span><span>iPhone</span><span
+>、</span><span>iPod</span><span
+>、</span><span>iTouch</span><span
+>和</span><span>iPad</span><span
+>等移动设备而开发的流媒体协议，点</span><span><a target="_blank" href="http://www.chinaunicom.com.cn/upload/1287474923316.pdf"><span
+><span>这里</span></span></a></span><span
+>下载。）</span></p>
+<p class=MsoNormal align=left style='margin-left:21.0pt;text-align:left'><b><span
+>注意</span></b><span >：暂时不支持</span><span
+lang=EN-US>HTTPS</span></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+<p class=MsoNormal align=center style='text-align:center'><b><span
+style='font-size:14.0pt;'>媒体格式</span></b><b><span
+style='font-size:14.0pt'>(Core Media Formats)</span></b></p>
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>下表列出了</span><span>Android</span><span
+>平台内置支持的媒体格式。请注意，任何一种移动设备都有可能提供更多的不在表中的格式支持。</span></p>
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><b><span
+>注意</span></b><span >：具体的媒体编解码不一定在所有的</span><span
+lang=EN-US>Android</span><span >平台版本上都支持，相应的会通过括号标注出来，例如</span><span
+lang=EN-US>”(Android 3.0+)”</span></p>
+
+<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0 width=584
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=49 valign=top style='width:37.0pt;border:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><b><span
+  >类型</span></b></p>
+  </td>
+  <td width=90 valign=top style='width:67.65pt;border:solid black 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><b><span
+  >格式</span><span> /</span></b><b><span
+  >编码</span></b></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border:solid black 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span class=def><b><span
+  style='font-size:9.0pt;;color:#313131'>编码器</span></b></span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border:solid black 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><b><span
+  >解码器</span></b></p>
+  </td>
+  <td width=142 valign=top style='width:106.15pt;border:solid black 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><b><span
+  >详细说明</span></b></p>
+  </td>
+  <td width=180 valign=top style='width:134.65pt;border:solid black 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><b><span
+  >支持文件类型</span><span> / </span></b><b><span
+  >容器格式</span></b></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=49 rowspan=9 valign=top style='width:37.0pt;border:solid black 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>Audio</span></p>
+  </td>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>AAC
+  LC/LTP</span></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=142 rowspan=3 valign=top style='width:106.15pt;border-top:none;
+  border-left:none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-family:
+  宋体'>单声道</span><span>/</span><span >立体声</span>
+  <span >满足各种标准比特率组合，最高可达</span><span>160kbsp</span><span
+  >，采样率从</span><span>8</span><span
+  >到</span><span>48kHz</span></p>
+  </td>
+  <td width=180 rowspan=3 valign=top style='width:134.65pt;border-top:none;
+  border-left:none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>3GPP
+  (.3gp) and MPEG-4 (.mp4, .m4a). No support for raw AAC (.aac)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>HE-AACv1
+  (AAC+)</span></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>HE-AACv2
+  (enhanced AAC+)</span></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>AMR-NB</span></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=142 valign=top style='width:106.15pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>4.75 to
+  12.2 kbps sampled @ 8kHz</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>3GPP
+  (.3gp) </span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>AMR-WB</span></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=142 valign=top style='width:106.15pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>9
+  rates from 6.60 kbit/s to 23.85 kbit/s sampled @ 16kHz</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>3GPP
+  (.3gp)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>MP3</span></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=142 valign=top style='width:106.15pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span style='font-family:
+  宋体'>单声道</span><span>/</span><span >立体声</span><span
+ > 8-320kbps</span><span >常数</span><span
+ >(CBR)</span><span >或可变比特率</span><span
+ >(VBR)</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>MP3
+  (.mp3)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>MIDI</span></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=142 valign=top style='width:106.15pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>0</span><span
+  >和</span><span>1</span><span
+  >的</span><span>MIDI</span><span
+  >类型。</span><span>DLS</span><span
+  >版本</span><span>1</span><span
+  >和</span><span>2</span><span
+  >。</span><span><a
+  href="http://zhidao.baidu.com/question/11529092">XMF</a></span><span
+  >和移动</span><span>XMF</span><span
+  >。支持铃声格式</span><span>RTTTL/RTX, OTA, and
+  iMelody</span><span >。</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>Type 0
+  and 1 (.mid, .xmf, .mxmf). Also RTTTL/RTX (.rtttl, .rtx), OTA (.ota), and
+  iMelody (.imy)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>Ogg
+  Vorbis</span></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=142 valign=top style='width:106.15pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>Ogg
+  (.ogg)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>PCM/WAVE</span></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=142 valign=top style='width:106.15pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>8</span><span
+  >和</span><span>16</span><span
+  >位线性</span><span><a
+  href="http://baike.baidu.com/view/86849.htm">PCM</a></span><span
+  >（速率受硬件限制）</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>WAVE
+  (.wav)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=49 rowspan=4 valign=top style='width:37.0pt;border:solid black 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>Image</span></p>
+  </td>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>JPEG</span></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=142 valign=top style='width:106.15pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>Base+progressive</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>JPEG
+  (.jpg)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>GIF</span></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=142 valign=top style='width:106.15pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>GIF
+  (.gif)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>PNG</span></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=142 valign=top style='width:106.15pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>PNG
+  (.png)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>BMP</span></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=142 valign=top style='width:106.15pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>BMP
+  (.bmp)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=49 rowspan=3 valign=top style='width:37.0pt;border:solid black 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>Video</span></p>
+  </td>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>H.263</span></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=142 valign=top style='width:106.15pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>3GPP
+  (.3gp) and MPEG-4 (.mp4)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>H.264
+  AVC</span></p>
+  </td>
+  <td width=57 nowrap valign=top style='width:42.5pt;border-top:none;
+  border-left:none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;<br>
+  (Android 3.0+)</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=142 valign=top style='width:106.15pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>Baseline
+  Profile (BP)</span><span >（译者注：</span><span>H.264
+  Baseline Profile</span><span >压缩算法，参见</span><span
+ ><a target="_blank" href="http://article.cechina.cn/2007-04/2007420043248.htm"><span
+  ><span>这里</span></span></a></span><span
+  >）</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>3GPP
+  (.3gp) and MPEG-4 (.mp4)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=90 valign=top style='width:67.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>MPEG-4
+  SP</span></p>
+  </td>
+  <td width=57 valign=top style='width:42.5pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+  </td>
+  <td width=66 valign=top style='width:49.8pt;border-top:none;border-left:none;
+  border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&#8226;</span></p>
+  </td>
+  <td width=142 valign=top style='width:106.15pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.65pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=left style='text-align:left'><span>3GPP
+  (.3gp)</span></p>
+  </td>
+ </tr>
+</table>
+
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+<p class=MsoNormal align=center style='text-align:center'><b><span
+style='font-size:14.0pt;'>视频编码建议</span></b><b><span
+style='font-size:14.0pt'>(Video Encoding Recommendations)</span></b></p>
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>表二列出了</span><span>Android</span><span
+>媒体播放框架支持的视频编码配置和参数的例子。除了这些推荐的编码参数，设备支持的视频录像配置信息可以通过代理获得媒体回放功能参数。这些配置信息可以通过</span><span
+lang=EN-US>API</span><span >级别</span><span>8</span><span
+>开始加入的</span><code><span style='font-size:
+12.0pt'><a target="_blank" href="http://developer.android.com/reference/android/media/CamcorderProfile.html"><span
+style='font-size:10.5pt;font-family:"Calibri","sans-serif"'>CamcorderProfile</span></a></span></code><span
+>类来得到。</span></p>
+<p class=MsoNormal align=left style='text-align:left;text-indent:21.0pt'><span
+>表二：支持视频编码配置和参数的例子</span></p>
+
+<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0 width=454
+ style='margin-left:26.7pt;border-collapse:collapse;border:none'>
+ <tr>
+  <td width=123 valign=top style='width:92.1pt;border:solid black 1.0pt;
+  background:#DBE5F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>&nbsp;</span></p>
+  </td>
+  <td width=151 valign=top style='width:4.0cm;border:solid black 1.0pt;
+  border-left:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >低质量</span><span> &nbsp; </span></p>
+  </td>
+  <td width=180 valign=top style='width:134.7pt;border:solid black 1.0pt;
+  border-left:none;background:white;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >高质量</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border:solid black 1.0pt;border-top:none;
+  background:#DBE5F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>Video
+  codec</span></p>
+  </td>
+  <td width=151 style='width:4.0cm;border-top:none;border-left:none;border-bottom:
+  solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>H.264
+  Baseline Profile</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.7pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>H.264
+  Baseline Profile</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border:solid black 1.0pt;border-top:none;
+  background:#DBE5F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >视频分辨率</span></p>
+  </td>
+  <td width=151 style='width:4.0cm;border-top:none;border-left:none;border-bottom:
+  solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>176
+  x 144 px</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.7pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>480
+  x 360 px</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border:solid black 1.0pt;border-top:none;
+  background:#DBE5F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >视频帧速率</span></p>
+  </td>
+  <td width=151 style='width:4.0cm;border-top:none;border-left:none;border-bottom:
+  solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>12
+  fps</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.7pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>30
+  fps</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border:solid black 1.0pt;border-top:none;
+  background:#DBE5F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >视频比特率</span></p>
+  </td>
+  <td width=151 style='width:4.0cm;border-top:none;border-left:none;border-bottom:
+  solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>56
+  Kbps</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.7pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>500
+  Kbps</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border:solid black 1.0pt;border-top:none;
+  background:#DBE5F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >音频编码</span></p>
+  </td>
+  <td width=151 style='width:4.0cm;border-top:none;border-left:none;border-bottom:
+  solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>AAC-LC</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.7pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>AAC-LC</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border:solid black 1.0pt;border-top:none;
+  background:#DBE5F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >音频通道</span><span>(</span><span
+  >声道</span><span>)</span></p>
+  </td>
+  <td width=151 style='width:4.0cm;border-top:none;border-left:none;border-bottom:
+  solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>1
+  (</span><span >单声道</span><span>)</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.7pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>2(</span><span
+  >立体声</span><span>)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=123 style='width:92.1pt;border:solid black 1.0pt;border-top:none;
+  background:#DBE5F1;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  >音频比特率</span></p>
+  </td>
+  <td width=151 style='width:4.0cm;border-top:none;border-left:none;border-bottom:
+  solid black 1.0pt;border-right:solid black 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>24
+  Kbps</span></p>
+  </td>
+  <td width=180 valign=top style='width:134.7pt;border-top:none;border-left:
+  none;border-bottom:solid black 1.0pt;border-right:solid black 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span>128
+  Kbps</span></p>
+  </td>
+ </tr>
+</table>
+
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+>对于通过</span><span>HTTP</span><span
+>或</span><span>RTSP</span><span
+>传输视频数据还有额外要求：</span></p>
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt'><span style='font-family:Wingdings'>l<span
+style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+>对于</span><span>3GPP</span><span
+>和</span><span>MPEG-4</span><span
+>，</span><span style='color:#007900'>moov</span><span
+>单元必须先于任何</span><span style='color:#007900'>mdat</span><span
+>原子。</span></p>
+<p class=MsoNormal align=left style='margin-left:42.0pt;text-align:left;
+text-indent:-21.0pt'><span style='font-family:Wingdings'>l<span
+style='font:7.0pt "Times New Roman"'>&nbsp; </span></span><span
+>对于</span><span>3GPP</span><span
+>、</span><span>MPEG-4</span><span
+>和</span><span>WebM</span><span
+>，音频和视频对应在同一时间偏差可能不到</span><span>500KB</span><span
+>就分开。为了尽量减少这种音频</span><span>/</span><span
+>视频偏差，可以考虑较小的在较小的块中交叉音频和视频。</span></p>
+<p class=MsoNormal align=left style='text-align:left'><span>&nbsp;</span></p>
+
+</div>
+
+      
+</body>
+</html>

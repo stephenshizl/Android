@@ -1,0 +1,245 @@
+[FAQ08672] 如何实现界面布局根据阿拉伯语、波斯语等RTL语言而反转 Download 
+
+Platform:MT6589MT6582MT6572 
+Branch:JB2JB3JB5 
+FAQ Content android4.2 新增了RTL布局镜面反射，这种镜面反射其实就是根据语言显示方向调整layout布局，但google只是对少数app进行了设置，比如setting。如果想要在其他应用中使用这特性可以按照如下进行修改：
+
+1、在AndroidManifest.xml声明文件的<application>元素中，添加” android:supportsRtl=true”。
+
+2、把android:targetSdkVersion="16" 改成17。
+
+3、修改应用程序中layout的“left/right”布局属性，改为对应的”start/end”布局。
+
+ 
+
+注意：状态栏比较特殊，如果要发送的通知也可以使用RTL布局，除了修改SystemUI模块的AndroidManifest.xml文件，还需要修改发送通知的ap的AndroidManifest.xml文件。
+
+            
+
+如修改radiabutton使其有这种效果，可以修改文件
+
+packages\apps\Settings\res\layout\preference_radiobutton.xml
+
+如下地方
+
+ <RadioButton 
+
+        android:id="@+id/preference_radiobutton" 
+
+        android:layout_width="wrap_content"
+
+        android:layout_height="match_parent"
+
+        android:layout_alignParentEnd="true"
+
+        android:paddingStart="30dip"
+
+        android:paddingEnd="20dip"
+
+        android:focusable="false"/>
+
+                                                
+
+  <TextView android:id="@+id/preference_title"
+
+        android:layout_width="wrap_content"
+
+        android:layout_height="match_parent"
+
+        android:textAppearance="?android:attr/textAppearanceMedium"
+
+        android:layout_alignParentStart="true"
+
+        android:layout_marginStart="9dip"
+
+        android:layout_marginTop="6dip"
+
+        android:layout_marginBottom="6dip"
+
+        android:paddingEnd="60dip"
+
+        android:maxLines="1"
+
+        android:singleLine="true"
+
+        android:ellipsize="marquee"
+
+        android:focusable="false"/>
+ 
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+[FAQ10009] 阿拉伯语、波斯语等RTL语言下部分控件位置不对 Download 
+
+Platform:MT6572MT6582MT6588MT6589...MT6572MT6582MT6588MT6589MT6592 
+Branch:JB2JB3JB5 
+FAQ Content一些RTL语言比如阿拉伯语、波斯语，其layout布局以及Text显示方向是从右到左的，android4.2版本及以后新增属性android:supportsRtl可以实现这种功能。然而对于一下特殊的字符串，比如波斯语和英文混合的字串、纯英文字串以及一些特殊的控件并不能实现从右到左显示。对于这些问题，下面给出一些例子和解法。
+
+ 关于supportsRtl的使用可以参考：FAQ08672 
+
+1、混合字符或者纯英文下，TextView没有居右。
+
+A、找到其定义的layout文件
+
+用 match_parent替换wrap_content，如果替换后还是没有效果新增
+
+android:textDirection="locale”这个属性。
+
+例如Preference summary英文下没有居右，可以如下修改
+
+frameworks\base\core\res\res\layout\Preference_holo.xml
+
+<TextView android:id="@+android:id/summary"
+
+android:layout_width="match_parent"
+
+……
+
+android:textDirection="locale"
+
+B、如果找不到其layout，可以在code中使用如下函数进行设置
+
+setGravity(Gravity.RIGHT);
+
+setTextDirection(TEXT_DIRECTION_RTL);
+
+例如spinner控件波斯语下英文字串没有居右，可以如下修改
+
+public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+String language = Locale.getDefault().getLanguage();
+
+if(language.equals("ar")||language.equals("fa")){
+
+   TextView textview =(textview )view;
+
+textview.setGravity(Gravity.RIGHT);
+
+ }
+
+……
+
+2、对于一些控件没有居右或者layout布局错乱的问题
+
+应检查layout的“left/right”布局属性，是否已经改为对应的”start/end”属性。具体例子可以参考FAQ08672。
+
+3、对于一些图片方向不对的问题
+
+对于这些图片需要按照RTL重新设计，然后放到drawable-ldrtl-hdpi文件夹下。比如actionbar的那个竖线，使用的地方如下
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+<item android:state_pressed="true"
+
+android:drawable="@drawable/btn_cab_done_pressed_holo_dark" />
+
+<item android:state_focused="true" android:state_enabled="true"
+
+android:drawable="@drawable/btn_cab_done_focused_holo_dark" />
+
+<item android:state_enabled="true"
+
+android:drawable="@drawable/btn_cab_done_default_holo_dark" />
+
+上面那些图片位置在frameworks\base\core\res\res\drawable-hdpi，重新绘制后放到
+
+frameworks\base\core\res\res\drawable-ldrtl-hdpi目录下
+
+4、其他RTL相关的问题可以参考，
+
+FAQ10002： 如何修改Notifation Action Button的Icon和Text的位置
+
+FAQ09199： 切换到阿拉伯语、波斯等RTL语言音量调节图标没变化
+
+FAQ09094： RTL语言下电话号码从右向左显示的问题
+
+FAQ08961：当前语言设置为阿拉伯语时，ListView的Item有的左对齐，有的右对齐
+
+FAQ09127： 为什么输入RTL语言时，光标分成两段显示
+
+----------------------------------------------------------------------------------------------------------------------------
+FAQ09094
+1、一些复杂语言字符显示以及layout是从右向左的，比如阿拉伯语、波斯、乌尔都语、希伯来语。因此经常会遇到一些情况是，其他非RTL字符串(比如英文、数字等)在和这些语言字符组合时，当系统语言如果是RTL语言，那么非RTL字符串也会变成从右向左显示；还有就是一些ap，比如Phone、联系人等，在ap设置了一些属性之后电话号码会变成从右向左显示，例如：135 4567 4562 会变成4562 4567 135 如果要实现系统语言为阿拉伯语等RTL语言时，一些非RTL字串按照自己显示顺序(LTR)显示，可以按照如下方法修改,
+
+(A)    如果这些字串是在string.xml中定义，可以把相关字串加上控制符使其从左向右显示，如下
+
+                <string name="lockpassword_pin_too_long"> RTL字串\u202D <xliff:g id="number" example="17">%d</xliff:g>\u202C RTL字串</string>
+
+                也可以使用 '\u202A ，'\u202C';
+
+         (B)    如果是在代码中动态生成可以新增如下函数，进行处理
+
+       ///M: to fix number display order problem in Dialpad in Arabic/Hebrew/Urdu
+
+       private String numberLeftToRight(String origin) {
+
+           return TextUtils.isEmpty(origin) ? origin : '\u202D' + origin + '\u202C';// 也可以使用'\u202A ，'\u202C';
+
+  }
+
+
+     例如：通话界面拨打一个没有姓名的电话，如果在AndroidManifest.xml(JB2及以后版本) 声明文件的<application>元素中，添加了   android:supportsRtl=true这个属  性，电话号码就会出现如下情况
+
+
+
+     解决方法就是修改CallCard.java(alps\packages\apps\Phone\src\com\android\phone)的函数如下红色部分
+
+           private void updateDisplayForPerson(CallerInfo info,int presentation,boolean isTemporary,Call call,Connection conn) 
+
+    ……
+
+               // Promote the phone number up to the "name" slot:
+
+              // displayName = number;
+
+             displayName = numberLeftToRight(number);
+
+                 2、 对于RTL语言下TextView或者EditText“+18545784578”显示成“18545784578+”，这是google默认的问题，对比机也有类似的问题
+
+目前没有比较好的解决方法，如果确实要修改，可以在TexView地方加上特殊处理，如下对“+86”号码的处理。
+
+              TextView.java  alps\frameworks\base\core\java\android\widget 
+
+              private void setText(CharSequence text, BufferType type,
+
+                         boolean notifyBefore, int oldlen) {
+
+                 if (text == null) {
+
+                     text = "";
+
+                     }
+
+                   ///add this code
+
+                   Configuration con = mContext.getResources().getConfiguration();
+
+                   String l = con.locale.getLanguage();
+
+                   if(l.equals("ar")||l.equals("fa")||l.equals("iw")){///RTL language
+
+                                 Pattern pattern = Pattern.compile("\\+86[0-9]{11}");
+
+                                      Matcher mm = pattern.matcher(text);
+
+                                       while (mm.find()) {
+
+                                                        String subunmber = mm.group(0);
+
+                                                        int index = text.toString().indexOf(subunmber);
+
+                                                        String newChar = subunmber.substring(1)+"+";
+
+                                                        text = text.toString().replace(subunmber, newChar);
+
+                                       }
+
+                   }
+
+                   ///add this code
+
+        // If suggestions are not enabled, remove the suggestion spans from the text
+
+
+
+
+ 

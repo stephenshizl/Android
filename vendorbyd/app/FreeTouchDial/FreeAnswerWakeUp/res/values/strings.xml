@@ -1,5 +1,0 @@
-<resources>
-    <string name="app_name">FreeAnswerWakeUp</string>
-    <string name="hungup">你可以说“挂断”来停止呼叫</string>
-    <string name="hungup_answer">你可以说“接听”、“挂断”来接听或挂断电话</string>
-</resources>

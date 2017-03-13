@@ -1,5 +1,0 @@
-<resources>
-    <string name="app_name">FreeAnswerWakeUp</string>
-    <string name="hungup">Say \"Gua Duan\" to stop Dialing</string>
-    <string name="hungup_answer">Say \"Jie Ting\" , \"Gua Duan\" to answer or decline incoming call</string>
-</resources>

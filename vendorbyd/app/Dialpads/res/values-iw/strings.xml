@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-
-<string name="show_call_sub1">Sub1</string>
-<string name="show_call_sub2">Sub2</string>
-<string name="out_software_version">גרסת תוכנה</string>
-<string name="head_and_body_sar">&quot;<b >מחשב Lenovo ניידn</b><b >דגם: Lenovo PB1-770Mn</b><b >מידע על ספיגה ספציפיתn</b>התקן נייד זה עומד במגבלות הלאומיות לעניין קרינת SAR.nמגבלת ה-SAR בהודו עבור התקנים ניידים היא 1.6 ואט/ק&quot;ג בממוצע לכל גרם רקמה. הבדיקות לקביעת ערך ה-SAR מבוצעות באמצעות מצבי תפעול תקניים כאשר ההתקן משדר בעוצמה הגבוהה ביותר שאושרה לו בכל תחומי התדרים הנבדקים.nערך ה-SAR הגבוה ביותר שנמדד לגבי התקן Lenovo שברשותך בשימוש כשהוא סמוך לראש ולגוף הוא כדלקמן:nערך SAR לראש:0.211 ואט/ק&quot;ג nערך SAR לגוף:1.42 ואט/ק&quot;ג nלמידע נוסף, עיין במדריך למשתמש.&quot;</string>
-<string name="facotry_mode_dialog_message">לחיצה על לחצן אישור תמחק את כל נתוני המשתמש, אך תשמור על היישומים שהותקנו, אנו ממליצים שמשתמשים רגילים לא ישתמשו בה, כדי למנוע אבדן נתונים בטלפון</string>
-</resources>

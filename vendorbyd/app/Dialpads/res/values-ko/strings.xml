@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-
-<string name="show_call_sub1">Sub1</string>
-<string name="show_call_sub2">Sub2</string>
-<string name="out_software_version">소프트웨어 버전</string>
-<string name="head_and_body_sar">&quot;<b >Lenovo 모바일 휴대폰n</b><b >모델: Lenovo PB1-770Mn</b><b >전자파 인체 흡수율(SAR) 정보n</b>이 모바일 장치는 인도의 SAR 제한 수준을 준수합니다.n인도 SAR에 따라 모바일 장치의 중량은 조직 1g에 대해 평균 1.6W/kg으로 제한됩니다. SAR 테스트는 표준 동작을 사용하여 검증된 모든 주파수 대역에서 가장 높게 인증된 전원 레벨로 송신하는 장치로 수행되었습니다.n머리와 신체를 대상으로 테스트를 했을 때 가장 높게 측정된 Lenovo 장치의 SAR 값은 다음과 같습니다.n머리 부분 SAR:0.211W/kg n신체 부분 SAR:1.42W/kg n더 자세한 정보는 사용자 매뉴얼을 참조하십시오.&quot;</string>
-<string name="facotry_mode_dialog_message">확인 버튼을 클릭하면 모든 사용자 데이터가 삭제되지만 설치된 애플리케이션은 그대로 남아 있습니다. 휴대폰의 데이터 손실을 방지하기 위해 일반 사용자는 이 기능을 사용하지 않는 것이 좋습니다.</string>
-</resources>

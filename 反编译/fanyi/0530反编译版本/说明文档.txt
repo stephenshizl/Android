@@ -1,0 +1,3 @@
+1. apktool.bat d *.apk (解压apk资源)
+2. 解压apk代码方法：a.解压apk，得到classes.dex文件。b.拷贝classes.dex到dex2jar-2.0路径下，执行d2j-dex2jar.bat classes.dex
+                    c.用jd-gui.exe打开b生成的classes-dex2jar.jar文件即可

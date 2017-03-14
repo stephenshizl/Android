@@ -1,0 +1,14 @@
+#!/system/bin/sh
+#set -x
+
+result=$(cat /userstore/spkcalibration_303_imp_acc_low 2>&1);
+echo 0xE307 $result > /dev/adnc0;
+result=$(cat /userstore/spkcalibration_330_imp_acc_high 2>&1);
+echo 0xE370 $result > /dev/adnc0;
+result=$(cat /userstore/spkcalibration_304_imp_count 2>&1);
+echo 0xE308 $result > /dev/adnc0;
+result=$(cat /userstore/spkcalibration_temp 2>&1);
+echo 0xE309 $result > /dev/adnc0;
+
+
+

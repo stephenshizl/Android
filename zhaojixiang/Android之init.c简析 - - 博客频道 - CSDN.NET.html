@@ -1,0 +1,1537 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0056)http://blog.csdn.net/mdx20072419/article/details/9400621 -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">   
+    
+     
+    <script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/tracking.js" charset="utf-8"></script>  
+
+    <script type="text/javascript">
+        var protocol = window.location.protocol;
+        document.write('<script type="text/javascript" src="' + protocol + '//csdnimg.cn/pubfooter/js/repoAddr2.js?v=' + Math.random() + '"></' + 'script>');
+    </script><script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/repoAddr2.js"></script>
+
+  
+ <meta http-equiv="Cache-Control" content="no-siteapp"><link rel="alternate" media="handheld" href="http://blog.csdn.net/mdx20072419/article/details/9400621#">
+
+    <title>Android之init.c简析 - 
+        - 博客频道 - CSDN.NET</title>
+    
+    <meta name="description" content="你叫什么名字，今年多大？-MVC      play架构风格是严格按照MVC架构的，分别对应app目录下面的三个文件夹——models、views、controllers，由此形成了play独特的包结构。play的包结构是颠覆我们之前用过的那些框架的，比如springMVC、struts等。实体类全部在models文件夹中定义，包括对数据库的操作方法也都写在实体类中（后文具体讲解）；业务逻辑统统在">
+    <script src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/jquery.js" type="text/javascript"></script>
+    <script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/ad.js"></script>
+        <!--new top-->
+       
+        <link rel="stylesheet" href="http://c.csdnimg.cn/public/common/toolbar/css/index.css">
+        <!--new top-->
+
+    <link rel="Stylesheet" type="text/css" href="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/style.css">
+    <link id="RSSLink" title="RSS" type="application/rss+xml" rel="alternate" href="http://blog.csdn.net/mdx20072419/rss/list">
+    <link rel="shortcut icon" href="http://c.csdnimg.cn/public/favicon.ico">
+    <link type="text/css" rel="stylesheet" href="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/default.css">
+ 
+
+
+<script src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/share.js"></script><script type="text/javascript" charset="utf-8" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/main.js"></script><style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><link href="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/bdsstyle.css" rel="stylesheet" type="text/css"><script src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/logger.js"></script><link rel="stylesheet" href="http://bdimg.share.baidu.com/static/api/css/share_style0_16.css?v=6aba13f0.css"></head>
+<body><div id="MathJax_Message" style="display: none;"></div><iframe frameborder="0" style="display: none;"></iframe>
+    
+   
+      <!--new top-->
+    <script id="toolbar-tpl-scriptId" fixed="true" prod="blog" skin="black" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/html.js" type="text/javascript"></script>
+     <!--new top-->
+    <div id="container">
+        <div id="header">
+    <div class="header">
+        <div id="blog_title">
+            <h2>
+                <a href="http://blog.csdn.net/mdx20072419"></a></h2>
+            <h3></h3>
+            <div class="clear">
+            </div>
+        </div>
+        <div class="clear">
+        </div>
+    </div>
+</div>
+<div id="navigator">
+    <div class="navigator_bg">
+    </div>
+    <div class="navigator">
+        <ul>
+            
+                <li id="btnContents"><a href="http://blog.csdn.net/mdx20072419?viewmode=contents"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_mulu&#39;])">
+                    <img src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/ico_list.gif">目录视图</span></a></li>
+                <li id="btnView"><a href="http://blog.csdn.net/mdx20072419?viewmode=list"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_zhaiyao&#39;])">
+                    <img src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/ico_summary.gif">摘要视图</span></a></li>
+                <li id="btnRss"><a href="http://blog.csdn.net/mdx20072419/rss/list"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_RSS&#39;])">
+                    <img src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/ico_rss.gif">订阅</span></a></li>                
+
+            </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    var username = "mdx20072419";
+    var _blogger = username;
+    var blog_address = "http://blog.csdn.net/mdx20072419";
+    var static_host = "http://static.blog.csdn.net";
+    var currentUserName = "";  
+</script>
+
+        <div id="body">
+            <div id="main">
+                <div class="main">
+                        <div class="ad_class">
+<div class="notice tracking-ad" data-mod="popu_3"> 
+
+<a href="http://blog.csdn.net/phodal/article/details/50960160">
+<font color="red">为什么未来是全栈工程师的世界
+</font></a>
+&nbsp;&nbsp;&nbsp;
+<a href="http://blog.csdn.net/csdnedu/article/details/50788201">
+<font color="blue">前端精品课程免费看，写课评赢心动大礼！
+
+</font></a><font color="blue"><a href="http://lib.csdn.net/base/23">
+<font color="red">AngularJS知识库发布
+</font></a>
+
+</font>
+</div>                        </div>
+                        
+
+
+
+<!--AdForward Begin:-->
+<script type="text/javascript" ads-src="http://csdnim.qtmojo.com/main/s?user=csdn|blog|fumeiti&amp;db=csdnim&amp;border=0&amp;local=yes&amp;js=ie" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/AllyesDeliver.min.js" charset="gbk"></script>
+<!--AdForward End-->
+
+  
+<link href="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/comment1.css" type="text/css" rel="stylesheet">
+<link href="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/style1.css" type="text/css" rel="stylesheet">
+<script language="JavaScript" type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/jquery.cookie.js"></script>
+<script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/main(1).js"></script>
+<link rel="stylesheet" href="http://static.blog.csdn.net/public/res-min/markdown_views.css?v=1.0">
+<link rel="stylesheet" href="http://static.blog.csdn.net/css/category.css?v=1.0">
+<script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/MathJax.js"></script>
+
+ <script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/web-storage-cache.min.js"></script>
+
+
+  <script type="text/ecmascript">
+      window.quickReplyflag = true;
+           
+            var isBole = false;
+            
+          
+    </script>
+<div id="article_details" class="details">
+    <div class="article_title">   
+         <span class="ico ico_type_Original"></span>
+
+
+    <h1>
+        <span class="link_title"><a href="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/Android之init.c简析 - - 博客频道 - CSDN.NET.html">
+        Android之init.c简析            
+        </a></span>
+    </h1>
+</div>
+
+   
+
+        <div class="article_manage clearfix">
+        <div class="article_r">
+            <span class="link_postdate">2013-07-21 20:42</span>
+            <span class="link_view" title="阅读次数">1267人阅读</span>
+            <span class="link_comments" title="评论次数"> <a href="http://blog.csdn.net/mdx20072419/article/details/9400621#comments" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_pinglun&#39;])">评论</a>(0)</span>
+            <span class="link_collect tracking-ad" data-mod="popu_171"> <a href="javascript:void(0);" onclick="javascript:collectArticle(&#39;Android之init.c简析&#39;,&#39;9400621&#39;);return false;" title="收藏">收藏</a></span>
+             <span class="link_report"> <a href="http://blog.csdn.net/mdx20072419/article/details/9400621#report" onclick="javascript:report(9400621,2);return false;" title="举报">举报</a></span>
+
+        </div>
+    </div>
+    <div class="embody" style="display:none" id="embody">
+        <span class="embody_t">本文章已收录于：</span>
+        <div class="embody_c" id="lib" value="{&quot;err&quot;:0,&quot;msg&quot;:&quot;ok&quot;,&quot;data&quot;:[]}"></div>
+    </div>
+    <style type="text/css">        
+            .embody{
+                padding:10px 10px 10px;
+                margin:0 -20px;
+                border-bottom:solid 1px #ededed;                
+            }
+            .embody_b{
+                margin:0 ;
+                padding:10px 0;
+            }
+            .embody .embody_t,.embody .embody_c{
+                display: inline-block;
+                margin-right:10px;
+            }
+            .embody_t{
+                font-size: 12px;
+                color:#999;
+            }
+            .embody_c{
+                font-size: 12px;
+            }
+            .embody_c img,.embody_c em{
+                display: inline-block;
+                vertical-align: middle;               
+            }
+             .embody_c img{               
+                width:30px;
+                height:30px;
+            }
+            .embody_c em{
+                margin: 0 20px 0 10px;
+                color:#333;
+                font-style: normal;
+            }
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            var lib = eval("("+$("#lib").attr("value")+")");
+            var html = "";
+            if (lib.err == 0) {
+                $.each(lib.data, function (i) {
+                    var obj = lib.data[i];
+                    //html += '<img src="' + obj.logo + '"/>' + obj.name + "&nbsp;&nbsp;";
+                    html += ' <a href="' + obj.url + '" target="_blank">';
+                    html += ' <img src="' + obj.logo + '">';
+                    html += ' <em><b>' + obj.name + '</b></em>';
+                    html += ' </a>';
+                });
+                if (html != "") {
+                    setTimeout(function () {
+                        $("#lib").html(html);
+                        /*
+                        var testhtml = "";
+                        testhtml += '<a href="#">';
+                        testhtml += '<img src="http://img.knowledge.csdn.net/upload/base/1455589744328_328.jpg">';
+                        testhtml += '<em>Android知识库</em>';
+                        testhtml += '</a>';
+                        $(".embody_c").html(testhtml);
+                        */
+                        $("#embody").show();
+                    }, 100);
+                }
+            }          
+            
+        });
+    </script>
+      <div class="category clearfix">
+        <div class="category_l">
+           <img src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/category_icon.jpg">
+            <span>分类：</span>
+        </div>
+        <div class="category_r">
+                    <label onclick="GetCategoryArticles(&#39;1076773&#39;,&#39;mdx20072419&#39;,&#39;top&#39;,&#39;9400621&#39;);">
+                        <span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_fenlei&#39;]);">Android<em>（33）</em></span>
+                      <img class="arrow-down" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/arrow_triangle _down.jpg" style="display:inline;">
+                      <img class="arrow-up" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/arrow_triangle_up.jpg" style="display:none;">
+                        <div class="subItem">
+                            <div class="subItem_t"><a href="http://blog.csdn.net/mdx20072419/article/category/1076773" target="_blank">作者同类文章</a><i class="J_close">X</i></div>
+                            <ul class="subItem_l" id="top_1076773">                            
+                            </ul>
+                        </div>
+                    </label>                    
+        </div>
+    </div>
+    <script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/category.js"></script>  
+        <div class="bog_copyright">         
+            <p class="copyright_p">版权声明：本文为博主原创文章，未经博主允许不得转载。</p>
+        </div>
+
+  
+
+  
+  
+     
+
+<div id="article_content" class="article_content">
+
+<p align="center"></p>
+<div style="text-align:left"><span style="white-space:pre"></span>在Android系统启动时，内核引导参数上一般都会设置“init=/init”,这样的话，如果内核成功挂载了这个文件系统之后，首先运行的就是这个根目录下的init程序。这个程序所了什么呢？我们只有RFSC（Read the Fucking Source code）!!</div>
+<div style="text-align:left">init程序源码在Android官方源码的system/core/init中，main在init.c里。我们的分析就从main开始</div>
+<div style="text-align:left">init：（1）init是一个守护进程，为了防止init的子进程成为僵尸进程(zombie process)，需要init在子进程在结束时获取子进程的结束码，通过结束码将程序表中的子进程移除，防止成为僵尸进程的子进程占用程序表的空间，当程序表的空间达到上限时，则系统就不能再启动新的进程了，那么就会引起很严重的系统问题。<br>
+&nbsp; &nbsp; 在linux当中，父程序是通过捕捉SIGCHLD信号来得知子进程结束的情况的；由于系统默认在子进程暂停时也会发送信号SIGCHLD，init需要忽略子进程在暂停时发出的SIGCHLD信号，因此将act.sa_flags 置为SA_NOCLDSTOP，该标志位的含义是就是要求系统在子进程暂停时不发送SIGCHLD信号。</div>
+<div style="text-align:left">static void sigchld_handler(ints)</div>
+<div style="text-align:left">{</div>
+<div style="text-align:left">&nbsp; &nbsp; write(signal_fd, &amp;s, 1);</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">int main(int argc, char **argv)</div>
+<div style="text-align:left">{</div>
+<div style="text-align:left">act.sa_handler= sigchld_handler;</div>
+<div style="text-align:left">act.sa_flags= SA_NOCLDSTOP;</div>
+<div style="text-align:left">sigaction(SIGCHLD,&amp;act, 0);</div>
+<div style="text-align:left">structsigaction act;</div>
+<div style="text-align:left">act.sa_handler= sigchld_handler;</div>
+<div style="text-align:left">act.sa_flags= SA_NOCLDSTOP;</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp;………………………………………..</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">Linux进程通过互相发送接收消息来实现进程间的通信，这些消息被称为“信号”。每个进程在处理其他进程发送的信号时都需要注册程序，此程序被称为信号处理。当进程的运行状态改变或者终止时，就会产生某种信号，init进程是所有进程的父进程，当其子进程终止产生SIGCHLD信号时，init进程需要调用信号安装函数sigaction（），并通过参数传递至sigcation结构体中，已完成信号处理器的安装。</div>
+<div style="text-align:left">&nbsp; Init进程通过上述代码注册与子进程相关的SIGCHLD信号处理器，并把sigcation结构体的sa_flags设置为SA_NOCLDSTOP，该值表示仅当进程终止时才接收SIGCHLD信号。</div>
+<div style="text-align:left">sigchld_handler函数用于通知全局变量signal_fd，SIGCHLD信号已发生。对于产生的信号的实际处理，在init进程的事件处理循环中进行。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（2）对umask进行清零。</div>
+<div style="text-align:left">&nbsp; &nbsp; 何为umask，请看http://www.szstudy.cn/showArticle/53978.shtml</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">umask是什么？</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">当我们登录系统之后创建一个文件总是有一个默认权限的，那么这个权限是怎么来的呢？这就是umask干的事情。umask设置了用户创建文件的默认权限，它与chmod的效果刚好相反，umask设置的是权限“补码”，而chmod设置的是文件权限码。一般在/etc/profile、$ [HOME]/.bash_profile或$[HOME]/.profile中设置umask值。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">如何计算umask值？</div>
+<div style="text-align:left">umask命令允许你设定文件创建时的缺省模式，对应每一类用户(文件属主、同组用户、其他用户)存在一个相应的umask值中的数字。对于文件来说，这一数字的最大值分别是6。系统不允许你在创建一个文本文件时就赋予它执行权限，必须在创建后用chmod命令增加这一权限。目录则允许设置执行权限，这样针对目录来说，umask中各个数字最大可以到7。</div>
+<div style="text-align:left">该命令的一般形式为：umasknnn</div>
+<div style="text-align:left">其中nnn为umask置000 - 777。</div>
+<div style="text-align:left">如：umask值为022，则默认目录权限为755，默认文件权限为644。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（3）为rootfs建立必要的文件夹，并挂载适当的分区。</div>
+<div style="text-align:left">&nbsp; &nbsp; /dev （tmpfs）</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp;/dev/pts (devpts)</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp;/dev/socket</div>
+<div style="text-align:left">&nbsp; &nbsp; /proc (proc)</div>
+<div style="text-align:left">&nbsp; &nbsp; /sys &nbsp;(sysfs)</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">编译Android系统源码时，在生成的根文件系统中，不存在/dev,/proc/,/sys这类目录，他们是系统运行时的目录，有init进程在运行中生成，当系统终止时，他们就会消失。</div>
+<div style="text-align:left">&nbsp; Init进程执行后，生成/dev目录，包含系统使用的设备，而后调用open_devnull_stdio();函数，创建运行日志输出设备。open_devnull_stdio()函数会在/dev目录下生成__null__设备节点文件，并将标准输入，标准输出，标准错误，标准错误输出全部重定向__null__设备中。</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">void open_devnull_stdio(void)</div>
+<div style="text-align:left">{</div>
+<div style="text-align:left">&nbsp; &nbsp; intfd;</div>
+<div style="text-align:left">&nbsp; &nbsp;static const char *name = "/dev/__null__";</div>
+<div style="text-align:left">&nbsp; &nbsp; if(mknod(name, S_IFCHR | 0600, (1 &lt;&lt; 8) | 3) == 0) {</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp;fd = open(name, O_RDWR);</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp;unlink(name);</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp;if (fd &gt;= 0) {</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;dup2(fd, 0);</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;dup2(fd, 1);</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;dup2(fd, 2);</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;if (fd &gt; 2) {</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;close(fd);</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;}</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;return;</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp;}</div>
+<div style="text-align:left">&nbsp; &nbsp; }</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">&nbsp; &nbsp;exit(1);</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">(4)创建/dev/null和/dev/kmsg节点。</div>
+<div style="text-align:left">init进程通过log_init函数，生成"/dev/__kmsg__"设备节点文件。__kmsg__设备调用内核信息输出函数printk（），init进程即是通过该函数输出log信息。</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">void log_init(void)</div>
+<div style="text-align:left">{</div>
+<div style="text-align:left">&nbsp; &nbsp; staticconst char *name = "/dev/__kmsg__";</div>
+<div style="text-align:left">&nbsp; &nbsp; if(mknod(name, S_IFCHR | 0600, (1 &lt;&lt; 8) | 11) == 0) {</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp;log_fd = open(name, O_WRONLY);</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp;fcntl(log_fd, F_SETFD, FD_CLOEXEC);</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp;unlink(name);</div>
+<div style="text-align:left">&nbsp; &nbsp; }</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">Init进程通过__kmsg__设备定义用于输出信息的宏。关于宏输出信息，可以使用dmesg实用程序进行确认，dmesg用于显示内核信息。</div>
+<div style="text-align:left">#define ERROR(x...) &nbsp; log_write(3, "&lt;3&gt;init: " x)</div>
+<div style="text-align:left">#define NOTICE(x...) &nbsp;log_write(5, "&lt;5&gt;init: " x)</div>
+<div style="text-align:left">#define INFO(x...) &nbsp; &nbsp;log_write(6, "&lt;6&gt;init: " x)</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（5）解析/init.rc，将所有服务和操作信息加入链表</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">parse_config_file("/init.rc");</div>
+<div style="text-align:left">parse_config_file()函数用来分析*.rc配置文件，用来指定init.rc文件的路径。执行parse_config_file函数，读取并分析init.rc文件后，生成服务列表与动作列表。动作列表与服务列表全部会以链表的形式注册到service_list和action_list中，service_list和action_list是init进程中声明的全局结构体。</div>
+<div style="text-align:left">&nbsp;&nbsp;</div>
+<div style="text-align:left">(6) 初始化qemu设备，设置模拟器环境；从/proc/cmdline中提取信息内核启动参数,并保存到全局变量。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">qemu_init();</div>
+<div style="text-align:left">QEMU模拟器允许Android应用开发者在缺少Android实际设备的情况下运行处于开发中的应用程序。QEMU是面向PC的开源模拟器，能够模拟具有特定处理器设备，此外还提供虚拟网络，视频设备等。Android模拟器是虚拟的硬件平台，运行在模拟器的软件可以执行ARM命令集，LCD，相机，SD卡控制器等硬件设备都可以运行在Goldfish这种虚拟平台上。</div>
+<div style="text-align:left">import_kernel_cmdline(0);</div>
+<div style="text-align:left">staticvoid import_kernel_cmdline(int in_qemu)</div>
+<div style="text-align:left">{</div>
+<div style="text-align:left">&nbsp; &nbsp; char cmdline[1024];</div>
+<div style="text-align:left">&nbsp; &nbsp; char *ptr;</div>
+<div style="text-align:left">&nbsp; &nbsp; int fd;</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">&nbsp; &nbsp; fd = open("/proc/cmdline",O_RDONLY);</div>
+<div style="text-align:left">&nbsp; &nbsp; if (fd &gt;= 0) {</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; int n = read(fd, cmdline, 1023);</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; if (n &lt; 0) n = 0;</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; /* get rid of trailing newline, ithappens */</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; if (n &gt; 0 &amp;&amp; cmdline[n-1] =='\n') n--;</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; cmdline[n] = 0;</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; close(fd);</div>
+<div style="text-align:left">&nbsp; &nbsp; } else {</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; cmdline[0] = 0;</div>
+<div style="text-align:left">&nbsp; &nbsp; }</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">&nbsp; &nbsp; ptr = cmdline;</div>
+<div style="text-align:left">&nbsp; &nbsp; while (ptr &amp;&amp; *ptr) {</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; char *x = strchr(ptr, ' ');</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; if (x != 0) *x++ = 0;</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; import_kernel_nv(ptr, in_qemu);</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; ptr = x;</div>
+<div style="text-align:left">&nbsp; &nbsp; }</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（7）先从上一步获得的全局变量中获取信息硬件信息和版本号，如果没有则从/proc/cpuinfo中提取,并保存到全局变量。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（8）根据硬件信息选择一个/init.(硬件).rc，并解析，将服务和操作信息加入链表。</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;在G1的ramdisk根目录下有两个/init.(硬件).rc：init.goldfish.rc和init.trout.rc，init程序会根据上一步获得的硬件信息选择一个解析。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（9）执行链表中带有“early-init”触发的的命令。 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;action_for_each_trigger("early-init",action_add_queue_tail);触发在init脚本文件中名字为early-init的action，并且执行其commands，其实是:on early-init，在我们的init.rc中是没有的。action_for_each_trigger函数会将第一个参数中的命令保存到action_add_queue_tail，而后通过drain_action_queue()函数将运行队列中的命令逐一取出执行。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（10）遍历/sys文件夹， 将这些目录下的uevent文件找出，并使kernel重新生成那些在init的设备管理器开始前的设备添加事件。 初始化动态设备管理，使内核产生设备添加事件（为了自动产生设备节点)， 设备文件有变化时反应给内核。 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">device_fd = device_init();</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">int device_init(void)</div>
+<div style="text-align:left">{</div>
+<div style="text-align:left">&nbsp; &nbsp;suseconds_t t0, t1;</div>
+<div style="text-align:left">&nbsp; &nbsp;int fd;</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">&nbsp; &nbsp; fd = open_uevent_socket();</div>
+<div style="text-align:left">&nbsp; &nbsp;if(fd &lt; 0)</div>
+<div style="text-align:left">&nbsp; &nbsp; &nbsp; &nbsp;return -1;</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">&nbsp; &nbsp;fcntl(fd, F_SETFD, FD_CLOEXEC);</div>
+<div style="text-align:left">&nbsp; &nbsp;fcntl(fd, F_SETFL, O_NONBLOCK);</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">&nbsp; &nbsp;t0 = get_usecs();</div>
+<div style="text-align:left">&nbsp; &nbsp;coldboot(fd, "/sys/class");</div>
+<div style="text-align:left">&nbsp; &nbsp;coldboot(fd, "/sys/block");</div>
+<div style="text-align:left">&nbsp; &nbsp;coldboot(fd, "/sys/devices");</div>
+<div style="text-align:left">&nbsp; &nbsp;t1 = get_usecs();</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">&nbsp; &nbsp;log_event_print("coldboot %ld uS\n", ((long) (t1 - t0)));</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">&nbsp; &nbsp;make_device("/dev/pvrsrvkm", 0, 240, 0);</div>
+<div style="text-align:left">#if 0</div>
+<div style="text-align:left">&nbsp; &nbsp;make_device("/dev/bc_example", 0, 242, 0);</div>
+<div style="text-align:left">#endif</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">#if 1</div>
+<div style="text-align:left">&nbsp; &nbsp;make_device("/dev/fb0", 0, 29, 0);</div>
+<div style="text-align:left">&nbsp; &nbsp;make_device("/dev/fb1", 0, 29, 1);</div>
+<div style="text-align:left">&nbsp; &nbsp;make_device("/dev/fb2", 0, 29, 2);</div>
+<div style="text-align:left">&nbsp; &nbsp;make_device("/dev/fb3", 0, 29, 3);</div>
+<div style="text-align:left">&nbsp; &nbsp;make_device("/dev/fb4", 0, 29, 4);</div>
+<div style="text-align:left">#endif</div>
+<div style="text-align:left">&nbsp; &nbsp;return fd;</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（11）初始化属性系统，并导入初始化属性文件。 &nbsp;</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">初始化属性服务器，Actually theproperty system is working as share memory.Logically it looks like a registry underwindows system。</div>
+<div style="text-align:left">首先创建一个名字为system_properties的匿名共享内存区域，对并本init进程做mmap读写映射，其余共享它 的进程只有读的权限。然后将这个prop_area结构体通过全局变量__system_property_area__传递给property services。</div>
+<div style="text-align:left">接着调用函数load_properties_from_file(PROP_PATH_RAMDISK_DEFAULT)从/default.prop文件中加载编译时生成的属性。这个有点像Windows 下的注册表的作用。</div>
+<div style="text-align:left">&nbsp; 在Android系统中，所有的进程共享系统设置值，为此提供了一个名称为属性的保存空间。Init进程调用property_init()函数，在共享内存区域中，创建并初始化属性域。而后通过执行中的进程锁提供的API，访问属性中的设置值。但更改属性值只能在init进程中进行。当修改属性值时，要预先向init进程提交值变更申请，然后init进程处理该申请，并修改属性值。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（12）从属性系统中得到ro.debuggable，如果ro.debuggable为1，则初始化组合键(keychord )监听 &nbsp;这段代码是从属性里获取调试标志，如果是可以调试，就打开组合按键输入驱动程序,初始化keychord监听。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">// only listen for keychords ifro.debuggable is true</div>
+<div style="text-align:left">debuggable =property_get("ro.debuggable");</div>
+<div style="text-align:left">if (debuggable &amp;&amp;!strcmp(debuggable, "1")) {</div>
+<div style="text-align:left">keychord_fd = open_keychord();</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（13）打開console,如果cmdline中沒有指定console則打開默認的/dev/console。 &nbsp;</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">if (console[0]) {</div>
+<div style="text-align:left">snprintf(tmp, sizeof(tmp),"/dev/%s", console);</div>
+<div style="text-align:left">console_name = strdup(tmp);</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left">//打开console，如果cmdline 中没有指定console 则打开默认的/dev/console</div>
+<div style="text-align:left">fd = open(console_name, O_RDWR);</div>
+<div style="text-align:left">if (fd &gt;= 0)</div>
+<div style="text-align:left">have_console = 1;</div>
+<div style="text-align:left">close(fd);</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（14）读取/initlogo.rle,是一张565 rle 压缩的位图，如果成功则在/dev/fb0显示Logo,如果失败则将/dev/tty0设为TEXT模式并打开/dev/tty0,输出文本的ANDROID字样。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">load_565rle_image(INIT_IMAGE_FILE)函数将加载由参数传递过来的图像文件，而后将该文件显示在LCD屏幕上。如果想更改logo，只需修改INIT_IMAGE_FILE即可。由于函数只支持rle565格式图像的显示，再更改图像时，注意所选图像文件的格式。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">(15) 这段代码是用来判断是否使用模拟器运行，如果是，就加载内核命令行参数。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">if (qemu[0])</div>
+<div style="text-align:left">import_kernel_cmdline(1);</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（16）这段代码是根据内核命令行参数来设置工厂模式测试，比如在工厂生产手机过程里需要自动化演示功能，就可以根据这个标志来进行特别处理。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">if(!strcmp(bootmode,"factory"))</div>
+<div style="text-align:left">property_set("ro.factorytest","1");</div>
+<div style="text-align:left">else if(!strcmp(bootmode,"factory2"))</div>
+<div style="text-align:left">property_set("ro.factorytest","2");</div>
+<div style="text-align:left">else</div>
+<div style="text-align:left">property_set("ro.factorytest","0");</div>
+<div style="text-align:left">//这段代码是设置手机序列号到属性里保存，以便上层应用程序可以识别这台手机。</div>
+<div style="text-align:left">property_set("ro.serialno",serialno[0] ? serialno : "");</div>
+<div style="text-align:left">//这段代码是保存启动模式到属性里。</div>
+<div style="text-align:left">property_set("ro.bootmode",bootmode[0] ? bootmode : "unknown");</div>
+<div style="text-align:left">//这段代码是保存手机基带频率到属性里。</div>
+<div style="text-align:left">property_set("ro.baseband",baseband[0] ? baseband : "unknown");</div>
+<div style="text-align:left">//这段代码是保存手机硬件载波的方式到属性里。</div>
+<div style="text-align:left">property_set("ro.carrier",carrier[0] ? carrier : "unknown");</div>
+<div style="text-align:left">//保存引导程序的版本号到属性里，以便系统知道引导程序有什么特性。</div>
+<div style="text-align:left">property_set("ro.bootloader",bootloader[0] ? bootloader : "unknown");</div>
+<div style="text-align:left">//这里是保存硬件信息到属性里，其实就是获取CPU 的信息。</div>
+<div style="text-align:left">property_set("ro.hardware",hardware);</div>
+<div style="text-align:left">//这里是保存硬件修订的版本号到属性里，这样可以方便应用程序区分不同的硬件版本。</div>
+<div style="text-align:left">snprintf(tmp,PROP_VALUE_MAX, "%d", revision);</div>
+<div style="text-align:left">property_set("ro.revision",tmp);</div>
+<div style="text-align:left">/*</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">（17）執行所有触发标识为init的action。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">&nbsp;/* execute all the boot actions to get usstarted */</div>
+<div style="text-align:left">//执行所有触发标志为init的action</div>
+<div style="text-align:left">action_for_each_trigger("init",action_add_queue_tail);</div>
+<div style="text-align:left">drain_action_queue();</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（18）開始property服務</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">/* read any property files on system or dataand</div>
+<div style="text-align:left">* fire up the property service. This musthappen</div>
+<div style="text-align:left">* after the ro.foo properties are set aboveso</div>
+<div style="text-align:left">* that /data/local.prop cannot interferewith them.</div>
+<div style="text-align:left">*/</div>
+<div style="text-align:left">/*</div>
+<div style="text-align:left">开始property 服务，读取一些property 文件，这一动作必须在前面那些ro.foo设置后做，</div>
+<div style="text-align:left">以便/data/local.prop 不能干预到他们</div>
+<div style="text-align:left">- /system/build.prop</div>
+<div style="text-align:left">- /system/default.prop</div>
+<div style="text-align:left">- /data/local.prop</div>
+<div style="text-align:left">- 在读取认识的property 后读取presistentpropertie，在/data/property 中</div>
+<div style="text-align:left">这段代码是加载system 和data 目录下的属性，并启动属性监听服务。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（19）為sigchld handler創建信號機制。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">property_set_fd = start_property_service();</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（20）创建一个全双工的通讯机制的两个SOCKET</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">/*</div>
+<div style="text-align:left">这段代码是创建一个全双工的通讯机制的两个SOCKET，信号可以在signal_fd</div>
+<div style="text-align:left">和signal_recv_fd 双向通讯，从而建立起沟通的管道。其实这个信号管理，就</div>
+<div style="text-align:left">是用来让init 进程与它的子进程进行沟通的，子进程从signal_fd 写入信息，init</div>
+<div style="text-align:left">进程从signal_recv_fd 收到信息，然后再做处理。</div>
+<div style="text-align:left">*/</div>
+<div style="text-align:left">/* create a signalling mechanism for thesigchld handler */</div>
+<div style="text-align:left">if (socketpair(AF_UNIX, SOCK_STREAM, 0, s)== 0) {</div>
+<div style="text-align:left">signal_fd = s[0];</div>
+<div style="text-align:left">signal_recv_fd = s[1];</div>
+<div style="text-align:left">fcntl(s[0], F_SETFD, FD_CLOEXEC);</div>
+<div style="text-align:left">fcntl(s[0], F_SETFL, O_NONBLOCK);</div>
+<div style="text-align:left">fcntl(s[1], F_SETFD, FD_CLOEXEC);</div>
+<div style="text-align:left">fcntl(s[1], F_SETFL, O_NONBLOCK);</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left">/* make sure we actually have all thepieces we need */</div>
+<div style="text-align:left">/*</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">(21)这段代码是判断关键的几个组件是否成功初始化，主要就是设备文件系统是否成功初始化，属性服务是否成功初始化，信号通讯机制是否成功初始化。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">if((device_fd &lt; 0) ||</div>
+<div style="text-align:left">(property_set_fd&lt; 0) ||</div>
+<div style="text-align:left">(signal_recv_fd&lt; 0)) {</div>
+<div style="text-align:left">ERROR("initstartup failure\n");</div>
+<div style="text-align:left">return1;</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（22）執行所有触发标识为early-boot的</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">action &nbsp;action_for_each_trigger("early-boot",action_add_queue_tail);</div>
+<div style="text-align:left">//执行所有触发标志为boot的action</div>
+<div style="text-align:left">action_for_each_trigger("boot",action_add_queue_tail);</div>
+<div style="text-align:left">drain_action_queue();</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">（23）基于當前property狀態，執行所有触发标识为property的action&nbsp;</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">//这段代码是根据当前属性，运行属性命令。</div>
+<div style="text-align:left">queue_all_property_triggers();</div>
+<div style="text-align:left">drain_action_queue();</div>
+<div style="text-align:left">/* enable propertytriggers */</div>
+<div style="text-align:left">// 标明属性触发器已经初始化完成。</div>
+<div style="text-align:left">property_triggers_enabled= 1;</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">/*</div>
+<div style="text-align:left">这段代码是保存三个重要的服务socket，以便后面轮询使用。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">*/</div>
+<div style="text-align:left">ufds[0].fd =device_fd;</div>
+<div style="text-align:left">ufds[0].events =POLLIN;</div>
+<div style="text-align:left">ufds[1].fd =property_set_fd;</div>
+<div style="text-align:left">ufds[1].events =POLLIN;</div>
+<div style="text-align:left">ufds[2].fd =signal_recv_fd;</div>
+<div style="text-align:left">ufds[2].events =POLLIN;</div>
+<div style="text-align:left">fd_count = 3;</div>
+<div style="text-align:left">&nbsp;</div>
+<div style="text-align:left">//这段代码是判断是否处理组合键轮询。</div>
+<div style="text-align:left">ufds[3].events = POLLIN;</div>
+<div style="text-align:left">fd_count++;</div>
+<div style="text-align:left">} else {</div>
+<div style="text-align:left">ufds[3].events = 0;</div>
+<div style="text-align:left">ufds[3].revents = 0;</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left">//如果支持BOOTCHART，则初始化BOOTCHART</div>
+<div style="text-align:left">#if BOOTCHART</div>
+<div style="text-align:left">/*</div>
+<div style="text-align:left">这段代码是初始化linux 程序启动速度的性能分析工具，这个工具有一个好处，就是图形化显示每个进程启动顺序和占用时间，如果想优化系统的启动速度，记得启用这个工具。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">*/</div>
+<div style="text-align:left">bootchart_count = bootchart_init();</div>
+<div style="text-align:left">if (bootchart_count &lt; 0) {</div>
+<div style="text-align:left">ERROR("bootcharting initfailure\n");</div>
+<div style="text-align:left">} else if (bootchart_count &gt; 0) {</div>
+<div style="text-align:left">NOTICE("bootcharting started(period=%d ms)\n",</div>
+<div style="text-align:left">bootchart_count*BOOTCHART_POLLING_MS);</div>
+<div style="text-align:left">} else {</div>
+<div style="text-align:left">NOTICE("bootcharting ignored\n");</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left">#endif</div>
+<div style="text-align:left">/*</div>
+<div style="text-align:left">进入主进程循环:</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">- 重置轮询事件的接受状态，revents 为0</div>
+<div style="text-align:left">- 查询action 队列，并执行。</div>
+<div style="text-align:left">- 重启需要重启的服务</div>
+<div style="text-align:left">- 轮询注册的事件</div>
+<div style="text-align:left">- 如果signal_recv_fd 的revents 为POLLIN，则得到一个信号，获取并处理</div>
+<div style="text-align:left">- 如果device_fd 的revents 为POLLIN,调用handle_device_fd</div>
+<div style="text-align:left">- 如果property_fd 的revents 为POLLIN,调用handle_property_set_fd</div>
+<div style="text-align:left">- 如果keychord_fd 的revents 为POLLIN,调用handle_keychord</div>
+<div style="text-align:left">这段代码是进入死循环处理，以便这个init 进程变成一个服务。</div>
+<div style="text-align:left">*/</div>
+<div style="text-align:left">for(;;) {</div>
+<div style="text-align:left">int nr, i, timeout = -1;</div>
+<div style="text-align:left">// 清空每个socket 的事件计数。</div>
+<div style="text-align:left">for (i = 0; i &lt; fd_count; i++)</div>
+<div style="text-align:left">ufds[i].revents = 0;</div>
+<div style="text-align:left">// 这段代码是执行队列里的命令。</div>
+<div style="text-align:left">drain_action_queue();</div>
+<div style="text-align:left">// 这句代码是用来判断那些服务需要重新启动。</div>
+<div style="text-align:left">restart_processes();</div>
+<div style="text-align:left">// 这段代码是用来判断哪些进程启动超时。</div>
+<div style="text-align:left">if (process_needs_restart) {</div>
+<div style="text-align:left">timeout = (process_needs_restart -gettime()) * 1000;</div>
+<div style="text-align:left">if (timeout &lt; 0)</div>
+<div style="text-align:left">timeout = 0;</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left">#if BOOTCHART</div>
+<div style="text-align:left">//这段代码是用来计算运行性能。</div>
+<div style="text-align:left">if (bootchart_count &gt; 0) {</div>
+<div style="text-align:left">if (timeout &lt; 0 || timeout &gt;BOOTCHART_POLLING_MS)</div>
+<div style="text-align:left">timeout = BOOTCHART_POLLING_MS;</div>
+<div style="text-align:left">if (bootchart_step() &lt; 0 ||--bootchart_count == 0) {</div>
+<div style="text-align:left">bootchart_finish();</div>
+<div style="text-align:left">bootchart_count = 0;</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left">#endif</div>
+<div style="text-align:left">// 这段代码用来轮询几个socket 是否有事件处理。</div>
+<div style="text-align:left">nr = poll(ufds, fd_count, timeout);</div>
+<div style="text-align:left">if (nr &lt;= 0)</div>
+<div style="text-align:left">continue;</div>
+<div style="text-align:left">/*</div>
+<div style="text-align:left">这段代码是用来处理子进程的通讯，并且能删除任何已经退出或者杀死进程，这样做可以保持系统更加健壮性，增强容错能力。</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left"><br>
+</div>
+<div style="text-align:left">*/</div>
+<div style="text-align:left">if (ufds[2].revents == POLLIN) {</div>
+<div style="text-align:left">/* we got a SIGCHLD - reap and restart asneeded */</div>
+<div style="text-align:left">read(signal_recv_fd, tmp, sizeof(tmp));</div>
+<div style="text-align:left">while (!wait_for_one_process(0))</div>
+<div style="text-align:left">;</div>
+<div style="text-align:left">continue;</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left">// 这段代码是处理设备事件。</div>
+<div style="text-align:left">if (ufds[0].revents == POLLIN)</div>
+<div style="text-align:left">handle_device_fd(device_fd);</div>
+<div style="text-align:left">// 这段代码是处理属性服务事件。</div>
+<div style="text-align:left">if (ufds[1].revents == POLLIN)</div>
+<div style="text-align:left">handle_property_set_fd(property_set_fd);</div>
+<div style="text-align:left">// 这段代码是处理调试模式下的组合按键。</div>
+<div style="text-align:left">if (ufds[3].revents == POLLIN)</div>
+<div style="text-align:left">handle_keychord(keychord_fd);</div>
+<div style="text-align:left">}</div>
+<div style="text-align:left">return 0;</div>
+<div style="text-align:left">}</div>
+<p></p>
+   
+</div>
+
+
+
+
+<!-- Baidu Button BEGIN -->
+
+
+
+
+<div class="bdsharebuttonbox tracking-ad bdshare-button-style0-16" style="float: right;" data-mod="popu_172" data-bd-bind="1459222709913">
+<a href="http://blog.csdn.net/mdx20072419/article/details/9400621#" class="bds_more" data-cmd="more" style="background-position:0 0 !important; background-image: url(http://bdimg.share.baidu.com/static/api/img/share/icons_0_16.png?v=d754dcc0.png) !important"></a>
+<a href="http://blog.csdn.net/mdx20072419/article/details/9400621#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间" style="background-position:0 -52px !important"></a>
+<a href="http://blog.csdn.net/mdx20072419/article/details/9400621#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博" style="background-position:0 -104px !important"></a>
+<a href="http://blog.csdn.net/mdx20072419/article/details/9400621#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博" style="background-position:0 -260px !important"></a>
+<a href="http://blog.csdn.net/mdx20072419/article/details/9400621#" class="bds_renren" data-cmd="renren" title="分享到人人网" style="background-position:0 -208px !important"></a>
+<a href="http://blog.csdn.net/mdx20072419/article/details/9400621#" class="bds_weixin" data-cmd="weixin" title="分享到微信" style="background-position:0 -1612px !important"></a>
+</div>
+<script>window._bd_share_config = { "common": { "bdSnsKey": {}, "bdText": "", "bdMini": "1", "bdMiniList": false, "bdPic": "", "bdStyle": "0", "bdSize": "16" }, "share": {} }; with (document) 0[(getElementsByTagName('head')[0] || body).appendChild(createElement('script')).src = 'http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion=' + ~(-new Date() / 36e5)];</script>
+<!-- Baidu Button END -->
+
+   <link rel="stylesheet" href="http://static.blog.csdn.net/css/blog_detail.css">
+
+    
+<!--172.16.140.13-->
+
+<!-- Baidu Button BEGIN -->
+<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=1536434" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/bds_s_v2.js"></script>
+
+<script type="text/javascript">
+    document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date()/3600000)
+</script>
+<!-- Baidu Button END -->
+
+ 
+
+        <div id="digg" articleid="9400621">
+            <dl id="btnDigg" class="digg digg_disable">
+               
+                 <dt>顶</dt>
+                <dd>0</dd>
+            </dl>
+            <dl id="btnBury" class="digg digg_disable">
+              
+                  <dt>踩</dt>
+                <dd>0</dd>
+            </dl>
+        </div>
+
+   <ul class="article_next_prev">
+                <li class="prev_article"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_shangyipian&#39;]);location.href=&#39;/mdx20072419/article/details/9381339&#39;;">上一篇</span><a href="http://blog.csdn.net/mdx20072419/article/details/9381339" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_shangyipian&#39;])">shell 函数返回值接收问题</a></li>
+                <li class="next_article"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_xiayipian&#39;]);location.href=&#39;/mdx20072419/article/details/9445869&#39;;">下一篇</span><a href="http://blog.csdn.net/mdx20072419/article/details/9445869" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_xiayipian&#39;])">ubuntu 10.10 可用更新源</a></li>
+    </ul>
+
+    <div style="clear:both; height:10px;"></div>
+
+
+        <div class="similar_article" style="">
+                <h4>我的同类文章</h4>
+                <div class="similar_c" style="margin:20px 0px 0px 0px">
+                    <div class="similar_c_t">
+                                <label class="similar_cur">
+                                    <span style="cursor:pointer" onclick="GetCategoryArticles(&#39;1076773&#39;,&#39;mdx20072419&#39;,&#39;foot&#39;,&#39;9400621&#39;);">Android<em>（33）</em></span>
+                                </label>
+                    </div>
+                   
+                    <div class="similar_wrap tracking-ad" data-mod="popu_141" style="max-height:195px;">
+                        <a href="http://blog.csdn.net/" style="display:none">http://blog.csdn.net</a>
+                        <ul class="similar_list fl"><li><em>•</em><a href="http://blog.csdn.net/mdx20072419/article/details/49903893" id="foot_aritcle_49903893undefined6095506416168064" target="_blank" title="Android 操作系统获取Root权限 原理详细解析">Android 操作系统获取Root权限 原理详细解析</a><span>2015-11-18</span><label><i>阅读</i><b>86</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/mdx20072419/article/details/48240075" id="foot_aritcle_48240075undefined825747040566057" target="_blank" title="Android Studio汉化">Android Studio汉化</a><span>2015-09-06</span><label><i>阅读</i><b>116</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/mdx20072419/article/details/47864821" id="foot_aritcle_47864821undefined05550344008952379" target="_blank" title="android L 启动流程">android L 启动流程</a><span>2015-08-24</span><label><i>阅读</i><b>355</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/mdx20072419/article/details/46907123" id="foot_aritcle_46907123undefined8296944822650403" target="_blank" title="利用Java反射机制改变SharedPreferences存储路径">利用Java反射机制改变SharedPreferences存储路径</a><span>2015-07-23</span><label><i>阅读</i><b>112</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/mdx20072419/article/details/45078265" id="foot_aritcle_45078265undefined8460666306782514" target="_blank" title="Android USB Host开发之manager.getDeviceList()获取不到设备列表">Android USB Host开发之manager.getDeviceList()获取不到设备列表</a><span>2015-04-16</span><label><i>阅读</i><b>126</b></label></li> </ul>
+
+                        <ul class="similar_list fr"><li><em>•</em><a href="http://blog.csdn.net/mdx20072419/article/details/49755709" id="foot_aritcle_49755709undefined30130119249224663" target="_blank" title="提示read-only file system">提示read-only file system</a><span>2015-11-10</span><label><i>阅读</i><b>76</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/mdx20072419/article/details/47865103" id="foot_aritcle_47865103undefined9156038297805935" target="_blank" title="Android 5.0 API新增和改进">Android 5.0 API新增和改进</a><span>2015-08-22</span><label><i>阅读</i><b>190</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/mdx20072419/article/details/47017717" id="foot_aritcle_47017717undefined3376612749416381" target="_blank" title="Android 5.x SEAndroid/SElinux内核节点的读写权限">Android 5.x SEAndroid/SElinux内核节点的读写权限</a><span>2015-07-23</span><label><i>阅读</i><b>327</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/mdx20072419/article/details/46638275" id="foot_aritcle_46638275undefined8623013489414006" target="_blank" title="强烈推荐转载-Android 性能测试">强烈推荐转载-Android 性能测试</a><span>2015-06-25</span><label><i>阅读</i><b>2537</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/mdx20072419/article/details/44854835" id="foot_aritcle_44854835undefined18657131236977875" target="_blank" title="LayoutInflater的获取与使用">LayoutInflater的获取与使用</a><span>2015-04-03</span><label><i>阅读</i><b>101</b></label></li> </ul>
+                    <a href="http://blog.csdn.net/mdx20072419/article/category/1076773" class="MoreArticle">更多文章</a></div>
+                </div>
+            </div>    
+    <script type="text/javascript">
+        $(function () {
+            GetCategoryArticles('1076773', 'mdx20072419','foot','9400621');
+        });
+    </script>
+      
+</div>
+<div id="suggest">
+
+</div>
+         <script language="javascript" type="text/javascript">     
+             $(function(){
+                 $.get("/mdx20072419/svc/GetSuggestContent/9400621",function(data){
+                     $("#suggest").html(data);
+                 });     
+             });             
+         </script>  
+
+
+<style>
+.blog-ass-articl dd {
+color: #369;
+width: 99%; /*修改行*/
+float: left;
+overflow: hidden;
+font: normal normal 12px/23px "SimSun";
+height: 23px;
+margin: 0;
+padding: 0 0 0 10px;
+margin-right: 30px;
+background: url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px;
+}
+</style>
+
+<dl class="blog-ass-articl" id="res-relatived"> 
+    <div class="embody embody_b" id="libkeyparent" style="display:none">
+            <span class="embody_t">更多资料请参考：</span>
+            <div class="embody_c" id="libkey"></div>
+    </div>
+
+
+     <dt><span>猜你在找</span></dt>    
+
+
+   
+
+
+    <div id="adCollege" style="width: 42%;float: left;"> 
+        <script src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/job_reco.js" type="text/javascript"></script> 
+        <script type="text/javascript">
+            csdn.position.showEdu({
+                sourceType: "blog",
+                searchType: "detail",
+                searchKey: "9400621",
+                username: "",
+                recordcount: "5",
+                containerId: "adCollege" //容器DIV的id。 
+            });
+        </script> 
+    </div>  
+
+    
+     <div id="res" data-mod="popu_36" class="tracking-ad" style="width: 42%;float: left;margin-right: 30px;"></div>
+   
+</dl>
+
+
+<script type="text/javascript">
+    $(function () {
+        setTimeout(function () {
+            var searchtitletags = 'Android之init.c简析' + ',' + $("#tags").html();
+            searchService({
+                index: 'blog',
+                query: searchtitletags,
+                from: 5,
+                size: 5,
+                appendTo: '#res',
+                url: 'recommend',
+                his: 2,
+                client: "blog_cf_enhance",
+                tmpl: '<dd style="background:url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px;"><a href="#{ url }" title="#{ title }" strategy="#{ strategy }">#{ title }</a></dd>'
+            });
+        }, 500);
+    });    
+
+ </script>  
+
+    <div id="ad_cen">        
+<!--AdForward Begin:-->
+<script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/s" charset="gbk"></script>
+<!--AdForward End-->    </div>  
+
+<div class="comment_class">
+    <div id="comment_title" class="panel_head">
+        <span class="see_comment">查看评论</span><a name="comments"></a></div>
+    <div id="comment_list"><br>&nbsp;&nbsp;暂无评论<br><br><div class="clear"></div></div>
+    <div id="comment_bar">
+    </div>
+    <div id="comment_form"><div class="guest_link">您还没有登录,请<a href="javascript:void(0);" onclick="javascript:loginbox();">[登录]</a>或<a href="http://passport.csdn.net/account/register?from=http%3A%2F%2Fblog.csdn.net%2Fmdx20072419%2Farticle%2Fdetails%2F9400621">[注册]</a></div></div>
+    <div class="announce">
+        * 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场<a name="reply"></a><a name="quote"></a></div>
+</div>
+
+<script type="text/javascript">
+    var fileName = '9400621';
+    var commentscount = 0;
+    var islock = false
+</script>
+<script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/comment.js"></script>
+    <div id="ad_bot">
+    </div>
+<div id="report_dialog">
+</div>
+
+<div id="d-top" style="bottom:60px;">
+        <a id="quick-reply" class="btn btn-top q-reply" title="快速回复" style="display:none;">
+            <img src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/blog-icon-reply.png" alt="快速回复">
+        </a>    
+
+    <a id="d-top-a" class="btn btn-top backtop" style="display: none;" title="返回顶部" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_huidaodingbu&#39;])">         
+         <img src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/top.png" alt="TOP">
+    </a>
+</div>
+<script type="text/javascript">
+    $(function ()
+    {
+        $("#ad_frm_0").height("90px");
+        
+        setTimeout(function(){
+            $("#ad_frm_2").height("200px");
+        },1000);    
+    });
+  
+</script>
+<style type="text/css">
+    .tag_list
+    {
+        background: none repeat scroll 0 0 #FFFFFF;
+        border: 1px solid #D7CBC1;
+        color: #000000;
+        font-size: 12px;
+        line-height: 20px;
+        list-style: none outside none;
+        margin: 10px 2% 0 1%;
+        padding: 1px;
+    }
+    .tag_list h5
+    {
+        background: none repeat scroll 0 0 #E0DBD3;
+        color: #47381C;
+        font-size: 12px;
+        height: 24px;
+        line-height: 24px;
+        padding: 0 5px;
+        margin: 0;
+    }
+    .tag_list h5 a
+    {
+        color: #47381C;
+    }
+    .classify
+    {
+        margin: 10px 0;
+        padding: 4px 12px 8px;
+    }
+    .classify a
+    {
+        margin-right: 20px;
+        white-space: nowrap;
+    }
+</style>
+
+
+<div class="tag_list" style="">
+
+    <h5>
+        <a href="http://www.csdn.net/tag/" target="_blank">核心技术类目</a></h5>
+    <div class="classify">
+<a title="全部主题" href="http://www.csdn.net/tag" target="_blank" onclick="LogClickCount(this,336);">全部主题</a>
+<a title="Hadoop" href="http://g.csdn.net/5272865" target="_blank" onclick="LogClickCount(this,336);">Hadoop</a>
+<a title="AWS" href="http://g.csdn.net/5272866" target="_blank" onclick="LogClickCount(this,336);">AWS</a>
+<a title="移动游戏" href="http://g.csdn.net/5272870" target="_blank" onclick="LogClickCount(this,336);">移动游戏</a>
+<a title="Java" href="http://g.csdn.net/5272871" target="_blank" onclick="LogClickCount(this,336);">Java</a>
+<a title="Android" href="http://g.csdn.net/5272872" target="_blank" onclick="LogClickCount(this,336);">Android</a>
+<a title="iOS" href="http://g.csdn.net/5272873" target="_blank" onclick="LogClickCount(this,336);">iOS</a>
+<a title="Swift" href="http://g.csdn.net/5272868" target="_blank" onclick="LogClickCount(this,336);">Swift</a>
+<a title="智能硬件" href="http://g.csdn.net/5272869" target="_blank" onclick="LogClickCount(this,336);">智能硬件</a>
+<a title="Docker" href="http://g.csdn.net/5272867" target="_blank" onclick="LogClickCount(this,336);">Docker</a>
+<a title="OpenStack" href="http://g.csdn.net/5272925" target="_blank" onclick="LogClickCount(this,336);">OpenStack</a>
+<a title="VPN" href="http://www.csdn.net/tag/vpn" target="_blank" onclick="LogClickCount(this,336);">VPN</a>
+<a title="Spark" href="http://g.csdn.net/5272924" target="_blank" onclick="LogClickCount(this,336);">Spark</a>
+<a title="ERP" href="http://www.csdn.net/tag/erp" target="_blank" onclick="LogClickCount(this,336);">ERP</a>
+<a title="IE10" href="http://www.csdn.net/tag/ie10" target="_blank" onclick="LogClickCount(this,336);">IE10</a>
+<a title="Eclipse" href="http://www.csdn.net/tag/eclipse" target="_blank" onclick="LogClickCount(this,336);">Eclipse</a>
+<a title="CRM" href="http://www.csdn.net/tag/crm" target="_blank" onclick="LogClickCount(this,336);">CRM</a>
+<a title="JavaScript" href="http://www.csdn.net/tag/javascript" target="_blank" onclick="LogClickCount(this,336);">JavaScript</a>
+<a title="数据库" href="http://www.csdn.net/tag/%E6%95%B0%E6%8D%AE%E5%BA%93" target="_blank" onclick="LogClickCount(this,336);">数据库</a>
+<a title="Ubuntu" href="http://www.csdn.net/tag/ubuntu" target="_blank" onclick="LogClickCount(this,336);">Ubuntu</a>
+<a title="NFC" href="http://www.csdn.net/tag/nfc" target="_blank" onclick="LogClickCount(this,336);">NFC</a>
+<a title="WAP" href="http://www.csdn.net/tag/wap" target="_blank" onclick="LogClickCount(this,336);">WAP</a>
+<a title="jQuery" href="http://www.csdn.net/tag/jquery" target="_blank" onclick="LogClickCount(this,336);">jQuery</a>
+<a title="BI" href="http://www.csdn.net/tag/bi" target="_blank" onclick="LogClickCount(this,336);">BI</a>
+<a title="HTML5" href="http://www.csdn.net/tag/html5" target="_blank" onclick="LogClickCount(this,336);">HTML5</a>
+<a title="Spring" href="http://www.csdn.net/tag/spring" target="_blank" onclick="LogClickCount(this,336);">Spring</a>
+<a title="Apache" href="http://www.csdn.net/tag/apache" target="_blank" onclick="LogClickCount(this,336);">Apache</a>
+<a title=".NET" href="http://www.csdn.net/tag/.net" target="_blank" onclick="LogClickCount(this,336);">.NET</a>
+<a title="API" href="http://www.csdn.net/tag/api" target="_blank" onclick="LogClickCount(this,336);">API</a>
+<a title="HTML" href="http://www.csdn.net/tag/html" target="_blank" onclick="LogClickCount(this,336);">HTML</a>
+<a title="SDK" href="http://www.csdn.net/tag/sdk" target="_blank" onclick="LogClickCount(this,336);">SDK</a>
+<a title="IIS" href="http://www.csdn.net/tag/iis" target="_blank" onclick="LogClickCount(this,336);">IIS</a>
+<a title="Fedora" href="http://www.csdn.net/tag/fedora" target="_blank" onclick="LogClickCount(this,336);">Fedora</a>
+<a title="XML" href="http://www.csdn.net/tag/xml" target="_blank" onclick="LogClickCount(this,336);">XML</a>
+<a title="LBS" href="http://www.csdn.net/tag/lbs" target="_blank" onclick="LogClickCount(this,336);">LBS</a>
+<a title="Unity" href="http://www.csdn.net/tag/unity" target="_blank" onclick="LogClickCount(this,336);">Unity</a>
+<a title="Splashtop" href="http://www.csdn.net/tag/splashtop" target="_blank" onclick="LogClickCount(this,336);">Splashtop</a>
+<a title="UML" href="http://www.csdn.net/tag/uml" target="_blank" onclick="LogClickCount(this,336);">UML</a>
+<a title="components" href="http://www.csdn.net/tag/components" target="_blank" onclick="LogClickCount(this,336);">components</a>
+<a title="Windows Mobile" href="http://www.csdn.net/tag/windowsmobile" target="_blank" onclick="LogClickCount(this,336);">Windows Mobile</a>
+<a title="Rails" href="http://www.csdn.net/tag/rails" target="_blank" onclick="LogClickCount(this,336);">Rails</a>
+<a title="QEMU" href="http://www.csdn.net/tag/qemu" target="_blank" onclick="LogClickCount(this,336);">QEMU</a>
+<a title="KDE" href="http://www.csdn.net/tag/kde" target="_blank" onclick="LogClickCount(this,336);">KDE</a>
+<a title="Cassandra" href="http://www.csdn.net/tag/cassandra" target="_blank" onclick="LogClickCount(this,336);">Cassandra</a>
+<a title="CloudStack" href="http://www.csdn.net/tag/cloudstack" target="_blank" onclick="LogClickCount(this,336);">CloudStack</a>
+<a title="FTC" href="http://www.csdn.net/tag/ftc" target="_blank" onclick="LogClickCount(this,336);">FTC</a>
+<a title="coremail" href="http://www.csdn.net/tag/coremail" target="_blank" onclick="LogClickCount(this,336);">coremail</a>
+<a title="OPhone " href="http://www.csdn.net/tag/ophone" target="_blank" onclick="LogClickCount(this,336);">OPhone </a>
+<a title="CouchBase" href="http://www.csdn.net/tag/couchbase" target="_blank" onclick="LogClickCount(this,336);">CouchBase</a>
+<a title="云计算" href="http://www.csdn.net/tag/%E4%BA%91%E8%AE%A1%E7%AE%97" target="_blank" onclick="LogClickCount(this,336);">云计算</a>
+<a title="iOS6" href="http://www.csdn.net/tag/iOS6" target="_blank" onclick="LogClickCount(this,336);">iOS6</a>
+<a title="Rackspace " href="http://www.csdn.net/tag/rackspace" target="_blank" onclick="LogClickCount(this,336);">Rackspace </a>
+<a title="Web App" href="http://www.csdn.net/tag/webapp" target="_blank" onclick="LogClickCount(this,336);">Web App</a>
+<a title="SpringSide" href="http://www.csdn.net/tag/springside" target="_blank" onclick="LogClickCount(this,336);">SpringSide</a>
+<a title="Maemo" href="http://www.csdn.net/tag/maemo" target="_blank" onclick="LogClickCount(this,336);">Maemo</a>
+<a title="Compuware" href="http://www.csdn.net/tag/compuware" target="_blank" onclick="LogClickCount(this,336);">Compuware</a>
+<a title="大数据" href="http://www.csdn.net/tag/%E5%A4%A7%E6%95%B0%E6%8D%AE" target="_blank" onclick="LogClickCount(this,336);">大数据</a>
+<a title="aptech" href="http://www.csdn.net/tag/aptech" target="_blank" onclick="LogClickCount(this,336);">aptech</a>
+<a title="Perl" href="http://www.csdn.net/tag/perl" target="_blank" onclick="LogClickCount(this,336);">Perl</a>
+<a title="Tornado" href="http://www.csdn.net/tag/tornado" target="_blank" onclick="LogClickCount(this,336);">Tornado</a>
+<a title="Ruby" href="http://www.csdn.net/tag/ruby" target="_blank" onclick="LogClickCount(this,336);">Ruby</a>
+<a title="Hibernate" href="http://www.csdn.net/hibernate" target="_blank" onclick="LogClickCount(this,336);">Hibernate</a>
+<a title="ThinkPHP" href="http://www.csdn.net/tag/thinkphp" target="_blank" onclick="LogClickCount(this,336);">ThinkPHP</a>
+<a title="HBase" href="http://www.csdn.net/tag/hbase" target="_blank" onclick="LogClickCount(this,336);">HBase</a>
+<a title="Pure" href="http://www.csdn.net/tag/pure" target="_blank" onclick="LogClickCount(this,336);">Pure</a>
+<a title="Solr" href="http://www.csdn.net/tag/solr" target="_blank" onclick="LogClickCount(this,336);">Solr</a>
+<a title="Angular" href="http://www.csdn.net/tag/angular" target="_blank" onclick="LogClickCount(this,336);">Angular</a>
+<a title="Cloud Foundry" href="http://www.csdn.net/tag/cloudfoundry" target="_blank" onclick="LogClickCount(this,336);">Cloud Foundry</a>
+<a title="Redis" href="http://www.csdn.net/tag/redis" target="_blank" onclick="LogClickCount(this,336);">Redis</a>
+<a title="Scala" href="http://www.csdn.net/tag/scala" target="_blank" onclick="LogClickCount(this,336);">Scala</a>
+<a title="Django" href="http://www.csdn.net/tag/django" target="_blank" onclick="LogClickCount(this,336);">Django</a>
+<a title="Bootstrap" href="http://www.csdn.net/tag/bootstrap" target="_blank" onclick="LogClickCount(this,336);">Bootstrap</a>
+    </div>
+
+</div>
+  <script language="javascript" type="text/javascript">     
+      $(function(){
+              setTimeout(function(){
+                  $.get("/mdx20072419/svc/GetTagContent",function(data){
+                      $(".tag_list").html(data).show();
+                  });     
+              });
+          },500);                       
+ </script> 
+
+
+<div id="pop_win" style="display:none ;position: absolute; z-index: 10000; border: 1px solid rgb(220, 220, 220); top: 222.5px; left: 630px; opacity: 1; background: none 0px 0px repeat scroll rgb(255, 255, 255);">
+    
+</div>
+<div id="popup_mask"></div>
+<style>
+    #popup_mask
+    {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        z-index: 9999;
+        left: 0px;
+        top: 0px;
+        opacity: 0.3;
+        filter: alpha(opacity=30);
+        display: none;
+    }
+
+</style>
+
+
+
+
+<script type="text/javascript">
+    $(function(){
+        setTimeout(function(){
+            $(".comment_body:contains('回复')").each(function(index,item){
+                var u=$(this).text().split('：')[0].toString().replace("回复","")
+                var thisComment=$(this);
+                if(u)
+                {
+                    $.getJSON("https://passport.csdn.net/get/nick?callback=?", {users: u}, function(a) {
+                        if(a!=null&&a.data!=null&&a.data.length>0)
+                        {
+                            nick=a.data[0].n; 
+                            if(u!=nick)
+                            {
+                                thisComment.text(thisComment.text().replace(u,nick));  
+                            }
+                        }       
+                    });  
+                }
+            });
+        },200);  
+        
+        setTimeout(function(){
+            $("a img[src='http://js.tongji.linezing.com/stats.gif']").parent().css({"position":"absolute","left":"50%"});
+        },300);
+    });
+
+    function loginbox(){
+        var $logpop=$("#pop_win");
+        $logpop.html('<iframe src="https://passport.csdn.net/account/loginbox?service=http://static.blog.csdn.net/callback.htm" frameborder="0" height="600" width="400" scrolling="no"></iframe>');
+
+        $('#popup_mask').css({
+            opacity: 0.5,
+            width: $( document ).width() + 'px',
+            height:  $( document ).height() + 'px'
+        });
+        $('#popup_mask').css("display","block");
+ 
+        $logpop.css( {
+            top: ($( window ).height() - $logpop.height())/ 2  + $( window 
+       ).scrollTop() + 'px',
+            left:($( window ).width() - $logpop.width())/ 2
+        } );
+ 
+        setTimeout( function () {
+            $logpop.show();
+            $logpop.css( {
+                opacity: 1
+            } );
+        }, 200 );
+ 
+        $('#popup_mask').unbind("click");
+        $('#popup_mask').bind("click", function(){
+            $('#popup_mask').hide();
+            var $clopop = $("#pop_win");
+            $("#common_ask_div_sc").css("display","none");
+            $clopop.css( {
+                opacity: 0
+            } );
+            setTimeout( function () {
+                $clopop.hide();
+            }, 350 );
+            return false;
+        });
+    }   
+
+</script>
+
+
+                        <div class="clear">
+                        </div>
+                    </div>                   
+                
+            </div>
+                   
+           <div id="side">
+    <div class="side">
+<div id="panel_Profile" class="panel">
+<ul class="panel_head"><span>个人资料</span></ul>
+<ul class="panel_body profile">
+<div id="blog_userface">
+    <a href="http://my.csdn.net/mdx20072419" target="_blank">
+    <img src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/1_mdx20072419.jpg" title="访问我的空间" style="max-width:90%">
+    </a>
+    <br>
+    <span><a href="http://my.csdn.net/mdx20072419" class="user_name" target="_blank">mdx20072419</a></span>
+</div>
+<div class="interact">
+
+    <a href="javascript:void(0);" class="attent" id="span_add_follow" title="[加关注]"></a>
+
+ <a href="javascript:void(0);" class="letter" title="[发私信]" onclick="window.open(&#39;http://msg.csdn.net/letters/model?receiver=mdx20072419&#39;,&#39;_blank&#39;,&#39;height=350,width=700&#39;);_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_sixin&#39;])"></a>  
+</div>
+<div id="blog_medal">
+                <div id="bms_box">
+               </div>
+</div>
+<ul id="blog_rank">
+    <li>访问：<span>167498次</span></li>
+    <li>积分：<span>2211</span> </li>    
+    <li>等级： <span style="position:relative;display:inline-block;z-index:1">
+            <img src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/blog5.png" alt="" style="vertical-align: middle;" id="leveImg">
+            <div id="smallTittle" style=" position: absolute;  left: -24px;  top: 25px;  text-align: center;  width: 101px;  height: 32px;  background-color: #fff;  line-height: 32px;  border: 2px #DDDDDD solid;  box-shadow: 0px 2px 2px rgba (0,0,0,0.1);  display: none;   z-index: 999;">
+            <div style="left: 42%;  top: -8px;  position: absolute;  width: 0;  height: 0;  border-left: 10px solid transparent;  border-right: 10px solid transparent;  border-bottom: 8px solid #EAEAEA;"></div>
+            积分：2211 </div>
+        </span>  </li>
+    <li>排名：<span>第10802名</span></li>
+</ul>
+<ul id="blog_statistics">
+    <li>原创：<span>60篇</span></li>
+    <li>转载：<span>48篇</span></li>
+    <li>译文：<span>0篇</span></li>
+    <li>评论：<span>51条</span></li>
+</ul>
+</ul>
+</div>
+
+
+<div class="panel" id="panel_Search">
+    <ul class="panel_head"><span>文章搜索</span></ul>
+    <ul class="panel_body">
+        <form id="frmSearch" action="http://so.csdn.net/search" class="form_search" target="_blank">
+        <span><input id="inputSearch" type="text" class="blogsearch" title="请输入关键字"></span>
+        <input id="btnSubmit" type="button" value="搜索" title="search in blog">
+        <input type="hidden" name="q" id="inputQ">
+        <input type="hidden" name="t" value="blog">
+        <a id="btnSearchBlog" target="_blank"></a>
+        </form>
+    </ul>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $("#btnSubmit").click(function () {           
+            search();
+        });
+
+        $("#frmSearch").submit(function () {
+            search();
+            return false;
+        });
+
+        function search()
+        {
+            var url = "http://so.csdn.net/so/search/s.do?q=" + encodeURIComponent($("#inputSearch").val()) + "&u=" + username + "&t=blog";
+            window.location.href = url;
+        }   
+    });
+</script><div id="panel_Category" class="panel">
+<ul class="panel_head"><span>文章分类</span></ul>
+<ul class="panel_body">    
+                 <li>
+                    <a href="http://blog.csdn.net/mdx20072419/article/category/1076773" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">Android</a><span>(34)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/mdx20072419/article/category/1190658" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">系统移植</a><span>(28)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/mdx20072419/article/category/1190659" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">C语言</a><span>(17)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/mdx20072419/article/category/1191440" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">linux基础</a><span>(18)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/mdx20072419/article/category/1234182" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">杂感</a><span>(1)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/mdx20072419/article/category/1290596" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">linux内核</a><span>(5)</span>
+                </li>
+</ul>
+</div><div id="panel_Archive" class="panel">
+<ul class="panel_head"><span>文章存档</span></ul>
+<ul class="panel_body">
+<div id="archive_list"><li><a href="http://blog.csdn.net/mdx20072419/article/month/2015/11">2015年11月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2015/09">2015年09月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2015/08">2015年08月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2015/07">2015年07月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2015/06">2015年06月</a><span>(1)</span></li><span class="hidelist" style="display:none;"><li><a href="http://blog.csdn.net/mdx20072419/article/month/2015/04">2015年04月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2015/03">2015年03月</a><span>(4)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2015/01">2015年01月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2014/12">2014年12月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2013/11">2013年11月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2013/10">2013年10月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2013/09">2013年09月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2013/08">2013年08月</a><span>(4)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2013/07">2013年07月</a><span>(6)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2013/06">2013年06月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2013/05">2013年05月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2013/04">2013年04月</a><span>(6)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2013/01">2013年01月</a><span>(4)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2012/12">2012年12月</a><span>(5)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2012/11">2012年11月</a><span>(4)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2012/10">2012年10月</a><span>(5)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2012/09">2012年09月</a><span>(13)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2012/08">2012年08月</a><span>(12)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2012/07">2012年07月</a><span>(3)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2012/06">2012年06月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2012/05">2012年05月</a><span>(4)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2012/04">2012年04月</a><span>(7)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2012/02">2012年02月</a><span>(5)</span></li><li><a href="http://blog.csdn.net/mdx20072419/article/month/2012/01">2012年01月</a><span>(5)</span></li></span><div id="archive_list_button" class="list_closed">展开</div></div>
+</ul>
+</div>
+<div id="hotarticls" class="panel">
+<ul class="panel_head">
+    <span>       
+阅读排行    </span>
+</ul>
+
+<ul class="panel_body itemlist">
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/9381339" title="shell 函数返回值接收问题">shell 函数返回值接收问题</a><span>(19505)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/9632779" title="Android更改桌面应用程序launcher的两种方式">Android更改桌面应用程序launcher的两种方式</a><span>(19408)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/8543388" title="scanf()函数用法小结">scanf()函数用法小结</a><span>(17450)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/7897435" title="ltrace与strace用法">ltrace与strace用法</a><span>(5433)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/9772051" title=".tar.xz文件的解压">.tar.xz文件的解压</a><span>(5214)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/10354651" title="Android--hw_get_module解析">Android--hw_get_module解析</a><span>(4660)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/8060432" title="sudo: no valid sudoers sources found, quitting">sudo: no valid sudoers sources found, quitting</a><span>(4571)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/7193186" title="Looking up port of RPC 100003/2 on 10.0.1.9">Looking up port of RPC 100003/2 on 10.0.1.9</a><span>(4132)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/9744595" title="Failed to load session “ubuntu”  -- 12.04">Failed to load session “ubuntu”  -- 12.04</a><span>(3170)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/7767809" title="Linux下如何查看CPU信息, 包括位数和多核信息">Linux下如何查看CPU信息, 包括位数和多核信息</a><span>(2879)</span>
+</li>
+</ul>
+</div>
+<div id="hotarticls2" class="panel">
+<ul class="panel_head"><span>评论排行</span></ul>
+<ul class="panel_body itemlist">
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/9632779" title="Android更改桌面应用程序launcher的两种方式">Android更改桌面应用程序launcher的两种方式</a><span>(11)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/8086353" title="C中结构体大小的计算">C中结构体大小的计算</a><span>(6)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/7193186" title="Looking up port of RPC 100003/2 on 10.0.1.9">Looking up port of RPC 100003/2 on 10.0.1.9</a><span>(4)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/7901185" title="Putty打开报错“Invalid Port number”">Putty打开报错“Invalid Port number”</a><span>(4)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/7814390" title="深入理解指针之必看">深入理解指针之必看</a><span>(4)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/8862523" title="gets函数有问题？">gets函数有问题？</a><span>(3)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/12529437" title="修改Android开机画面之rle制作">修改Android开机画面之rle制作</a><span>(3)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/8150326" title="指针数组和数组指针">指针数组和数组指针</a><span>(2)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/8013146" title="strcmp函数和strcpy函数">strcmp函数和strcpy函数</a><span>(2)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/mdx20072419/article/details/46638275" title="强烈推荐转载-Android 性能测试">强烈推荐转载-Android 性能测试</a><span>(2)</span>
+</li>
+</ul>
+</div>
+<div id="homepageArticles" class="panel tracking-ad" data-mod="popu_4">
+<ul class="panel_head"><span>推荐文章</span></ul>
+<ul class="panel_body" id="ad_commend">
+<ul>
+<li><a href="http://blog.csdn.net/diyangxia/article/details/40348765" target="_blank">*Viewpager实现底部滑动菜单，同时取消预加载</a></li>
+<li><a href="http://blog.csdn.net/erlib/article/details/50994209" target="_blank">*几种软负载均衡策略分析</a></li>
+<li><a href="http://blog.csdn.net/fanyun_01/article/details/50921678" target="_blank">*浅谈Storm流式处理框架</a></li>
+<li><a href="http://blog.csdn.net/u013088062/article/details/50893901" target="_blank">*有关深度学习领域的几点想法</a></li>
+<li><a href="http://blog.csdn.net/wangpeng198688/article/details/50964828" target="_blank">* 管理Java垃圾回收的五个建议</a></li>
+<li><a href="http://blog.csdn.net/u014421556/article/details/50964505" target="_blank">* 大数据并发问题</a></li>
+
+</ul></ul>
+</div>
+
+
+<div id="newcomments" class="panel">
+<ul class="panel_head"><span>最新评论</span></ul>
+<ul class="panel_body itemlist">
+    <li>
+   
+         <a href="http://blog.csdn.net/mdx20072419/article/details/9632779#comments">Android更改桌面应用程序launcher的两种方式</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/u013356657" class="user_name">u013356657</a>:
+frameworks/base/core/java/android/content/Intent.j...
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/mdx20072419/article/details/9632779#comments">Android更改桌面应用程序launcher的两种方式</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/qq_30409791" class="user_name">qq_30409791</a>:
+大神，只有APK文件，如何实现设置APK应用为默认启动的桌面
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/mdx20072419/article/details/8543388#comments">scanf()函数用法小结</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/qq_33692620" class="user_name">qq_33692620</a>:
+C语言难学啊啊
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/mdx20072419/article/details/8543388#comments">Android更改桌面应用程序launcher的两种方式</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/mdx20072419" class="user_name">mdx20072419</a>:
+@lwl867303602:我的这篇文章就是基于自己获得的源码来实现的
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/mdx20072419/article/details/8543388#comments">Android更改桌面应用程序launcher的两种方式</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/lwl867303602" class="user_name">lwl867303602</a>:
+如果是自己下载的源码编译也是这样的操作步骤吗？
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/mdx20072419/article/details/7894068#comments">ldr     r0, =0xff000fff</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/lijianmin007" class="user_name">lijianmin007</a>:
+不能吧，比较的位数不一样了，如果在IRAM中运行该代码，PC待比较的那些位的值应该是000吧。而TE...
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/mdx20072419/article/details/46638275#comments">强烈推荐转载-Android 性能测试</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/u012833845" class="user_name">u012833845</a>:
+这部文章似曾相识啊
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/mdx20072419/article/details/46638275#comments">强烈推荐转载-Android 性能测试</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/laome19850211" class="user_name">laome19850211</a>:
+功耗测试部分由例子吗？比如说代码等？这篇文章的原地址是哪里？谢谢
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/mdx20072419/article/details/46638275#comments">Android更改桌面应用程序launcher的两种方式</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/mdx20072419" class="user_name">mdx20072419</a>:
+@seacover:小米手机或者是华为手机 他们的系统已经经过订制了，所以说，按照官方launche...
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/mdx20072419/article/details/46638275#comments">Android更改桌面应用程序launcher的两种方式</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/seacover" class="user_name">seacover</a>:
+大神，在模拟器上测试通过，放在小米手机和华为手机上都不好用，请指点
+    </p>
+    </li>
+</ul>
+</div>
+    </div>
+    <div class="clear">
+    </div>
+ </div>   
+            <div class="clear">
+            </div>
+        </div>
+        
+
+<script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/cnick.js"></script>
+<script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/newblog.min.js"></script>
+
+
+<script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/showblogmedal.ashx"></script>
+<script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/JavaScript1.js"></script><link rel="stylesheet" type="text/css" href="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/pub_footer_2014.css"><div class="pub_fo"><div id="pub_footerall" class="pub_footer_new"><dl><dt></dt> <dd class="foot_sub_menu"><a href="http://www.csdn.net/company/about.html" target="_blank">公司简介</a><span>|</span><a href="http://www.csdn.net/company/recruit.html" target="_blank">招贤纳士</a><span>|</span><a href="http://www.csdn.net/company/marketing.html" target="_blank">广告服务</a><span>|</span><a href="http://www.csdn.net/company/account.html" target="_blank">银行汇款帐号</a><span>|</span><a href="http://www.csdn.net/company/contact.html" target="_blank">联系方式</a><span>|</span><a href="http://www.csdn.net/company/statement.html" target="_blank">版权声明</a><span>|</span><a href="http://www.csdn.net/company/layer.html" target="_blank">法律顾问</a><span>|</span><a href="mailto:webmaster@csdn.net">问题报告</a><span>|</span><a target="_blank" href="http://www.csdn.net/friendlink.html">合作伙伴</a><span>|</span><a href="http://bbs.csdn.net/forums/Service" target="_blank">论坛反馈</a></dd><dd class="foot_contact"><a href="http://wpa.qq.com/msgrd?v=3&uin=2355263776&site=qq&menu=yes" target="_blank" class="qq">网站客服</a><a href="http://wpa.qq.com/msgrd?v=3&uin=2251809102&site=qq&menu=yes" target="_blank" class="qq">杂志客服</a><a href="http://e.weibo.com/csdnsupport/profile" target="_blank" class="weibo">微博客服</a><a href="mailto:webmaster@csdn.net" class="email" title="联系邮箱">webmaster@csdn.net</a><span class="phone" title="服务热线">400-600-2320</span><span class="interval">|</span><span>北京创新乐知信息技术有限公司 版权所有</span><span class="interval">|</span><span>江苏乐知网络技术有限公司 提供商务支持</span></dd><dd class="foot_copyright"><span>京&nbsp;ICP&nbsp;证&nbsp;09002463&nbsp;号</span><span class="interval">|</span><span>Copyright © 1999-2014, CSDN.NET, All Rights Reserved&nbsp;</span><a href="http://www.hd315.gov.cn/beian/view.asp?bianhao=010202001032100010" target="_blank"><img src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/gongshang_logos.gif" alt="GongshangLogo" title=""></a></dd></dl></div></div><script id="noticeScript" type="text/javascript" btnid="header_notice_num" wrapid="note1" count="5" subcount="5" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/notify.js"></script>
+
+    <script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/login.js"></script>
+<script type="text/javascript">document.write("<img src=http://counter.csdn.net/pv.aspx?id=24 border=0 width=0 height=0>");</script><img src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/pv.aspx" border="0" width="0" height="0">
+<script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/counter.js"></script><script type="text/javascript" charset="UTF-8" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/msg.popup.js"></script>
+<script type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/ad-blog.js"></script>
+<script type="text/javascript">
+    $(function () {
+        function __get_code_toolbar(snippet_id) {
+            return $("<span class='tracking-ad' data-mod='popu_167'><a href='https://code.csdn.net/snippets/"
+                    + snippet_id
+                    + "' target='_blank' title='在CODE上查看代码片'  style='text-indent:0;'><img src='https://code.csdn.net/assets/CODE_ico.png' width=12 height=12 alt='在CODE上查看代码片' style='position:relative;top:1px;left:2px;'/></a></span>"
+                    + "<span class='tracking-ad' data-mod='popu_170'><a href='https://code.csdn.net/snippets/"
+                    + snippet_id
+                    + "/fork' target='_blank' title='派生到我的代码片' style='text-indent:0;'><img src='https://code.csdn.net/assets/ico_fork.svg' width=12 height=12 alt='派生到我的代码片' style='position:relative;top:2px;left:2px;'/></a></span>");
+        }
+        
+        $("[code_snippet_id]").each(function () {
+            __s_id = $(this).attr("code_snippet_id");
+            if (__s_id != null && __s_id != "" && __s_id != 0 && parseInt(__s_id) > 70020) {
+                __code_tool = __get_code_toolbar(__s_id);
+                $(this).prev().find(".tools").append(__code_tool);
+            }
+        });
+
+        $(".bar").show();
+    });
+</script>
+
+
+
+
+    </div>
+      <!--new top-->
+    
+    <script id="csdn-toolbar-id" btnid="header_notice_num" wrapid="note1" count="5" subcount="5" type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/toolbar.js"></script>
+     <!--new top-->
+   
+    <link href="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/ask_float_block.css" type="text/css" rel="stylesheet">
+    <script language="JavaScript" type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/wmd.js"></script>
+    <script language="JavaScript" type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/showdown.js"></script>
+    <script language="JavaScript" type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/prettify.js"></script>
+    <script language="JavaScript" type="text/javascript" src="./Android之init.c简析 - - 博客频道 - CSDN.NET_files/ask_float_block.js"></script>
+   
+
+   
+ </body></html>

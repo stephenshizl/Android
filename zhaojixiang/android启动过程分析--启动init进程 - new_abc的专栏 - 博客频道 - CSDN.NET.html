@@ -1,0 +1,1620 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0052)http://blog.csdn.net/new_abc/article/details/7424587 -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">   
+   
+
+    <script src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/ca-pub-8990951720398508.js"></script><script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/tracking.js" charset="utf-8"></script>  
+
+    <script type="text/javascript">
+        var protocol = window.location.protocol;
+        document.write('<script type="text/javascript" src="' + protocol + '//csdnimg.cn/pubfooter/js/repoAddr2.js?v=' + Math.random() + '"></' + 'script>');
+    </script><script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/repoAddr2.js"></script>
+
+  
+ <meta http-equiv="Cache-Control" content="no-siteapp"><link rel="alternate" media="handheld" href="http://blog.csdn.net/new_abc/article/details/7424587#">
+
+    <title>android启动过程分析--启动init进程 - new_abc的专栏
+        - 博客频道 - CSDN.NET</title>
+    
+    <meta name="description" content="最近在查关于Linux下时间编程的问题：1. Linux下与时间有关的结构体struct timeval{ int tv_sec; int tv_usec; }; 其中tv_sec是由凌晨开始算起的秒数，tv_usec则是微秒(10E-6 second)。 struct timezone{ int tv_minuteswest; int tv_dsttime; }; tv_minuteswest是格林威治时间往西方的时差，tv_dsttime则是时间的修正方式。 struct timespec { long">
+    <script src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/jquery.js" type="text/javascript"></script>
+      <script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/jquery-version.js"></script>
+    <script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/ad.js"></script>
+        <!--new top-->
+       
+        <link rel="stylesheet" href="http://c.csdnimg.cn/public/common/toolbar/css/index.css">
+        <!--new top-->
+    
+      <!-- ad begin -->
+         <script language="javascript" type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/tracking(1).js"></script>
+    <!-- ad end-->
+
+    <link rel="Stylesheet" type="text/css" href="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/style.css">
+    <link id="RSSLink" title="RSS" type="application/rss+xml" rel="alternate" href="http://blog.csdn.net/new_abc/rss/list">
+    <link rel="shortcut icon" href="http://c.csdnimg.cn/public/favicon.ico">
+    <link type="text/css" rel="stylesheet" href="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/green_black.css">
+ 
+
+
+<script src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/share.js"></script><style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Hover_Arrow {position: absolute; width: 15px; height: 11px; cursor: pointer}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; color: #666666}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_Menu_Close {position: absolute; width: 31px; height: 31px; top: -15px; left: -15px}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><script src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/get_ads.php" type="text/javascript"></script><script src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/logger.js"></script><link rel="stylesheet" href="http://bdimg.share.baidu.com/static/api/css/share_style0_16.css?v=6aba13f0.css"><link href="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/bdsstyle.css" rel="stylesheet" type="text/css"></head>
+<body><div id="MathJax_Message" style="display: none;"></div><iframe frameborder="0" style="display: none;"></iframe>
+    <!-- 广告位开始 -->
+        <div class="J_adv" data-view="true" data-mod="ad_popu_149" data-mtp="30" data-order="207" data-con="ad_content_586"><script id="popuLayer_js_q_a" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/popuLayer.js" defer="" async="" type="text/javascript"></script><div id="fulln1pze" style="text-align: center; width: 1170px; overflow: hidden; margin: 0px auto; display: block; height: 0px;"><a href="http://msdn.csdn.net/" target="_blank"><img src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/201605171015439276.jpg"></a></div><script>  document.getElementById('popuLayer_js_q_a').onload=function(){      window.CSDN.Layer.FullAdv('#fulln1pze',{storageName:'fulln1pze',total:-1});  }</script></div>
+    <!-- 广告位结束 -->
+
+    
+   
+      <!--new top-->
+    <script id="toolbar-tpl-scriptId" fixed="true" prod="blog" skin="black" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/html.js" type="text/javascript"></script>
+     <!--new top-->
+    <div id="container">
+        <div id="header">
+    <div class="header">
+        <div id="blog_title">
+            <h2>
+                <a href="http://blog.csdn.net/new_abc">new_abc的专栏</a></h2>
+            <h3></h3>
+            <div class="clear">
+            </div>
+        </div>
+        <div class="clear">
+        </div>
+        
+     
+    </div>
+</div>
+<div id="navigator">
+    <div class="navigator_bg">
+    </div>
+    <div class="navigator">
+        <ul>
+            
+                <li id="btnContents"><a href="http://blog.csdn.net/new_abc?viewmode=contents"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_mulu&#39;])">
+                    <img src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/ico_list.gif">目录视图</span></a></li>
+                <li id="btnView"><a href="http://blog.csdn.net/new_abc?viewmode=list"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_zhaiyao&#39;])">
+                    <img src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/ico_summary.gif">摘要视图</span></a></li>
+                <li id="btnRss"><a href="http://blog.csdn.net/new_abc/rss/list"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_RSS&#39;])">
+                    <img src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/ico_rss.gif">订阅</span></a></li>                
+            
+
+            </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    var username = "new_abc";
+    var _blogger = username;
+    var blog_address = "http://blog.csdn.net/new_abc";
+    var static_host = "http://static.blog.csdn.net";
+    var currentUserName = "";  
+</script>
+
+        <div id="body">
+            <div id="main">
+                <div class="main">
+                        <div class="ad_class">
+<div class="notice tracking-ad" data-mod="popu_3"> 
+
+
+<a href="http://blog.csdn.net/blogdevteam/article/details/51919935">
+<font color="blue">【公告】博客系统优化升级</font></a>
+&nbsp;&nbsp;&nbsp;
+<a href="http://lib.csdn.net/base/unity3d/structure">
+<font color="red">Unity3D学习，离VR开发还有一步
+</font></a>
+&nbsp;&nbsp;&nbsp;
+<a href="http://blog.csdn.net/blogdevteam/article/details/51984275">
+<font color="blue">博乐招募开始啦
+</font></a>
+&nbsp;&nbsp;&nbsp;
+
+<a href="http://lib.csdn.net/base/vr">
+<font color="red">虚拟现实，一探究竟
+</font></a>
+&nbsp;&nbsp;&nbsp;
+
+
+</div>                        </div>
+                        
+
+
+
+<!-- 广告位开始 -->
+<div class="J_adv" data-view="true" data-mod="ad_popu_72" data-mtp="40" data-order="40" data-con="ad_content_217" style="width: 1px; height: 1px; position: fixed; right: 10px; bottom: 10px; z-index: 999; background-color: transparent;"><div id="location_parent"></div><script>document.getElementById('location_parent').parentNode.style.height='1px';document.getElementById('location_parent').parentNode.style.width='1px';document.getElementById('location_parent').parentNode.style.position='fixed';document.getElementById('location_parent').parentNode.style.right='10px';document.getElementById('location_parent').parentNode.style.bottom='10px';document.getElementById('location_parent').parentNode.style.zIndex=999;document.getElementById('location_parent').parentNode.style.backgroundColor='transparent';</script><!-- 广告占位容器 --><div id="cpro_u2392861"></div><!-- 投放代码 --><script type="text/javascript">(window['cproStyleApi'] = window['cproStyleApi'] || {})['u2392861']={at:'3',rsi0:'300',rsi1:'250',pat:'17',tn:'baiduCustNativeAD_xuanfu',rss1:'#FFFFFF',conBW:'1',adp:'1',ptt:'0',titFF:'%E5%BE%AE%E8%BD%AF%E9%9B%85%E9%BB%91',titFS:'14',rss2:'#000000',titSU:'0'};/*服务器频道首页置顶Banner960*90，创建于2014-7-3*/(window.cproArray = window.cproArray || []).push({id:'u2392861'});  </script>  <script src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/f.js" type="text/javascript"></script></div>
+<!-- 广告位结束 -->
+
+  
+<link href="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/comment1.css" type="text/css" rel="stylesheet">
+<link href="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/style1.css" type="text/css" rel="stylesheet">
+<script language="JavaScript" type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/jquery.cookie.js"></script>
+<script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/main.js"></script>
+<link rel="stylesheet" href="http://static.blog.csdn.net/public/res-min/markdown_views.css?v=1.0">
+<link rel="stylesheet" href="http://static.blog.csdn.net/css/category.css?v=1.0">
+<script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/MathJax.js"></script>
+<script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/web-storage-cache.min.js"></script>
+<script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/replace.min.js"></script>
+
+
+
+
+  <script type="text/ecmascript">
+      window.quickReplyflag = true;
+           
+            var isBole = false;
+            
+          
+    </script>
+<div id="article_details" class="details">
+    <div class="article_title">   
+         <span class="ico ico_type_Original"></span>
+
+
+    <h1>
+        <span class="link_title"><a href="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET.html">
+        android启动过程分析--启动init进程            
+        </a></span>
+    </h1>
+</div>
+
+   
+
+        <div class="article_manage clearfix">
+        <div class="article_l">
+            <span class="link_categories">
+            标签：
+              <a href="http://www.csdn.net/tag/android" target="_blank" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_tag&#39;]);">android</a><a href="http://www.csdn.net/tag/service" target="_blank" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_tag&#39;]);">service</a><a href="http://www.csdn.net/tag/action" target="_blank" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_tag&#39;]);">action</a><a href="http://www.csdn.net/tag/command" target="_blank" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_tag&#39;]);">command</a><a href="http://www.csdn.net/tag/signal" target="_blank" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_tag&#39;]);">signal</a><a href="http://www.csdn.net/tag/struct" target="_blank" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_tag&#39;]);">struct</a>
+            </span>
+        </div>
+        <div class="article_r">
+            <span class="link_postdate">2012-04-03 23:11</span>
+            <span class="link_view" title="阅读次数">2628人阅读</span>
+            <span class="link_comments" title="评论次数"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#comments" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_pinglun&#39;])">评论</a>(0)</span>
+            <span class="link_collect tracking-ad" data-mod="popu_171"> <a href="javascript:void(0);" onclick="javascript:collectArticle(&#39;android启动过程分析--启动init进程&#39;,&#39;7424587&#39;);return false;" title="收藏">收藏</a></span>
+             <span class="link_report"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#report" onclick="javascript:report(7424587,2);return false;" title="举报">举报</a></span>
+
+        </div>
+    </div>
+    <div class="embody" style="display:none" id="embody">
+        <span class="embody_t">本文章已收录于：</span>
+        <div class="embody_c" id="lib" value="{&quot;err&quot;:0,&quot;msg&quot;:&quot;ok&quot;,&quot;data&quot;:[]}"></div>
+    </div>
+    <style type="text/css">        
+            .embody{
+                padding:10px 10px 10px;
+                margin:0 -20px;
+                border-bottom:solid 1px #ededed;                
+            }
+            .embody_b{
+                margin:0 ;
+                padding:10px 0;
+            }
+            .embody .embody_t,.embody .embody_c{
+                display: inline-block;
+                margin-right:10px;
+            }
+            .embody_t{
+                font-size: 12px;
+                color:#999;
+            }
+            .embody_c{
+                font-size: 12px;
+            }
+            .embody_c img,.embody_c em{
+                display: inline-block;
+                vertical-align: middle;               
+            }
+             .embody_c img{               
+                width:30px;
+                height:30px;
+            }
+            .embody_c em{
+                margin: 0 20px 0 10px;
+                color:#333;
+                font-style: normal;
+            }
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            try
+            {
+                var lib = eval("("+$("#lib").attr("value")+")");
+                var html = "";
+                if (lib.err == 0) {
+                    $.each(lib.data, function (i) {
+                        var obj = lib.data[i];
+                        //html += '<img src="' + obj.logo + '"/>' + obj.name + "&nbsp;&nbsp;";
+                        html += ' <a href="' + obj.url + '" target="_blank">';
+                        html += ' <img src="' + obj.logo + '">';
+                        html += ' <em><b>' + obj.name + '</b></em>';
+                        html += ' </a>';
+                    });
+                    if (html != "") {
+                        setTimeout(function () {
+                            $("#lib").html(html);                      
+                            $("#embody").show();
+                        }, 100);
+                    }
+                }      
+            } catch (err)
+            { }
+            
+        });
+    </script>
+      <div class="category clearfix">
+        <div class="category_l">
+           <img src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/category_icon.jpg">
+            <span>分类：</span>
+        </div>
+        <div class="category_r">
+                    <label onclick="GetCategoryArticles(&#39;1108421&#39;,&#39;new_abc&#39;,&#39;top&#39;,&#39;7424587&#39;);">
+                        <span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_fenlei&#39;]);">android框架<em>（82）</em></span>
+                      <img class="arrow-down" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/arrow_triangle _down.jpg" style="display:inline;">
+                      <img class="arrow-up" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/arrow_triangle_up.jpg" style="display:none;">
+                        <div class="subItem">
+                            <div class="subItem_t"><a href="http://blog.csdn.net/new_abc/article/category/1108421" target="_blank">作者同类文章</a><i class="J_close">X</i></div>
+                            <ul class="subItem_l" id="top_1108421">                            
+                            </ul>
+                        </div>
+                    </label>                    
+        </div>
+    </div>
+    <script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/category.js"></script>  
+        <div class="bog_copyright">         
+            <p class="copyright_p">版权声明：本文为博主原创文章，未经博主允许不得转载。</p>
+        </div>
+
+  
+
+  
+  
+     
+
+<div id="article_content" class="article_content">
+
+<p>每当我们学习一门新的语言时，我们总是以HelloWorld来开始我们的学习之旅，每当我们分析一个应用程序时，我们也总会找到main函数入口，学习一个系统，最好的办法也是先把它的启动流程弄清楚，这样，后面分析起来才能更好的把握。</p>
+<p><a href="http://lib.csdn.net/base/15" class="replace_word" title="undefined" target="_blank" style="color:#df3434; font-weight:bold;">Android</a>系统比较复杂，它的启动涉及的东西也比较多，但是只要我们把一点点都弄明白 ，最后整个流程起来再看的话也就会明了很多，我们先看下init启动过程中主要做的事。</p>
+<p>Android从Linux系统启动有4个步骤：</p>
+<p>(1)、init进程启动</p>
+<p>(2)、Native服务启动</p>
+<p>(3)、System Server、Android服务启动</p>
+<p>(4)、Home启动</p>
+<p>总体启动框架图如：</p>
+<p><img src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/1333464881_3812.png" alt=""><br>
+</p>
+<p>首先我们看下init进程的启动过程中都做了哪些事情：</p>
+<p><img src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/1333464931_5942.png" alt=""></p>
+<p>代码路径：system/init</p>
+<p>下面我们一步步看它都 做了哪些事情：</p>
+<p>1、准备系统启动所需要的最小文件目录:</p>
+<p>创建必要的文件夹，挂载所需文件系统，重定位标准输入输出错误到/dev/__null__，以下是相关代码：</p>
+<p></p>
+<div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 1178px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_1" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_1" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=1&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="datatypes">int</span><span>&nbsp;main(</span><span class="datatypes">int</span><span>&nbsp;argc,&nbsp;</span><span class="datatypes">char</span><span>&nbsp;**argv)&nbsp;&nbsp;</span></span></li><li class=""><span>{&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;fd_count&nbsp;=&nbsp;0;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">struct</span><span>&nbsp;pollfd&nbsp;ufds[4];&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">char</span><span>&nbsp;*tmpdev;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">char</span><span>*&nbsp;debuggable;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">char</span><span>&nbsp;tmp[32];&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;property_set_fd_init&nbsp;=&nbsp;0;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;signal_fd_init&nbsp;=&nbsp;0;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;keychord_fd_init&nbsp;=&nbsp;0;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(!strcmp(basename(argv[0]),&nbsp;</span><span class="string">"ueventd"</span><span>))&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;ueventd_main(argc,&nbsp;argv);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/*&nbsp;clear&nbsp;the&nbsp;umask&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;umask(0);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/*&nbsp;Get&nbsp;the&nbsp;basic&nbsp;filesystem&nbsp;setup&nbsp;we&nbsp;need&nbsp;put</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;together&nbsp;in&nbsp;the&nbsp;initramdisk&nbsp;on&nbsp;/&nbsp;and&nbsp;then&nbsp;we'll</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;let&nbsp;the&nbsp;rc&nbsp;file&nbsp;figure&nbsp;out&nbsp;the&nbsp;rest.</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;mkdir(<span class="string">"/dev"</span><span>,&nbsp;0755);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;mkdir(<span class="string">"/proc"</span><span>,&nbsp;0755);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;mkdir(<span class="string">"/sys"</span><span>,&nbsp;0755);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;mount(<span class="string">"tmpfs"</span><span>,&nbsp;</span><span class="string">"/dev"</span><span>,&nbsp;</span><span class="string">"tmpfs"</span><span>,&nbsp;0,&nbsp;</span><span class="string">"mode=0755"</span><span>);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;mkdir(<span class="string">"/dev/pts"</span><span>,&nbsp;0755);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;mkdir(<span class="string">"/dev/socket"</span><span>,&nbsp;0755);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;mount(<span class="string">"devpts"</span><span>,&nbsp;</span><span class="string">"/dev/pts"</span><span>,&nbsp;</span><span class="string">"devpts"</span><span>,&nbsp;0,&nbsp;NULL);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;mount(<span class="string">"proc"</span><span>,&nbsp;</span><span class="string">"/proc"</span><span>,&nbsp;</span><span class="string">"proc"</span><span>,&nbsp;0,&nbsp;NULL);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;mount(<span class="string">"sysfs"</span><span>,&nbsp;</span><span class="string">"/sys"</span><span>,&nbsp;</span><span class="string">"sysfs"</span><span>,&nbsp;0,&nbsp;NULL);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/*&nbsp;We&nbsp;must&nbsp;have&nbsp;some&nbsp;place&nbsp;other&nbsp;than&nbsp;/&nbsp;to&nbsp;create&nbsp;the</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;device&nbsp;nodes&nbsp;for&nbsp;kmsg&nbsp;and&nbsp;null,&nbsp;otherwise&nbsp;we&nbsp;won't</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;be&nbsp;able&nbsp;to&nbsp;remount&nbsp;/&nbsp;read-only&nbsp;later&nbsp;on.</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;Now&nbsp;that&nbsp;tmpfs&nbsp;is&nbsp;mounted&nbsp;on&nbsp;/dev,&nbsp;we&nbsp;can&nbsp;actually</span>&nbsp;</span></li><li class="alt"><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;talk&nbsp;to&nbsp;the&nbsp;outside&nbsp;world.</span>&nbsp;</span></li><li class=""><span><span class="comment">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;open_devnull_stdio();<span class="comment">//需要在后面的程序中看到打印的话需要屏蔽这个函数</span><span>&nbsp;&nbsp;</span></span></li></ol></div><pre name="code" class="cpp" style="display: none;">int main(int argc, char **argv)
+{
+    int fd_count = 0;
+    struct pollfd ufds[4];
+    char *tmpdev;
+    char* debuggable;
+    char tmp[32];
+    int property_set_fd_init = 0;
+    int signal_fd_init = 0;
+    int keychord_fd_init = 0;
+
+    if (!strcmp(basename(argv[0]), "ueventd"))
+        return ueventd_main(argc, argv);
+
+    /* clear the umask */
+    umask(0);
+
+        /* Get the basic filesystem setup we need put
+         * together in the initramdisk on / and then we'll
+         * let the rc file figure out the rest.
+         */
+    mkdir("/dev", 0755);
+    mkdir("/proc", 0755);
+    mkdir("/sys", 0755);
+
+    mount("tmpfs", "/dev", "tmpfs", 0, "mode=0755");
+    mkdir("/dev/pts", 0755);
+    mkdir("/dev/socket", 0755);
+    mount("devpts", "/dev/pts", "devpts", 0, NULL);
+    mount("proc", "/proc", "proc", 0, NULL);
+    mount("sysfs", "/sys", "sysfs", 0, NULL);
+
+        /* We must have some place other than / to create the
+         * device nodes for kmsg and null, otherwise we won't
+         * be able to remount / read-only later on.
+         * Now that tmpfs is mounted on /dev, we can actually
+         * talk to the outside world.
+         */
+    open_devnull_stdio();//需要在后面的程序中看到打印的话需要屏蔽这个函数
+
+</pre>我们再看下open_devnull_stdio 函数
+<p></p>
+<p></p>
+<div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 2052px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_2" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_2" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=2&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="keyword">void</span><span>&nbsp;open_devnull_stdio(</span><span class="keyword">void</span><span>)&nbsp;&nbsp;</span></span></li><li class=""><span>{&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;fd;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">static</span><span>&nbsp;</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">char</span><span>&nbsp;*name&nbsp;=&nbsp;</span><span class="string">"/dev/__null__"</span><span>;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(mknod(name,&nbsp;S_IFCHR&nbsp;|&nbsp;0600,&nbsp;(1&nbsp;&lt;&lt;&nbsp;8)&nbsp;|&nbsp;3)&nbsp;==&nbsp;0)&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fd&nbsp;=&nbsp;open(name,&nbsp;O_RDWR);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unlink(name);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(fd&nbsp;&gt;=&nbsp;0)&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dup2(fd,&nbsp;0);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dup2(fd,&nbsp;1);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dup2(fd,&nbsp;2);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(fd&nbsp;&gt;&nbsp;2)&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;close(fd);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;exit(1);&nbsp;&nbsp;</span></li><li class=""><span>}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="cpp" style="display: none;">void open_devnull_stdio(void)
+{
+    int fd;
+    static const char *name = "/dev/__null__";
+    if (mknod(name, S_IFCHR | 0600, (1 &lt;&lt; 8) | 3) == 0) {
+        fd = open(name, O_RDWR);
+        unlink(name);
+        if (fd &gt;= 0) {
+            dup2(fd, 0);
+            dup2(fd, 1);
+            dup2(fd, 2);
+            if (fd &gt; 2) {
+                close(fd);
+            }
+            return;
+        }
+    }
+
+    exit(1);
+}
+</pre>这里调用dup函数把标准输入，输出，错误输出都重定位到/dev/__null__<br>
+<br>
+2、初始化log系统
+<p></p>
+<p>调用log_init对log系统进行初始化，我们看下这个函数：</p>
+<p></p>
+<div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 2622px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_3" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_3" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=3&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="keyword">void</span><span>&nbsp;log_init(</span><span class="keyword">void</span><span>)&nbsp;&nbsp;</span></span></li><li class=""><span>{&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">static</span><span>&nbsp;</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">char</span><span>&nbsp;*name&nbsp;=&nbsp;</span><span class="string">"/dev/__kmsg__"</span><span>;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(mknod(name,&nbsp;S_IFCHR&nbsp;|&nbsp;0600,&nbsp;(1&nbsp;&lt;&lt;&nbsp;8)&nbsp;|&nbsp;11)&nbsp;==&nbsp;0)&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;log_fd&nbsp;=&nbsp;open(name,&nbsp;O_WRONLY);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;fcntl(log_fd,&nbsp;F_SETFD,&nbsp;FD_CLOEXEC);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unlink(name);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class="alt"><span>}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="cpp" style="display: none;">void log_init(void)
+{
+    static const char *name = "/dev/__kmsg__";
+    if (mknod(name, S_IFCHR | 0600, (1 &lt;&lt; 8) | 11) == 0) {
+        log_fd = open(name, O_WRONLY);
+        fcntl(log_fd, F_SETFD, FD_CLOEXEC);
+        unlink(name);
+    }
+}</pre>这里创建并打开了一个设备节点，用于后面的log信息处理，如写日志等就往这个节点里面写.<br>
+<p>.3、解析init.rc</p>
+<p>这里调用了parse_config去解析init.rc。</p>
+<p></p>
+<div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 2945px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_4" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_4" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=4&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="keyword">static</span><span>&nbsp;</span><span class="keyword">void</span><span>&nbsp;parse_config(</span><span class="keyword">const</span><span>&nbsp;</span><span class="datatypes">char</span><span>&nbsp;*fn,&nbsp;</span><span class="datatypes">char</span><span>&nbsp;*s)&nbsp;&nbsp;</span></span></li><li class=""><span>{&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">struct</span><span>&nbsp;parse_state&nbsp;state;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">char</span><span>&nbsp;*args[INIT_PARSER_MAXARGS];&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;nargs;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;nargs&nbsp;=&nbsp;0;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;state.filename&nbsp;=&nbsp;fn;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;state.line&nbsp;=&nbsp;1;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;state.ptr&nbsp;=&nbsp;s;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;state.nexttoken&nbsp;=&nbsp;0;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;state.parse_line&nbsp;=&nbsp;parse_line_no_op;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">for</span><span>&nbsp;(;;)&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">switch</span><span>&nbsp;(next_token(&amp;state))&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">case</span><span>&nbsp;T_EOF:&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state.parse_line(&amp;state,&nbsp;0,&nbsp;0);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">case</span><span>&nbsp;T_NEWLINE:&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(nargs)&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;kw&nbsp;=&nbsp;lookup_keyword(args[0]);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(kw_is(kw,&nbsp;SECTION))&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state.parse_line(&amp;state,&nbsp;0,&nbsp;0);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parse_new_section(&amp;state,&nbsp;kw,&nbsp;nargs,&nbsp;args);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;<span class="keyword">else</span><span>&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state.parse_line(&amp;state,&nbsp;nargs,&nbsp;args);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nargs&nbsp;=&nbsp;0;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">break</span><span>;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">case</span><span>&nbsp;T_TEXT:&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(nargs&nbsp;&lt;&nbsp;INIT_PARSER_MAXARGS)&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;args[nargs++]&nbsp;=&nbsp;state.text;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">break</span><span>;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class="alt"><span>}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="cpp" style="display: none;">static void parse_config(const char *fn, char *s)
+{
+    struct parse_state state;
+    char *args[INIT_PARSER_MAXARGS];
+    int nargs;
+
+    nargs = 0;
+    state.filename = fn;
+    state.line = 1;
+    state.ptr = s;
+    state.nexttoken = 0;
+    state.parse_line = parse_line_no_op;
+    for (;;) {
+        switch (next_token(&amp;state)) {
+        case T_EOF:
+            state.parse_line(&amp;state, 0, 0);
+            return;
+        case T_NEWLINE:
+            if (nargs) {
+                int kw = lookup_keyword(args[0]);
+                if (kw_is(kw, SECTION)) {
+                    state.parse_line(&amp;state, 0, 0);
+                    parse_new_section(&amp;state, kw, nargs, args);
+                } else {
+                    state.parse_line(&amp;state, nargs, args);
+                }
+                nargs = 0;
+            }
+            break;
+        case T_TEXT:
+            if (nargs &lt; INIT_PARSER_MAXARGS) {
+                args[nargs++] = state.text;
+            }
+            break;
+        }
+    }
+}
+</pre><br>
+调用next_token对下一个字符进行解析，这里分成了三类，文件结束，换行，还有就是字符<span style="white-space:pre"> </span>
+，它们的处理也不一样。
+<p></p>
+<p>1、如果是文件结束符，直接调用parse_line进行处理</p>
+<p>2、如果是字符，则保存到args变量中</p>
+<p>3、如果是换行，首先查关键字，如果是SECTION，说明是一个新的段的开始，先调用parse_line处理(因为第二个参数为0，其实什么也没有做)，然后调用parse_new_section对这新的一个段的开始一行进行解析;否则直接调用parse_line解析。</p>
+<p>再看一下parse_new_section</p>
+<div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 3932px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_5" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_5" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=5&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="keyword">void</span><span>&nbsp;parse_new_section(</span><span class="keyword">struct</span><span>&nbsp;parse_state&nbsp;*state,&nbsp;</span><span class="datatypes">int</span><span>&nbsp;kw,&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;nargs,&nbsp;</span><span class="datatypes">char</span><span>&nbsp;**args)&nbsp;&nbsp;</span></span></li><li class="alt"><span>{&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;printf(<span class="string">"[&nbsp;%s&nbsp;%s&nbsp;]\n"</span><span>,&nbsp;args[0],&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nargs&nbsp;&gt;&nbsp;1&nbsp;?&nbsp;args[1]&nbsp;:&nbsp;<span class="string">""</span><span>);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">switch</span><span>(kw)&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">case</span><span>&nbsp;K_service:&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state-&gt;context&nbsp;=&nbsp;parse_service(state,&nbsp;nargs,&nbsp;args);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(state-&gt;context)&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state-&gt;parse_line&nbsp;=&nbsp;parse_line_service;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">break</span><span>;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">case</span><span>&nbsp;K_on:&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state-&gt;context&nbsp;=&nbsp;parse_action(state,&nbsp;nargs,&nbsp;args);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(state-&gt;context)&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state-&gt;parse_line&nbsp;=&nbsp;parse_line_action;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">break</span><span>;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;state-&gt;parse_line&nbsp;=&nbsp;parse_line_no_op;&nbsp;&nbsp;</span></li><li class="alt"><span>}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="cpp" style="display: none;">void parse_new_section(struct parse_state *state, int kw,
+                       int nargs, char **args)
+{
+    printf("[ %s %s ]\n", args[0],
+           nargs &gt; 1 ? args[1] : "");
+    switch(kw) {
+    case K_service:
+        state-&gt;context = parse_service(state, nargs, args);
+        if (state-&gt;context) {
+            state-&gt;parse_line = parse_line_service;
+            return;
+        }
+        break;
+    case K_on:
+        state-&gt;context = parse_action(state, nargs, args);
+        if (state-&gt;context) {
+            state-&gt;parse_line = parse_line_action;
+            return;
+        }
+        break;
+    }
+    state-&gt;parse_line = parse_line_no_op;
+}
+</pre>这里也是对keyword分两种情况进行了处理，一个是service，另一个是on
+<p></p>
+<p>1、如果是service,则调用parse_service进行处理，并将state的parse_line设置为parse_line_service;</p>
+<p>2、如果是On,则调用parse_action进行解析，并将state的parse_line设置为parse_line_action;</p>
+<p>再来看一下parse_service</p>
+<p></p>
+<div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 4562px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_6" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_6" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=6&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="keyword">static</span><span>&nbsp;</span><span class="keyword">void</span><span>&nbsp;*parse_service(</span><span class="keyword">struct</span><span>&nbsp;parse_state&nbsp;*state,&nbsp;</span><span class="datatypes">int</span><span>&nbsp;nargs,&nbsp;</span><span class="datatypes">char</span><span>&nbsp;**args)&nbsp;&nbsp;</span></span></li><li class=""><span>{&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">struct</span><span>&nbsp;service&nbsp;*svc;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(nargs&nbsp;&lt;&nbsp;3)&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parse_error(state,&nbsp;<span class="string">"services&nbsp;must&nbsp;have&nbsp;a&nbsp;name&nbsp;and&nbsp;a&nbsp;program\n"</span><span>);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;0;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(!valid_name(args[1]))&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parse_error(state,&nbsp;<span class="string">"invalid&nbsp;service&nbsp;name&nbsp;'%s'\n"</span><span>,&nbsp;args[1]);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;0;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;svc&nbsp;=&nbsp;service_find_by_name(args[1]);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(svc)&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parse_error(state,&nbsp;<span class="string">"ignored&nbsp;duplicate&nbsp;definition&nbsp;of&nbsp;service&nbsp;'%s'\n"</span><span>,&nbsp;args[1]);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;0;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;nargs&nbsp;-=&nbsp;2;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;svc&nbsp;=&nbsp;calloc(1,&nbsp;<span class="keyword">sizeof</span><span>(*svc)&nbsp;+&nbsp;</span><span class="keyword">sizeof</span><span>(</span><span class="datatypes">char</span><span>*)&nbsp;*&nbsp;nargs);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(!svc)&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parse_error(state,&nbsp;<span class="string">"out&nbsp;of&nbsp;memory\n"</span><span>);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;0;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;svc-&gt;name&nbsp;=&nbsp;args[1];&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;svc-&gt;classname&nbsp;=&nbsp;<span class="string">"default"</span><span>;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;memcpy(svc-&gt;args,&nbsp;args&nbsp;+&nbsp;2,&nbsp;<span class="keyword">sizeof</span><span>(</span><span class="datatypes">char</span><span>*)&nbsp;*&nbsp;nargs);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;svc-&gt;args[nargs]&nbsp;=&nbsp;0;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;svc-&gt;nargs&nbsp;=&nbsp;nargs;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;svc-&gt;onrestart.name&nbsp;=&nbsp;<span class="string">"onrestart"</span><span>;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;list_init(&amp;svc-&gt;onrestart.commands);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;list_add_tail(&amp;service_list,&nbsp;&amp;svc-&gt;slist);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;svc;&nbsp;&nbsp;</span></span></li><li class=""><span>}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="cpp" style="display: none;">static void *parse_service(struct parse_state *state, int nargs, char **args)
+{
+    struct service *svc;
+    if (nargs &lt; 3) {
+        parse_error(state, "services must have a name and a program\n");
+        return 0;
+    }
+    if (!valid_name(args[1])) {
+        parse_error(state, "invalid service name '%s'\n", args[1]);
+        return 0;
+    }
+
+    svc = service_find_by_name(args[1]);
+    if (svc) {
+        parse_error(state, "ignored duplicate definition of service '%s'\n", args[1]);
+        return 0;
+    }
+
+    nargs -= 2;
+    svc = calloc(1, sizeof(*svc) + sizeof(char*) * nargs);
+    if (!svc) {
+        parse_error(state, "out of memory\n");
+        return 0;
+    }
+    svc-&gt;name = args[1];
+    svc-&gt;classname = "default";
+    memcpy(svc-&gt;args, args + 2, sizeof(char*) * nargs);
+    svc-&gt;args[nargs] = 0;
+    svc-&gt;nargs = nargs;
+    svc-&gt;onrestart.name = "onrestart";
+    list_init(&amp;svc-&gt;onrestart.commands);
+    list_add_tail(&amp;service_list, &amp;svc-&gt;slist);
+    return svc;
+}
+</pre><br>
+这里首先看这个service是否已经存在，存在说明重复了，直接返回错误，
+<p></p>
+<p>不存在的话根据这个service的参数等分配空间，并利用传进来的参数进行初始化，最后把它加到service_list列表。</p>
+<p>再看看parse_action</p>
+<p></p>
+<div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 5412px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_7" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_7" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=7&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="keyword">static</span><span>&nbsp;</span><span class="keyword">void</span><span>&nbsp;*parse_action(</span><span class="keyword">struct</span><span>&nbsp;parse_state&nbsp;*state,&nbsp;</span><span class="datatypes">int</span><span>&nbsp;nargs,&nbsp;</span><span class="datatypes">char</span><span>&nbsp;**args)&nbsp;&nbsp;</span></span></li><li class=""><span>{&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">struct</span><span>&nbsp;action&nbsp;*act;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(nargs&nbsp;&lt;&nbsp;2)&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parse_error(state,&nbsp;<span class="string">"actions&nbsp;must&nbsp;have&nbsp;a&nbsp;trigger\n"</span><span>);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;0;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(nargs&nbsp;&gt;&nbsp;2)&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;parse_error(state,&nbsp;<span class="string">"actions&nbsp;may&nbsp;not&nbsp;have&nbsp;extra&nbsp;parameters\n"</span><span>);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;0;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;act&nbsp;=&nbsp;calloc(1,&nbsp;<span class="keyword">sizeof</span><span>(*act));&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;act-&gt;name&nbsp;=&nbsp;args[1];&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;list_init(&amp;act-&gt;commands);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;list_add_tail(&amp;action_list,&nbsp;&amp;act-&gt;alist);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/*&nbsp;XXX&nbsp;add&nbsp;to&nbsp;hash&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;act;&nbsp;&nbsp;</span></span></li><li class=""><span>}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="cpp" style="display: none;">static void *parse_action(struct parse_state *state, int nargs, char **args)
+{
+    struct action *act;
+    if (nargs &lt; 2) {
+        parse_error(state, "actions must have a trigger\n");
+        return 0;
+    }
+    if (nargs &gt; 2) {
+        parse_error(state, "actions may not have extra parameters\n");
+        return 0;
+    }
+    act = calloc(1, sizeof(*act));
+    act-&gt;name = args[1];
+    list_init(&amp;act-&gt;commands);
+    list_add_tail(&amp;action_list, &amp;act-&gt;alist);
+        /* XXX add to hash */
+    return act;
+}
+</pre><br>
+这里主要把命令加入到action_list中。<br>
+<p></p>
+<p>4、添加一些其它的命令到action_queue和action_queue<br>
+</p>
+<p>主要调用queue_builtin_action把action_list中的一些命令添加到action_queue，</p>
+<p>调用queue_builtin_action一些命令到action_list</p>
+<p>5、进入循环处理</p>
+<p>1)、调用execute_one_command执行一个命令</p>
+<p></p>
+<div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 6018px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_8" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_8" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=8&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="keyword">void</span><span>&nbsp;execute_one_command(</span><span class="keyword">void</span><span>)&nbsp;&nbsp;</span></span></li><li class=""><span>{&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;ret;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(!cur_action&nbsp;||&nbsp;!cur_command&nbsp;||&nbsp;is_last_command(cur_action,&nbsp;cur_command))&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cur_action&nbsp;=&nbsp;action_remove_queue_head();&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cur_command&nbsp;=&nbsp;NULL;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(!cur_action)&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;INFO(<span class="string">"processing&nbsp;action&nbsp;%p&nbsp;(%s)\n"</span><span>,&nbsp;cur_action,&nbsp;cur_action-&gt;name);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cur_command&nbsp;=&nbsp;get_first_command(cur_action);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;<span class="keyword">else</span><span>&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cur_command&nbsp;=&nbsp;get_next_command(cur_action,&nbsp;cur_command);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(!cur_command)&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;ret&nbsp;=&nbsp;cur_command-&gt;func(cur_command-&gt;nargs,&nbsp;cur_command-&gt;args);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;INFO(<span class="string">"command&nbsp;'%s'&nbsp;r=%d\n"</span><span>,&nbsp;cur_command-&gt;args[0],&nbsp;ret);&nbsp;&nbsp;</span></span></li><li class="alt"><span>}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="cpp" style="display: none;">void execute_one_command(void)
+{
+    int ret;
+
+    if (!cur_action || !cur_command || is_last_command(cur_action, cur_command)) {
+        cur_action = action_remove_queue_head();
+        cur_command = NULL;
+        if (!cur_action)
+            return;
+        INFO("processing action %p (%s)\n", cur_action, cur_action-&gt;name);
+        cur_command = get_first_command(cur_action);
+    } else {
+        cur_command = get_next_command(cur_action, cur_command);
+    }
+
+    if (!cur_command)
+        return;
+
+    ret = cur_command-&gt;func(cur_command-&gt;nargs, cur_command-&gt;args);
+    INFO("command '%s' r=%d\n", cur_command-&gt;args[0], ret);
+}
+</pre><br>
+这里主要是从action_queue的队列头弹出一个命令并调用它的func函数执行，这里的func函数 一般是do_***,在keywords.h中定义的。
+<p></p>
+<p>2)、restart_processes</p>
+<p>查看是否有服务需要重启，如果有重启它。</p>
+<p>3)、把基于property、signal、keychord的句柄加入poll检测，调用poll等待事件到来。</p>
+<p><span style="white-space:pre"></span></p>
+<div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 6634px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_9" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_9" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=9&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="keyword">for</span><span>&nbsp;(i&nbsp;=&nbsp;0;&nbsp;i&nbsp;&lt;&nbsp;fd_count;&nbsp;i++)&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(ufds[i].revents&nbsp;==&nbsp;POLLIN)&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(ufds[i].fd&nbsp;==&nbsp;get_property_set_fd())&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handle_property_set_fd();&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">else</span><span>&nbsp;</span><span class="keyword">if</span><span>&nbsp;(ufds[i].fd&nbsp;==&nbsp;get_keychord_fd())&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handle_keychord();&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">else</span><span>&nbsp;</span><span class="keyword">if</span><span>&nbsp;(ufds[i].fd&nbsp;==&nbsp;get_signal_fd())&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handle_signal();&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="cpp" style="display: none;"> for (i = 0; i &lt; fd_count; i++) {
+            if (ufds[i].revents == POLLIN) {
+                if (ufds[i].fd == get_property_set_fd())
+                    handle_property_set_fd();
+                else if (ufds[i].fd == get_keychord_fd())
+                    handle_keychord();
+                else if (ufds[i].fd == get_signal_fd())
+                    handle_signal();
+            }
+        }</pre><br>
+<p>分别调用相应的函数进行处理,这里稍微分析下这三个事件。</p>
+<p>1、handle_property_set_fd</p>
+<p>这个函数主要用来处理属性事件，包括属性设置和启动一些service,部分代码</p>
+<p></p><div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 7004px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_10" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_10" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=10&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="keyword">if</span><span>(memcmp(msg.name,</span><span class="string">"ctl."</span><span>,4)&nbsp;==&nbsp;0)&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(check_control_perms(msg.value,&nbsp;cr.uid,&nbsp;cr.gid))&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;handle_control_message((<span class="datatypes">char</span><span>*)&nbsp;msg.name&nbsp;+&nbsp;4,&nbsp;(</span><span class="datatypes">char</span><span>*)&nbsp;msg.value);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;<span class="keyword">else</span><span>&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ERROR(<span class="string">"sys_prop:&nbsp;Unable&nbsp;to&nbsp;%s&nbsp;service&nbsp;ctl&nbsp;[%s]&nbsp;uid:&nbsp;%d&nbsp;pid:%d\n"</span><span>,&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;msg.name&nbsp;+&nbsp;4,&nbsp;msg.value,&nbsp;cr.uid,&nbsp;cr.pid);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>}&nbsp;<span class="keyword">else</span><span>&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(check_perms(msg.name,&nbsp;cr.uid,&nbsp;cr.gid))&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;property_set((<span class="datatypes">char</span><span>*)&nbsp;msg.name,&nbsp;(</span><span class="datatypes">char</span><span>*)&nbsp;msg.value);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;<span class="keyword">else</span><span>&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ERROR(<span class="string">"sys_prop:&nbsp;permission&nbsp;denied&nbsp;uid:%d&nbsp;&nbsp;name:%s\n"</span><span>,&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cr.uid,&nbsp;msg.name);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class="alt"><span>}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="cpp" style="display: none;">        if(memcmp(msg.name,"ctl.",4) == 0) {
+            if (check_control_perms(msg.value, cr.uid, cr.gid)) {
+                handle_control_message((char*) msg.name + 4, (char*) msg.value);
+            } else {
+                ERROR("sys_prop: Unable to %s service ctl [%s] uid: %d pid:%d\n",
+                        msg.name + 4, msg.value, cr.uid, cr.pid);
+            }
+        } else {
+            if (check_perms(msg.name, cr.uid, cr.gid)) {
+                property_set((char*) msg.name, (char*) msg.value);
+            } else {
+                ERROR("sys_prop: permission denied uid:%d  name:%s\n",
+                      cr.uid, msg.name);
+            }
+        }</pre><br>
+如果是ctl开头的，说明是控制信息，启动或停止某个service<p></p>
+<p>我们看在开机界面的启动，这个也是一个services,在init.rc中加进去了，但是没有启动</p>
+<p></p><div class="dp-highlighter bg_plain"><div class="bar"><div class="tools"><b>[plain]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 706px; top: 7447px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_11" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_11" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=11&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1"><li class="alt"><span><span>service&nbsp;bootanim&nbsp;/system/bin/bootanimation&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;user&nbsp;graphics&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;group&nbsp;graphics&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;disabled&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;oneshot&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="plain" style="display: none;">service bootanim /system/bin/bootanimation
+    user graphics
+    group graphics
+    disabled
+    oneshot
+</pre><br>
+然后在status_t SurfaceFlinger::readyToRun()中有如下代码：<p></p>
+<p>&nbsp;property_set("ctl.start", "bootanim");<br>
+</p>
+<p>bootanim 就是上面&nbsp;/system/bin/bootanimation 这个service的名字，<br>
+</p>
+<p>我们看到property_set最终调用了send_prop_msg，看下这个函数：</p>
+<p></p><div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 7743px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_12" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_12" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=12&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="keyword">static</span><span>&nbsp;</span><span class="datatypes">int</span><span>&nbsp;send_prop_msg(prop_msg&nbsp;*msg)&nbsp;&nbsp;</span></span></li><li class=""><span>{&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;s;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;r;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;s&nbsp;=&nbsp;socket_local_client(PROP_SERVICE_NAME,&nbsp;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ANDROID_SOCKET_NAMESPACE_RESERVED,&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SOCK_STREAM);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>(s&nbsp;&lt;&nbsp;0)&nbsp;</span><span class="keyword">return</span><span>&nbsp;-1;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">while</span><span>((r&nbsp;=&nbsp;send(s,&nbsp;msg,&nbsp;</span><span class="keyword">sizeof</span><span>(prop_msg),&nbsp;0))&nbsp;&lt;&nbsp;0)&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>((errno&nbsp;==&nbsp;EINTR)&nbsp;||&nbsp;(errno&nbsp;==&nbsp;EAGAIN))&nbsp;</span><span class="keyword">continue</span><span>;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">break</span><span>;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>(r&nbsp;==&nbsp;</span><span class="keyword">sizeof</span><span>(prop_msg))&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r&nbsp;=&nbsp;0;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;<span class="keyword">else</span><span>&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r&nbsp;=&nbsp;-1;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;close(s);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;r;&nbsp;&nbsp;</span></span></li><li class=""><span>}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="cpp" style="display: none;">static int send_prop_msg(prop_msg *msg)
+{
+    int s;
+    int r;
+    
+    s = socket_local_client(PROP_SERVICE_NAME, 
+                            ANDROID_SOCKET_NAMESPACE_RESERVED,
+                            SOCK_STREAM);
+    if(s &lt; 0) return -1;
+    
+    while((r = send(s, msg, sizeof(prop_msg), 0)) &lt; 0) {
+        if((errno == EINTR) || (errno == EAGAIN)) continue;
+        break;
+    }
+
+    if(r == sizeof(prop_msg)) {
+        r = 0;
+    } else {
+        r = -1;
+    }
+
+    close(s);
+    return r;
+}
+</pre><br>
+这里把消息发给服务端，那么服务端是什么时候监听的呢，我们看下init.rc中有如下代码。<p></p>
+<p>在mina函数 中有</p>
+<p></p><div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 8367px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_13" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_13" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=13&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span>queue_builtin_action(property_service_init_action,&nbsp;</span><span class="string">"property_service_init"</span><span>);&nbsp;&nbsp;</span></span></li></ol></div><pre name="code" class="cpp" style="display: none;">queue_builtin_action(property_service_init_action, "property_service_init");</pre><br>
+这里面调用了start_property_service();我们看下它；<p></p>
+<p></p><div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 8506px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_14" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_14" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=14&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="keyword">void</span><span>&nbsp;start_property_service(</span><span class="keyword">void</span><span>)&nbsp;&nbsp;</span></span></li><li class=""><span>{&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;fd;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;load_properties_from_file(PROP_PATH_SYSTEM_BUILD);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;load_properties_from_file(PROP_PATH_SYSTEM_DEFAULT);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;load_properties_from_file(PROP_PATH_LOCAL_OVERRIDE);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/*&nbsp;Read&nbsp;persistent&nbsp;properties&nbsp;after&nbsp;all&nbsp;default&nbsp;values&nbsp;have&nbsp;been&nbsp;loaded.&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;load_persistent_properties();&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;fd&nbsp;=&nbsp;create_socket(PROP_SERVICE_NAME,&nbsp;SOCK_STREAM,&nbsp;0666,&nbsp;0,&nbsp;0);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>(fd&nbsp;&lt;&nbsp;0)&nbsp;</span><span class="keyword">return</span><span>;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;fcntl(fd,&nbsp;F_SETFD,&nbsp;FD_CLOEXEC);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;fcntl(fd,&nbsp;F_SETFL,&nbsp;O_NONBLOCK);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;listen(fd,&nbsp;8);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;property_set_fd&nbsp;=&nbsp;fd;&nbsp;&nbsp;</span></li><li class=""><span>}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="cpp" style="display: none;">void start_property_service(void)
+{
+    int fd;
+
+    load_properties_from_file(PROP_PATH_SYSTEM_BUILD);
+    load_properties_from_file(PROP_PATH_SYSTEM_DEFAULT);
+    load_properties_from_file(PROP_PATH_LOCAL_OVERRIDE);
+    /* Read persistent properties after all default values have been loaded. */
+    load_persistent_properties();
+
+    fd = create_socket(PROP_SERVICE_NAME, SOCK_STREAM, 0666, 0, 0);
+    if(fd &lt; 0) return;
+    fcntl(fd, F_SETFD, FD_CLOEXEC);
+    fcntl(fd, F_SETFL, O_NONBLOCK);
+
+    listen(fd, 8);
+    property_set_fd = fd;
+}
+</pre><br>
+<div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 8960px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_15" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_15" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=15&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span>property&nbsp;&nbsp;</span></span></li></ol></div><pre name="code" class="cpp" style="display: none;">property</pre>对的，就是在这里监听的。这样有属性设置或启动相关service时就可以通过socket通信来 实现了。<p></p>
+<p>2、handle_keychord<span style="color:rgb(51,51,51); font-family:Arial; font-size:14px; line-height:26px; text-align:left">处理调试模式下的组合按键</span></p>
+<p><span style="color:rgb(51,51,51); font-family:Arial; font-size:14px; line-height:26px; text-align:left">3、handle_signal</span></p>
+<p><span style="color:rgb(51,51,51); font-family:Arial; font-size:14px; line-height:26px; text-align:left"></span></p><div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 9124px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_16" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_16" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=16&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="keyword">void</span><span>&nbsp;handle_signal(</span><span class="keyword">void</span><span>)&nbsp;&nbsp;</span></span></li><li class=""><span>{&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">char</span><span>&nbsp;tmp[32];&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/*&nbsp;we&nbsp;got&nbsp;a&nbsp;SIGCHLD&nbsp;-&nbsp;reap&nbsp;and&nbsp;restart&nbsp;as&nbsp;needed&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;read(signal_recv_fd,&nbsp;tmp,&nbsp;<span class="keyword">sizeof</span><span>(tmp));&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">while</span><span>&nbsp;(!wait_for_one_process(0))&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;&nbsp;&nbsp;</span></li><li class="alt"><span>}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="cpp" style="display: none;">void handle_signal(void)
+{
+    char tmp[32];
+
+    /* we got a SIGCHLD - reap and restart as needed */
+    read(signal_recv_fd, tmp, sizeof(tmp));
+    while (!wait_for_one_process(0))
+        ;
+}</pre><br>
+handle_signal阻塞在read上，但当有子进程退出时，sigchld_handler会write(signal_fd, &amp;s, 1);这里signal_fd与signal_recv_fd是本了已经建立好的通信套接字，导致上面的read返回，进入&nbsp;wait_for_one_process<div class="dp-highlighter bg_cpp"><div class="bar"><div class="tools"><b>[cpp]</b> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="ViewSource" title="view plain" onclick="dp.sh.Toolbar.Command(&#39;ViewSource&#39;,this);return false;">view plain</a><span data-mod="popu_168"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="CopyToClipboard" title="copy" onclick="dp.sh.Toolbar.Command(&#39;CopyToClipboard&#39;,this);return false;">copy</a><div style="position: absolute; left: 695px; top: 9447px; width: 30px; height: 17px; z-index: 99;"><embed id="ZeroClipboardMovie_17" src="http://static.blog.csdn.net/scripts/ZeroClipboard/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" width="30" height="17" name="ZeroClipboardMovie_17" align="middle" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=17&amp;width=30&amp;height=17" wmode="transparent"></div></span><span data-mod="popu_169"> <a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="PrintSource" title="print" onclick="dp.sh.Toolbar.Command(&#39;PrintSource&#39;,this);return false;">print</a></span><a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="About" title="?" onclick="dp.sh.Toolbar.Command(&#39;About&#39;,this);return false;">?</a></div></div><ol start="1" class="dp-cpp"><li class="alt"><span><span class="keyword">static</span><span>&nbsp;</span><span class="datatypes">int</span><span>&nbsp;wait_for_one_process(</span><span class="datatypes">int</span><span>&nbsp;block)&nbsp;&nbsp;</span></span></li><li class=""><span>{&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;pid_t&nbsp;pid;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">int</span><span>&nbsp;status;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">struct</span><span>&nbsp;service&nbsp;*svc;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">struct</span><span>&nbsp;socketinfo&nbsp;*si;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">time_t</span><span>&nbsp;now;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">struct</span><span>&nbsp;listnode&nbsp;*node;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">struct</span><span>&nbsp;command&nbsp;*cmd;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">while</span><span>&nbsp;(&nbsp;(pid&nbsp;=&nbsp;waitpid(-1,&nbsp;&amp;status,&nbsp;block&nbsp;?&nbsp;0&nbsp;:&nbsp;WNOHANG))&nbsp;==&nbsp;-1&nbsp;&amp;&amp;&nbsp;errno&nbsp;==&nbsp;EINTR&nbsp;);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(pid&nbsp;&lt;=&nbsp;0)&nbsp;</span><span class="keyword">return</span><span>&nbsp;-1;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;INFO(<span class="string">"waitpid&nbsp;returned&nbsp;pid&nbsp;%d,&nbsp;status&nbsp;=&nbsp;%08x\n"</span><span>,&nbsp;pid,&nbsp;status);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;svc&nbsp;=&nbsp;service_find_by_pid(pid);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(!svc)&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ERROR(<span class="string">"untracked&nbsp;pid&nbsp;%d&nbsp;exited\n"</span><span>,&nbsp;pid);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;0;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;NOTICE(<span class="string">"process&nbsp;'%s',&nbsp;pid&nbsp;%d&nbsp;exited\n"</span><span>,&nbsp;svc-&gt;name,&nbsp;pid);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(!(svc-&gt;flags&nbsp;&amp;&nbsp;SVC_ONESHOT))&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;kill(-pid,&nbsp;SIGKILL);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NOTICE(<span class="string">"process&nbsp;'%s'&nbsp;killing&nbsp;any&nbsp;children&nbsp;in&nbsp;process&nbsp;group\n"</span><span>,&nbsp;svc-&gt;name);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/*&nbsp;remove&nbsp;any&nbsp;sockets&nbsp;we&nbsp;may&nbsp;have&nbsp;created&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">for</span><span>&nbsp;(si&nbsp;=&nbsp;svc-&gt;sockets;&nbsp;si;&nbsp;si&nbsp;=&nbsp;si-&gt;next)&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="datatypes">char</span><span>&nbsp;tmp[128];&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;snprintf(tmp,&nbsp;<span class="keyword">sizeof</span><span>(tmp),&nbsp;ANDROID_SOCKET_DIR</span><span class="string">"/%s"</span><span>,&nbsp;si-&gt;name);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unlink(tmp);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;svc-&gt;pid&nbsp;=&nbsp;0;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;svc-&gt;flags&nbsp;&amp;=&nbsp;(~SVC_RUNNING);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/*&nbsp;oneshot&nbsp;processes&nbsp;go&nbsp;into&nbsp;the&nbsp;disabled&nbsp;state&nbsp;on&nbsp;exit&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(svc-&gt;flags&nbsp;&amp;&nbsp;SVC_ONESHOT)&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;svc-&gt;flags&nbsp;|=&nbsp;SVC_DISABLED;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/*&nbsp;disabled&nbsp;processes&nbsp;do&nbsp;not&nbsp;get&nbsp;restarted&nbsp;automatically&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(svc-&gt;flags&nbsp;&amp;&nbsp;SVC_DISABLED)&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;notify_service_state(svc-&gt;name,&nbsp;<span class="string">"stopped"</span><span>);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;0;&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;now&nbsp;=&nbsp;gettime();&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(svc-&gt;flags&nbsp;&amp;&nbsp;SVC_CRITICAL)&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(svc-&gt;time_crashed&nbsp;+&nbsp;CRITICAL_CRASH_WINDOW&nbsp;&gt;=&nbsp;now)&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span><span>&nbsp;(++svc-&gt;nr_crashed&nbsp;&gt;&nbsp;CRITICAL_CRASH_THRESHOLD)&nbsp;{&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ERROR(<span class="string">"critical&nbsp;process&nbsp;'%s'&nbsp;exited&nbsp;%d&nbsp;times&nbsp;in&nbsp;%d&nbsp;minutes;&nbsp;"</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"rebooting&nbsp;into&nbsp;recovery&nbsp;mode\n"</span><span>,&nbsp;svc-&gt;name,&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CRITICAL_CRASH_THRESHOLD,&nbsp;CRITICAL_CRASH_WINDOW&nbsp;/&nbsp;60);&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sync();&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__reboot(LINUX_REBOOT_MAGIC1,&nbsp;LINUX_REBOOT_MAGIC2,&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LINUX_REBOOT_CMD_RESTART2,&nbsp;<span class="string">"recovery"</span><span>);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;0;&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;<span class="keyword">else</span><span>&nbsp;{&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;svc-&gt;time_crashed&nbsp;=&nbsp;now;&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;svc-&gt;nr_crashed&nbsp;=&nbsp;1;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;svc-&gt;flags&nbsp;|=&nbsp;SVC_RESTARTING;&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">/*&nbsp;Execute&nbsp;all&nbsp;onrestart&nbsp;commands&nbsp;for&nbsp;this&nbsp;service.&nbsp;*/</span><span>&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;list_for_each(node,&nbsp;&amp;svc-&gt;onrestart.commands)&nbsp;{&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cmd&nbsp;=&nbsp;node_to_item(node,&nbsp;<span class="keyword">struct</span><span>&nbsp;command,&nbsp;clist);&nbsp;&nbsp;</span></span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cmd-&gt;func(cmd-&gt;nargs,&nbsp;cmd-&gt;args);&nbsp;&nbsp;</span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;</span></li><li class=""><span>&nbsp;&nbsp;&nbsp;&nbsp;notify_service_state(svc-&gt;name,&nbsp;<span class="string">"restarting"</span><span>);&nbsp;&nbsp;</span></span></li><li class="alt"><span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span><span>&nbsp;0;&nbsp;&nbsp;</span></span></li><li class=""><span>}&nbsp;&nbsp;</span></li></ol></div><pre name="code" class="cpp" style="display: none;">static int wait_for_one_process(int block)
+{
+    pid_t pid;
+    int status;
+    struct service *svc;
+    struct socketinfo *si;
+    time_t now;
+    struct listnode *node;
+    struct command *cmd;
+
+    while ( (pid = waitpid(-1, &amp;status, block ? 0 : WNOHANG)) == -1 &amp;&amp; errno == EINTR );
+    if (pid &lt;= 0) return -1;
+    INFO("waitpid returned pid %d, status = %08x\n", pid, status);
+
+    svc = service_find_by_pid(pid);
+    if (!svc) {
+        ERROR("untracked pid %d exited\n", pid);
+        return 0;
+    }
+
+    NOTICE("process '%s', pid %d exited\n", svc-&gt;name, pid);
+
+    if (!(svc-&gt;flags &amp; SVC_ONESHOT)) {
+        kill(-pid, SIGKILL);
+        NOTICE("process '%s' killing any children in process group\n", svc-&gt;name);
+    }
+
+    /* remove any sockets we may have created */
+    for (si = svc-&gt;sockets; si; si = si-&gt;next) {
+        char tmp[128];
+        snprintf(tmp, sizeof(tmp), ANDROID_SOCKET_DIR"/%s", si-&gt;name);
+        unlink(tmp);
+    }
+
+    svc-&gt;pid = 0;
+    svc-&gt;flags &amp;= (~SVC_RUNNING);
+
+        /* oneshot processes go into the disabled state on exit */
+    if (svc-&gt;flags &amp; SVC_ONESHOT) {
+        svc-&gt;flags |= SVC_DISABLED;
+    }
+
+        /* disabled processes do not get restarted automatically */
+    if (svc-&gt;flags &amp; SVC_DISABLED) {
+        notify_service_state(svc-&gt;name, "stopped");
+        return 0;
+    }
+
+    now = gettime();
+    if (svc-&gt;flags &amp; SVC_CRITICAL) {
+        if (svc-&gt;time_crashed + CRITICAL_CRASH_WINDOW &gt;= now) {
+            if (++svc-&gt;nr_crashed &gt; CRITICAL_CRASH_THRESHOLD) {
+                ERROR("critical process '%s' exited %d times in %d minutes; "
+                      "rebooting into recovery mode\n", svc-&gt;name,
+                      CRITICAL_CRASH_THRESHOLD, CRITICAL_CRASH_WINDOW / 60);
+                sync();
+                __reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,
+                         LINUX_REBOOT_CMD_RESTART2, "recovery");
+                return 0;
+            }
+        } else {
+            svc-&gt;time_crashed = now;
+            svc-&gt;nr_crashed = 1;
+        }
+    }
+
+    svc-&gt;flags |= SVC_RESTARTING;
+
+    /* Execute all onrestart commands for this service. */
+    list_for_each(node, &amp;svc-&gt;onrestart.commands) {
+        cmd = node_to_item(node, struct command, clist);
+        cmd-&gt;func(cmd-&gt;nargs, cmd-&gt;args);
+    }
+    notify_service_state(svc-&gt;name, "restarting");
+    return 0;
+}
+</pre>wait_for_one_process首先会根据关闭进程的pid查找service,进行一些相关处理，关闭一些相关资源，如果是SVC_CRITICAL类型的service，则判断重启次数和时间，超过一定限制的话进入recovery模式。<br>
+<p></p>
+<p><span style="color:rgb(51,51,51); font-family:Arial; font-size:14px; line-height:26px; text-align:left">然后把service标记为SVC_RESTARTING，这样在restart_processes里面会将它重启，再执行这个service相关命令。</span></p>
+<p><span style="color:rgb(51,51,51); font-family:Arial; font-size:14px; line-height:26px; text-align:left">到这里init的任务就基本完成了。</span></p>
+<p><br>
+</p>
+<p><br>
+</p>
+<p></p>
+<p></p>
+   
+</div>
+
+
+
+
+<!-- Baidu Button BEGIN -->
+
+
+
+
+<div class="bdsharebuttonbox tracking-ad bdshare-button-style0-16" style="float: right;" data-mod="popu_172" data-bd-bind="1471483316264">
+<a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="bds_more" data-cmd="more" style="background-position:0 0 !important; background-image: url(http://bdimg.share.baidu.com/static/api/img/share/icons_0_16.png?v=d754dcc0.png) !important"></a>
+<a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间" style="background-position:0 -52px !important"></a>
+<a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博" style="background-position:0 -104px !important"></a>
+<a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博" style="background-position:0 -260px !important"></a>
+<a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="bds_renren" data-cmd="renren" title="分享到人人网" style="background-position:0 -208px !important"></a>
+<a href="http://blog.csdn.net/new_abc/article/details/7424587#" class="bds_weixin" data-cmd="weixin" title="分享到微信" style="background-position:0 -1612px !important"></a>
+</div>
+<script>window._bd_share_config = { "common": { "bdSnsKey": {}, "bdText": "", "bdMini": "1", "bdMiniList": false, "bdPic": "", "bdStyle": "0", "bdSize": "16" }, "share": {} }; with (document) 0[(getElementsByTagName('head')[0] || body).appendChild(createElement('script')).src = 'http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion=' + ~(-new Date() / 36e5)];</script>
+<!-- Baidu Button END -->
+
+   <link rel="stylesheet" href="http://static.blog.csdn.net/css/blog_detail.css">
+
+    
+<!--172.16.140.11-->
+
+<!-- Baidu Button BEGIN -->
+<script type="text/javascript" id="bdshare_js" data="type=tools&amp;uid=1536434" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/bds_s_v2.js"></script>
+
+<script type="text/javascript">
+    document.getElementById("bdshell_js").src = "http://bdimg.share.baidu.com/static/js/shell_v2.js?cdnversion=" + Math.ceil(new Date()/3600000)
+</script>
+<!-- Baidu Button END -->
+
+ 
+
+        <div id="digg" articleid="7424587">
+            <dl id="btnDigg" class="digg digg_disable" onclick="btndigga();">
+               
+                 <dt>顶</dt>
+                <dd>0</dd>
+            </dl>
+           
+              
+            <dl id="btnBury" class="digg digg_disable" onclick="btnburya();">
+              
+                  <dt>踩</dt>
+                <dd>0</dd>               
+            </dl>
+            
+        </div>
+     <div class="tracking-ad" data-mod="popu_222"><a href="javascript:void(0);">&nbsp;</a>   </div>
+    <div class="tracking-ad" data-mod="popu_223"> <a href="javascript:void(0);">&nbsp;</a></div>
+    <script type="text/javascript">
+                function btndigga() {
+                    $(".tracking-ad[data-mod='popu_222'] a").click();
+                }
+                function btnburya() {
+                    $(".tracking-ad[data-mod='popu_223'] a").click();
+                }
+            </script>
+
+   <ul class="article_next_prev">
+                <li class="prev_article"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_shangyipian&#39;]);location.href=&#39;/new_abc/article/details/7420755&#39;;">上一篇</span><a href="http://blog.csdn.net/new_abc/article/details/7420755" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_shangyipian&#39;])">android usb挂载分析--类图</a></li>
+                <li class="next_article"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_xiayipian&#39;]);location.href=&#39;/new_abc/article/details/7435508&#39;;">下一篇</span><a href="http://blog.csdn.net/new_abc/article/details/7435508" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_xiayipian&#39;])">adb install 流程</a></li>
+    </ul>
+
+    <div style="clear:both; height:10px;"></div>
+
+
+        <div class="similar_article" style="">
+                <h4>我的同类文章</h4>
+                <div class="similar_c" style="margin:20px 0px 0px 0px">
+                    <div class="similar_c_t">
+                                <label class="similar_cur">
+                                    <span style="cursor:pointer" onclick="GetCategoryArticles(&#39;1108421&#39;,&#39;new_abc&#39;,&#39;foot&#39;,&#39;7424587&#39;);">android框架<em>（82）</em></span>
+                                </label>
+                    </div>
+                   
+                    <div class="similar_wrap tracking-ad" data-mod="popu_141" style="max-height:195px;">
+                        <a href="http://blog.csdn.net/" style="display:none">http://blog.csdn.net</a>
+                        <ul class="similar_list fl"><li><em>•</em><a href="http://blog.csdn.net/new_abc/article/details/48474045" id="foot_aritcle_48474045undefined26162000792101026" target="_blank" title="Android系统修改导航栏显示位置">Android系统修改导航栏显示位置</a><span>2015-09-15</span><label><i>阅读</i><b>956</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/new_abc/article/details/41720439" id="foot_aritcle_41720439undefined6821014382876456" target="_blank" title="System　ＵＩ　调试方法">System　ＵＩ　调试方法</a><span>2014-12-04</span><label><i>阅读</i><b>1032</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/new_abc/article/details/30100289" id="foot_aritcle_30100289undefined30953756999224424" target="_blank" title="javah生成jni文件">javah生成jni文件</a><span>2014-06-11</span><label><i>阅读</i><b>359</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/new_abc/article/details/29211031" id="foot_aritcle_29211031undefined577629795530811" target="_blank" title=".mk编译错误">.mk编译错误</a><span>2014-06-07</span><label><i>阅读</i><b>483</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/new_abc/article/details/26676507" id="foot_aritcle_26676507undefined3936549734789878" target="_blank" title="android Widget添加过程和android添加widget不更新的问题分析解决">android Widget添加过程和android添加widget不更新的问题分析解决</a><span>2014-05-23</span><label><i>阅读</i><b>3246</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/new_abc/article/details/17094919" id="foot_aritcle_17094919undefined7903627406340092" target="_blank" title="Android 不能使用内部资源">Android 不能使用内部资源</a><span>2013-12-03</span><label><i>阅读</i><b>4374</b></label></li> </ul>
+
+                        <ul class="similar_list fr"><li><em>•</em><a href="http://blog.csdn.net/new_abc/article/details/42803977" id="foot_aritcle_42803977undefined5437444997951388" target="_blank" title="android IPC通信中的UID和PID识别">android IPC通信中的UID和PID识别</a><span>2015-01-17</span><label><i>阅读</i><b>411</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/new_abc/article/details/40503413" id="foot_aritcle_40503413undefined13545354991219938" target="_blank" title="使用插值器和Keyframes">使用插值器和Keyframes</a><span>2014-10-27</span><label><i>阅读</i><b>598</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/new_abc/article/details/30043667" id="foot_aritcle_30043667undefined9796216876711696" target="_blank" title="glLookAt() 解析">glLookAt() 解析</a><span>2014-06-11</span><label><i>阅读</i><b>373</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/new_abc/article/details/28418993" id="foot_aritcle_28418993undefined1500808191485703" target="_blank" title="关闭串口">关闭串口</a><span>2014-06-04</span><label><i>阅读</i><b>595</b></label></li> <li><em>•</em><a href="http://blog.csdn.net/new_abc/article/details/18218605" id="foot_aritcle_18218605undefined13959200028330088" target="_blank" title="Android属性之build.prop生成过程分析">Android属性之build.prop生成过程分析</a><span>2014-01-13</span><label><i>阅读</i><b>664</b></label></li> </ul>
+                    <a href="http://blog.csdn.net/new_abc/article/category/1108421" class="MoreArticle">更多文章</a></div>
+                </div>
+            </div>    
+    <script type="text/javascript">
+        $(function () {
+            GetCategoryArticles('1108421', 'new_abc','foot','7424587');
+        });
+    </script>
+      
+</div>
+<div id="suggest">
+
+</div>
+         <script language="javascript" type="text/javascript">     
+             $(function(){
+                 $.get("/new_abc/svc/GetSuggestContent/7424587",function(data){
+                     $("#suggest").html(data);
+                 });     
+             });             
+         </script>  
+
+
+<style>
+.blog-ass-articl dd {
+color: #369;
+width: 99%; /*修改行*/
+float: left;
+overflow: hidden;
+font: normal normal 12px/23px "SimSun";
+height: 23px;
+margin: 0;
+padding: 0 0 0 10px;
+margin-right: 30px;
+background: url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px;
+}
+</style>
+
+ <link rel="stylesheet" href="http://static.blog.csdn.net/css/replace.css">
+
+<div id="relate" data-mod="popu_218" class="tracking-ad" style="display: block;">
+        <div class="relate_t">
+            <h3><span>参考知识库</span></h3>
+        </div>
+        <div class="relate_c"></div>
+</div>
+ 
+
+<dl class="blog-ass-articl" id="res-relatived"> 
+    <div class="embody embody_b" id="libkeyparent" style="display:none">
+            <span class="embody_t">更多资料请参考：</span>
+            <div class="embody_c" id="libkey"></div>
+    </div>
+
+
+     <dt><span>猜你在找</span></dt>    
+
+
+   
+
+
+    <div id="adCollege" style="width: 42%;float: left;"> 
+        <script src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/job_reco.js" type="text/javascript"></script> 
+        <script type="text/javascript">
+            csdn.position.showEdu({
+                sourceType: "blog",
+                searchType: "detail",
+                searchKey: "7424587",
+                username: "",
+                recordcount: "5",
+                containerId: "adCollege" //容器DIV的id。 
+            });
+        </script> 
+    </div>  
+
+    
+     <div id="res" data-mod="popu_36" class="tracking-ad" style="width: 42%;float: left;margin-right: 30px;"></div>
+   
+</dl>
+
+
+<script type="text/javascript">
+    $(function () {
+        setTimeout(function () {
+            var searchtitletags = 'android启动过程分析--启动init进程' + ',' + $("#tags").html();
+            searchService({
+                index: 'blog',
+                query: searchtitletags,
+                from: 5,
+                size: 5,
+                appendTo: '#res',
+                url: 'recommend',
+                his: 2,
+                client: "blog_cf_enhance",
+                tmpl: '<dd style="background:url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px;"><a href="#{ url }" title="#{ title }" strategy="#{ strategy }">#{ title }</a></dd>'
+            });
+        }, 500);
+    });    
+
+ </script>  
+
+    <div id="ad_cen">        
+<!-- 广告位开始 -->
+<div class="J_adv" data-view="true" data-mod="ad_popu_71" data-mtp="43" data-order="114" data-con="ad_content_671" style="width: 728px; height: 90px;"><script src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/adsbygoogle.js"></script><ins class="adsbygoogle" style="display:inline-block;width:728px;height:90px" data-ad-client="ca-pub-8990951720398508" data-ad-slot="8267689356/3115746762" data-adsbygoogle-status="done"><ins id="aswift_0_expand" style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px;background-color:transparent"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px;background-color:transparent"><iframe width="728" height="90" frameborder="0" marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" allowfullscreen="true" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){setTimeout(h,0)}else if(h.match){try{h=s.upd(h,i)}catch(e){}w.location.replace(h)}}" id="aswift_0" name="aswift_0" style="left:0;position:absolute;top:0;"></iframe></ins></ins></ins><script>(adsbygoogle=window.adsbygoogle || []).push({});</script></div>
+<!-- 广告位结束 -->    </div>  
+
+<div class="comment_class">
+    <div id="comment_title" class="panel_head">
+        <span class="see_comment">查看评论</span><a name="comments"></a></div>
+    <div id="comment_list"><br>&nbsp;&nbsp;暂无评论<br><br><div class="clear"></div></div>
+    <div id="comment_bar">
+    </div>
+    <div id="comment_form"><div class="guest_link">您还没有登录,请<a href="javascript:void(0);" onclick="javascript:loginbox();">[登录]</a>或<a href="http://passport.csdn.net/account/register?from=http%3A%2F%2Fblog.csdn.net%2Fnew_abc%2Farticle%2Fdetails%2F7424587">[注册]</a></div></div>
+    <div class="announce">
+        * 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场<a name="reply"></a><a name="quote"></a></div>
+</div>
+
+<script type="text/javascript">
+    var fileName = '7424587';
+    var commentscount = 0;
+    var islock = false
+</script>
+<script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/comment.js"></script>
+    <div id="ad_bot">
+    </div>
+<div id="report_dialog">
+</div>
+
+<div id="d-top" style="bottom:60px;">
+        <a id="quick-reply" class="btn btn-top q-reply" title="快速回复" style="display:none;">
+            <img src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/blog-icon-reply.png" alt="快速回复">
+        </a>    
+
+    <a id="d-top-a" class="btn btn-top backtop" style="display: none;" title="返回顶部" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_huidaodingbu&#39;])">         
+         <img src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/top.png" alt="TOP">
+    </a>
+</div>
+<script type="text/javascript">
+    $(function ()
+    {
+        $("#ad_frm_0").height("90px");
+        
+        setTimeout(function(){
+            $("#ad_frm_2").height("200px");
+        },1000);    
+    });
+  
+</script>
+<style type="text/css">
+    .tag_list
+    {
+        background: none repeat scroll 0 0 #FFFFFF;
+        border: 1px solid #D7CBC1;
+        color: #000000;
+        font-size: 12px;
+        line-height: 20px;
+        list-style: none outside none;
+        margin: 10px 2% 0 1%;
+        padding: 1px;
+    }
+    .tag_list h5
+    {
+        background: none repeat scroll 0 0 #E0DBD3;
+        color: #47381C;
+        font-size: 12px;
+        height: 24px;
+        line-height: 24px;
+        padding: 0 5px;
+        margin: 0;
+    }
+    .tag_list h5 a
+    {
+        color: #47381C;
+    }
+    .classify
+    {
+        margin: 10px 0;
+        padding: 4px 12px 8px;
+    }
+    .classify a
+    {
+        margin-right: 20px;
+        white-space: nowrap;
+    }
+</style>
+
+
+<div class="tag_list" style="">
+
+    <h5>
+        <a href="http://www.csdn.net/tag/" target="_blank">核心技术类目</a></h5>
+    <div class="classify">
+<a title="全部主题" href="http://www.csdn.net/tag" target="_blank" onclick="LogClickCount(this,336);">全部主题</a>
+<a title="Hadoop" href="http://g.csdn.net/5272865" target="_blank" onclick="LogClickCount(this,336);">Hadoop</a>
+<a title="AWS" href="http://g.csdn.net/5272866" target="_blank" onclick="LogClickCount(this,336);">AWS</a>
+<a title="移动游戏" href="http://g.csdn.net/5272870" target="_blank" onclick="LogClickCount(this,336);">移动游戏</a>
+<a title="Java" href="http://g.csdn.net/5272871" target="_blank" onclick="LogClickCount(this,336);">Java</a>
+<a title="Android" href="http://g.csdn.net/5272872" target="_blank" onclick="LogClickCount(this,336);">Android</a>
+<a title="iOS" href="http://g.csdn.net/5272873" target="_blank" onclick="LogClickCount(this,336);">iOS</a>
+<a title="Swift" href="http://g.csdn.net/5272868" target="_blank" onclick="LogClickCount(this,336);">Swift</a>
+<a title="智能硬件" href="http://g.csdn.net/5272869" target="_blank" onclick="LogClickCount(this,336);">智能硬件</a>
+<a title="Docker" href="http://g.csdn.net/5272867" target="_blank" onclick="LogClickCount(this,336);">Docker</a>
+<a title="OpenStack" href="http://g.csdn.net/5272925" target="_blank" onclick="LogClickCount(this,336);">OpenStack</a>
+<a title="VPN" href="http://www.csdn.net/tag/vpn" target="_blank" onclick="LogClickCount(this,336);">VPN</a>
+<a title="Spark" href="http://g.csdn.net/5272924" target="_blank" onclick="LogClickCount(this,336);">Spark</a>
+<a title="ERP" href="http://www.csdn.net/tag/erp" target="_blank" onclick="LogClickCount(this,336);">ERP</a>
+<a title="IE10" href="http://www.csdn.net/tag/ie10" target="_blank" onclick="LogClickCount(this,336);">IE10</a>
+<a title="Eclipse" href="http://www.csdn.net/tag/eclipse" target="_blank" onclick="LogClickCount(this,336);">Eclipse</a>
+<a title="CRM" href="http://www.csdn.net/tag/crm" target="_blank" onclick="LogClickCount(this,336);">CRM</a>
+<a title="JavaScript" href="http://www.csdn.net/tag/javascript" target="_blank" onclick="LogClickCount(this,336);">JavaScript</a>
+<a title="数据库" href="http://www.csdn.net/tag/%E6%95%B0%E6%8D%AE%E5%BA%93" target="_blank" onclick="LogClickCount(this,336);">数据库</a>
+<a title="Ubuntu" href="http://www.csdn.net/tag/ubuntu" target="_blank" onclick="LogClickCount(this,336);">Ubuntu</a>
+<a title="NFC" href="http://www.csdn.net/tag/nfc" target="_blank" onclick="LogClickCount(this,336);">NFC</a>
+<a title="WAP" href="http://www.csdn.net/tag/wap" target="_blank" onclick="LogClickCount(this,336);">WAP</a>
+<a title="jQuery" href="http://www.csdn.net/tag/jquery" target="_blank" onclick="LogClickCount(this,336);">jQuery</a>
+<a title="BI" href="http://www.csdn.net/tag/bi" target="_blank" onclick="LogClickCount(this,336);">BI</a>
+<a title="HTML5" href="http://www.csdn.net/tag/html5" target="_blank" onclick="LogClickCount(this,336);">HTML5</a>
+<a title="Spring" href="http://www.csdn.net/tag/spring" target="_blank" onclick="LogClickCount(this,336);">Spring</a>
+<a title="Apache" href="http://www.csdn.net/tag/apache" target="_blank" onclick="LogClickCount(this,336);">Apache</a>
+<a title=".NET" href="http://www.csdn.net/tag/.net" target="_blank" onclick="LogClickCount(this,336);">.NET</a>
+<a title="API" href="http://www.csdn.net/tag/api" target="_blank" onclick="LogClickCount(this,336);">API</a>
+<a title="HTML" href="http://www.csdn.net/tag/html" target="_blank" onclick="LogClickCount(this,336);">HTML</a>
+<a title="SDK" href="http://www.csdn.net/tag/sdk" target="_blank" onclick="LogClickCount(this,336);">SDK</a>
+<a title="IIS" href="http://www.csdn.net/tag/iis" target="_blank" onclick="LogClickCount(this,336);">IIS</a>
+<a title="Fedora" href="http://www.csdn.net/tag/fedora" target="_blank" onclick="LogClickCount(this,336);">Fedora</a>
+<a title="XML" href="http://www.csdn.net/tag/xml" target="_blank" onclick="LogClickCount(this,336);">XML</a>
+<a title="LBS" href="http://www.csdn.net/tag/lbs" target="_blank" onclick="LogClickCount(this,336);">LBS</a>
+<a title="Unity" href="http://www.csdn.net/tag/unity" target="_blank" onclick="LogClickCount(this,336);">Unity</a>
+<a title="Splashtop" href="http://www.csdn.net/tag/splashtop" target="_blank" onclick="LogClickCount(this,336);">Splashtop</a>
+<a title="UML" href="http://www.csdn.net/tag/uml" target="_blank" onclick="LogClickCount(this,336);">UML</a>
+<a title="components" href="http://www.csdn.net/tag/components" target="_blank" onclick="LogClickCount(this,336);">components</a>
+<a title="Windows Mobile" href="http://www.csdn.net/tag/windowsmobile" target="_blank" onclick="LogClickCount(this,336);">Windows Mobile</a>
+<a title="Rails" href="http://www.csdn.net/tag/rails" target="_blank" onclick="LogClickCount(this,336);">Rails</a>
+<a title="QEMU" href="http://www.csdn.net/tag/qemu" target="_blank" onclick="LogClickCount(this,336);">QEMU</a>
+<a title="KDE" href="http://www.csdn.net/tag/kde" target="_blank" onclick="LogClickCount(this,336);">KDE</a>
+<a title="Cassandra" href="http://www.csdn.net/tag/cassandra" target="_blank" onclick="LogClickCount(this,336);">Cassandra</a>
+<a title="CloudStack" href="http://www.csdn.net/tag/cloudstack" target="_blank" onclick="LogClickCount(this,336);">CloudStack</a>
+<a title="FTC" href="http://www.csdn.net/tag/ftc" target="_blank" onclick="LogClickCount(this,336);">FTC</a>
+<a title="coremail" href="http://www.csdn.net/tag/coremail" target="_blank" onclick="LogClickCount(this,336);">coremail</a>
+<a title="OPhone " href="http://www.csdn.net/tag/ophone" target="_blank" onclick="LogClickCount(this,336);">OPhone </a>
+<a title="CouchBase" href="http://www.csdn.net/tag/couchbase" target="_blank" onclick="LogClickCount(this,336);">CouchBase</a>
+<a title="云计算" href="http://www.csdn.net/tag/%E4%BA%91%E8%AE%A1%E7%AE%97" target="_blank" onclick="LogClickCount(this,336);">云计算</a>
+<a title="iOS6" href="http://www.csdn.net/tag/iOS6" target="_blank" onclick="LogClickCount(this,336);">iOS6</a>
+<a title="Rackspace " href="http://www.csdn.net/tag/rackspace" target="_blank" onclick="LogClickCount(this,336);">Rackspace </a>
+<a title="Web App" href="http://www.csdn.net/tag/webapp" target="_blank" onclick="LogClickCount(this,336);">Web App</a>
+<a title="SpringSide" href="http://www.csdn.net/tag/springside" target="_blank" onclick="LogClickCount(this,336);">SpringSide</a>
+<a title="Maemo" href="http://www.csdn.net/tag/maemo" target="_blank" onclick="LogClickCount(this,336);">Maemo</a>
+<a title="Compuware" href="http://www.csdn.net/tag/compuware" target="_blank" onclick="LogClickCount(this,336);">Compuware</a>
+<a title="大数据" href="http://www.csdn.net/tag/%E5%A4%A7%E6%95%B0%E6%8D%AE" target="_blank" onclick="LogClickCount(this,336);">大数据</a>
+<a title="aptech" href="http://www.csdn.net/tag/aptech" target="_blank" onclick="LogClickCount(this,336);">aptech</a>
+<a title="Perl" href="http://www.csdn.net/tag/perl" target="_blank" onclick="LogClickCount(this,336);">Perl</a>
+<a title="Tornado" href="http://www.csdn.net/tag/tornado" target="_blank" onclick="LogClickCount(this,336);">Tornado</a>
+<a title="Ruby" href="http://www.csdn.net/tag/ruby" target="_blank" onclick="LogClickCount(this,336);">Ruby</a>
+<a title="Hibernate" href="http://www.csdn.net/hibernate" target="_blank" onclick="LogClickCount(this,336);">Hibernate</a>
+<a title="ThinkPHP" href="http://www.csdn.net/tag/thinkphp" target="_blank" onclick="LogClickCount(this,336);">ThinkPHP</a>
+<a title="HBase" href="http://www.csdn.net/tag/hbase" target="_blank" onclick="LogClickCount(this,336);">HBase</a>
+<a title="Pure" href="http://www.csdn.net/tag/pure" target="_blank" onclick="LogClickCount(this,336);">Pure</a>
+<a title="Solr" href="http://www.csdn.net/tag/solr" target="_blank" onclick="LogClickCount(this,336);">Solr</a>
+<a title="Angular" href="http://www.csdn.net/tag/angular" target="_blank" onclick="LogClickCount(this,336);">Angular</a>
+<a title="Cloud Foundry" href="http://www.csdn.net/tag/cloudfoundry" target="_blank" onclick="LogClickCount(this,336);">Cloud Foundry</a>
+<a title="Redis" href="http://www.csdn.net/tag/redis" target="_blank" onclick="LogClickCount(this,336);">Redis</a>
+<a title="Scala" href="http://www.csdn.net/tag/scala" target="_blank" onclick="LogClickCount(this,336);">Scala</a>
+<a title="Django" href="http://www.csdn.net/tag/django" target="_blank" onclick="LogClickCount(this,336);">Django</a>
+<a title="Bootstrap" href="http://www.csdn.net/tag/bootstrap" target="_blank" onclick="LogClickCount(this,336);">Bootstrap</a>
+    </div>
+
+</div>
+  <script language="javascript" type="text/javascript">     
+      $(function(){
+              setTimeout(function(){
+                  $.get("/new_abc/svc/GetTagContent",function(data){
+                      $(".tag_list").html(data).show();
+                  });     
+              });
+          },500);                       
+ </script> 
+
+
+<div id="pop_win" style="display:none ;position: absolute; z-index: 10000; border: 1px solid rgb(220, 220, 220); top: 222.5px; left: 630px; opacity: 1; background: none 0px 0px repeat scroll rgb(255, 255, 255);">
+    
+</div>
+<div id="popup_mask"></div>
+<style>
+    #popup_mask
+    {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        z-index: 9999;
+        left: 0px;
+        top: 0px;
+        opacity: 0.3;
+        filter: alpha(opacity=30);
+        display: none;
+    }
+
+</style>
+
+
+
+
+<script type="text/javascript">
+    $(function(){
+        setTimeout(function(){
+            $(".comment_body:contains('回复')").each(function(index,item){
+                var u=$(this).text().split('：')[0].toString().replace("回复","")
+                var thisComment=$(this);
+                if(u)
+                {
+                    $.getJSON("https://passport.csdn.net/get/nick?callback=?", {users: u}, function(a) {
+                        if(a!=null&&a.data!=null&&a.data.length>0)
+                        {
+                            nick=a.data[0].n; 
+                            if(u!=nick)
+                            {
+                                thisComment.text(thisComment.text().replace(u,nick));  
+                            }
+                        }       
+                    });  
+                }
+            });         
+
+        },200);  
+
+        setTimeout(function(){
+            $(".math").each(function(index,value){$(this).find("span").last().css("color","#fff"); })
+        },5000);
+
+        setTimeout(function(){
+            $(".math").each(function(index,value){$(this).find("span").last().css("color","#fff"); })
+        },10000);
+
+        setTimeout(function(){
+            $(".math").each(function(index,value){$(this).find("span").last().css("color","#fff"); })
+        },15000);
+        
+        setTimeout(function(){
+            $("a img[src='http://js.tongji.linezing.com/stats.gif']").parent().css({"position":"absolute","left":"50%"});
+        },300);
+    });
+
+    function loginbox(){
+        var $logpop=$("#pop_win");
+        $logpop.html('<iframe src="https://passport.csdn.net/account/loginbox?service=http://static.blog.csdn.net/callback.htm" frameborder="0" height="600" width="400" scrolling="no"></iframe>');
+
+        $('#popup_mask').css({
+            opacity: 0.5,
+            width: $( document ).width() + 'px',
+            height:  $( document ).height() + 'px'
+        });
+        $('#popup_mask').css("display","block");
+ 
+        $logpop.css( {
+            top: ($( window ).height() - $logpop.height())/ 2  + $( window 
+       ).scrollTop() + 'px',
+            left:($( window ).width() - $logpop.width())/ 2
+        } );
+ 
+        setTimeout( function () {
+            $logpop.show();
+            $logpop.css( {
+                opacity: 1
+            } );
+        }, 200 );
+ 
+        $('#popup_mask').unbind("click");
+        $('#popup_mask').bind("click", function(){
+            $('#popup_mask').hide();
+            var $clopop = $("#pop_win");
+            $("#common_ask_div_sc").css("display","none");
+            $clopop.css( {
+                opacity: 0
+            } );
+            setTimeout( function () {
+                $clopop.hide();
+            }, 350 );
+            return false;
+        });
+    }   
+
+</script>
+ <script language="javascript" type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/async_new.js"></script>      
+
+
+                        <div class="clear">
+                        </div>
+                    </div>                   
+                
+            </div>
+                   
+           <div id="side">
+               
+    <div class="side">
+<div id="panel_Profile" class="panel">
+<ul class="panel_head"><span>个人资料</span></ul>
+<ul class="panel_body profile">
+<div id="blog_userface">
+    <a href="http://my.csdn.net/new_abc" target="_blank">
+    <img src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/1_new_abc.jpg" title="访问我的空间" style="max-width:90%">
+    </a>
+    <br>
+    <span><a href="http://my.csdn.net/new_abc" class="user_name" target="_blank">new_abc</a></span>
+</div>
+<div class="interact">
+
+    <a href="javascript:void(0);" class="attent" id="span_add_follow" title="[加关注]"></a>
+
+ <a href="javascript:void(0);" class="letter" title="[发私信]" onclick="window.open(&#39;http://msg.csdn.net/letters/model?receiver=new_abc&#39;,&#39;_blank&#39;,&#39;height=350,width=700&#39;);_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_sixin&#39;])"></a>  
+</div>
+<div id="blog_medal">
+                <div id="bms_box">
+               </div>
+</div>
+<ul id="blog_rank">
+    <li>访问：<span>708714次</span></li>
+    <li>积分：<span>10111</span> </li>    
+    <li>等级： <span style="position:relative;display:inline-block;z-index:1">
+            <img src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/blog7.png" alt="" style="vertical-align: middle;" id="leveImg">
+            <div id="smallTittle" style=" position: absolute;  left: -24px;  top: 25px;  text-align: center;  width: 101px;  height: 32px;  background-color: #fff;  line-height: 32px;  border: 2px #DDDDDD solid;  box-shadow: 0px 2px 2px rgba (0,0,0,0.1);  display: none;   z-index: 999;">
+            <div style="left: 42%;  top: -8px;  position: absolute;  width: 0;  height: 0;  border-left: 10px solid transparent;  border-right: 10px solid transparent;  border-bottom: 8px solid #EAEAEA;"></div>
+            积分：10111 </div>
+        </span>  </li>
+    <li>排名：<span>第1101名</span></li>
+</ul>
+<ul id="blog_statistics">
+    <li>原创：<span>261篇</span></li>
+    <li>转载：<span>149篇</span></li>
+    <li>译文：<span>60篇</span></li>
+    <li>评论：<span>241条</span></li>
+</ul>
+</ul>
+</div>
+
+
+<div class="panel" id="panel_Search">
+    <ul class="panel_head"><span>文章搜索</span></ul>
+    <ul class="panel_body">
+        <form id="frmSearch" action="http://so.csdn.net/search" class="form_search" target="_blank">
+        <span><input id="inputSearch" type="text" class="blogsearch" title="请输入关键字"></span>
+        <input id="btnSubmit" type="button" value="搜索" title="search in blog">
+        <input type="hidden" name="q" id="inputQ">
+        <input type="hidden" name="t" value="blog">
+        <a id="btnSearchBlog" target="_blank"></a>
+        </form>
+    </ul>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $("#btnSubmit").click(function () {           
+            search();
+        });
+
+        $("#frmSearch").submit(function () {
+            search();
+            return false;
+        });
+
+        function search()
+        {
+            var url = "http://so.csdn.net/so/search/s.do?q=" + encodeURIComponent($("#inputSearch").val()) + "&u=" + username + "&t=blog";
+            window.location.href = url;
+        }   
+    });
+</script><div id="panel_Category" class="panel">
+    <ul class="panel_head"><span>博客专栏</span></ul>
+    <ul class="panel_body" id="sp_column">
+    <table cellpadding="0" cellspacing="0"><tbody><tr>
+    <td style="padding:10px 10px 0 0;">
+    <a href="http://blog.csdn.net/column/details/linux-driver-study.html" target="_blank"><img src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/20151123175756864" style="width:75px;height:75px;"></a>
+    </td>
+    <td style="padding:10px 0; vertical-align:top;">
+    <a href="http://blog.csdn.net/column/details/linux-driver-study.html" target="_blank">linux设备驱动模型</a>
+    <p>文章：14篇</p>
+    <span>阅读：27720</span>
+    </td>
+    </tr></tbody></table>
+    <table cellpadding="0" cellspacing="0"><tbody><tr>
+    <td style="padding:10px 10px 0 0;">
+    <a href="http://blog.csdn.net/column/details/android-usb.html" target="_blank"><img src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/20151123175756786" style="width:75px;height:75px;"></a>
+    </td>
+    <td style="padding:10px 0; vertical-align:top;">
+    <a href="http://blog.csdn.net/column/details/android-usb.html" target="_blank">android usb挂载</a>
+    <p>文章：13篇</p>
+    <span>阅读：66807</span>
+    </td>
+    </tr></tbody></table>
+    </ul>
+</div><div id="panel_Category" class="panel">
+<ul class="panel_head"><span>文章分类</span></ul>
+<ul class="panel_body">    
+                 <li>
+                    <a href="http://blog.csdn.net/new_abc/article/category/1108420" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">android应用</a><span>(113)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/new_abc/article/category/1108421" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">android框架</a><span>(83)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/new_abc/article/category/1108422" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">总结</a><span>(6)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/new_abc/article/category/1111400" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">Linux</a><span>(62)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/new_abc/article/category/1127184" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">经典美文</a><span>(2)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/new_abc/article/category/1140358" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">其它</a><span>(11)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/new_abc/article/category/1156094" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">吉他</a><span>(22)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/new_abc/article/category/1160521" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">文件系统</a><span>(16)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/new_abc/article/category/1359203" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">u盘挂载</a><span>(8)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/new_abc/article/category/1431508" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">Linux内存管理</a><span>(0)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/new_abc/article/category/2310031" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">JAVA</a><span>(2)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/new_abc/article/category/5569401" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">Android 技巧</a><span>(2)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/new_abc/article/category/5700969" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">Python</a><span>(50)</span>
+                </li>
+                 <li>
+                    <a href="http://blog.csdn.net/new_abc/article/category/5791161" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_wenzhangfenlei&#39;]); ">Gradle</a><span>(22)</span>
+                </li>
+</ul>
+</div><div id="panel_Archive" class="panel">
+<ul class="panel_head"><span>文章存档</span></ul>
+<ul class="panel_body">
+<div id="archive_list"><li><a href="http://blog.csdn.net/new_abc/article/month/2016/08">2016年08月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2016/07">2016年07月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2016/06">2016年06月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2016/05">2016年05月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2016/03">2016年03月</a><span>(3)</span></li><span class="hidelist" style="display:none;"><li><a href="http://blog.csdn.net/new_abc/article/month/2015/11">2015年11月</a><span>(2)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2015/10">2015年10月</a><span>(5)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2015/09">2015年09月</a><span>(27)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2015/08">2015年08月</a><span>(77)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2015/07">2015年07月</a><span>(44)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2015/06">2015年06月</a><span>(7)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2015/01">2015年01月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2014/12">2014年12月</a><span>(6)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2014/11">2014年11月</a><span>(23)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2014/10">2014年10月</a><span>(12)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2014/09">2014年09月</a><span>(13)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2014/08">2014年08月</a><span>(5)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2014/07">2014年07月</a><span>(6)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2014/06">2014年06月</a><span>(5)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2014/05">2014年05月</a><span>(3)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2014/01">2014年01月</a><span>(4)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2013/12">2013年12月</a><span>(5)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2013/10">2013年10月</a><span>(23)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2013/09">2013年09月</a><span>(6)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2013/08">2013年08月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2013/07">2013年07月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2013/06">2013年06月</a><span>(4)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2013/05">2013年05月</a><span>(13)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2013/04">2013年04月</a><span>(6)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2013/03">2013年03月</a><span>(7)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2013/02">2013年02月</a><span>(3)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2013/01">2013年01月</a><span>(3)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2012/12">2012年12月</a><span>(1)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2012/11">2012年11月</a><span>(22)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2012/10">2012年10月</a><span>(9)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2012/09">2012年09月</a><span>(6)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2012/08">2012年08月</a><span>(13)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2012/07">2012年07月</a><span>(12)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2012/06">2012年06月</a><span>(24)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2012/05">2012年05月</a><span>(22)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2012/04">2012年04月</a><span>(26)</span></li><li><a href="http://blog.csdn.net/new_abc/article/month/2012/03">2012年03月</a><span>(10)</span></li></span><div id="archive_list_button" class="list_closed">展开</div></div>
+</ul>
+</div>
+<div id="hotarticls" class="panel">
+<ul class="panel_head">
+    <span>       
+阅读排行    </span>
+</ul>
+
+<ul class="panel_body itemlist">
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/40106569" title="使用ObjectAnimator设置动画">使用ObjectAnimator设置动画</a><span>(32131)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/12966503" title="PackageManagerService启动及初始化流程">PackageManagerService启动及初始化流程</a><span>(23984)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/11905529" title="eclipse调试出现Failed to connect to remote VM. Connection timed out.">eclipse调试出现Failed to connect to remote VM. Connection timed out.</a><span>(15063)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/7400740" title="android usb挂载分析---MountService启动">android usb挂载分析---MountService启动</a><span>(14723)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/7435508" title="adb install 流程">adb install 流程</a><span>(11498)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/8971835" title="SensorService启动分析">SensorService启动分析</a><span>(10601)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/40072499" title="使用ValueAnimator设置动画">使用ValueAnimator设置动画</a><span>(10346)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/8971907" title="registerListener流程">registerListener流程</a><span>(9071)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/7396733" title="android usb挂载分析----vold启动">android usb挂载分析----vold启动</a><span>(8940)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/38437595" title="Android 4.2 Ethernet启动流程">Android 4.2 Ethernet启动流程</a><span>(7981)</span>
+</li>
+</ul>
+</div>
+<div id="hotarticls2" class="panel">
+<ul class="panel_head"><span>评论排行</span></ul>
+<ul class="panel_body itemlist">
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/9172573" title="kernel升级">kernel升级</a><span>(15)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/7563693" title="linux设备驱动模型一三基础结构之示例">linux设备驱动模型一三基础结构之示例</a><span>(14)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/7467537" title="adb 简要分析">adb 简要分析</a><span>(12)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/12966503" title="PackageManagerService启动及初始化流程">PackageManagerService启动及初始化流程</a><span>(11)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/48474045" title="Android系统修改导航栏显示位置">Android系统修改导航栏显示位置</a><span>(10)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/8970627" title="linux i2c驱动">linux i2c驱动</a><span>(8)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/8971835" title="SensorService启动分析">SensorService启动分析</a><span>(8)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/8439511" title="TS解析">TS解析</a><span>(8)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/8097775" title="Binder使用示例">Binder使用示例</a><span>(7)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/new_abc/article/details/40106569" title="使用ObjectAnimator设置动画">使用ObjectAnimator设置动画</a><span>(7)</span>
+</li>
+</ul>
+</div>
+<div id="homepageArticles" class="panel tracking-ad" data-mod="popu_4">
+<ul class="panel_head"><span>推荐文章</span></ul>
+<ul class="panel_body" id="ad_commend">
+<ul>
+<li><a href="http://blog.csdn.net/phodal/article/details/52145386" target="_blank">* 致JavaScript也将征服的物联网世界</a></li>
+<li><a href="http://blog.csdn.net/ioio_jy/article/details/52124726" target="_blank">* 从苏宁电器到卡巴斯基：难忘的三年硕士时光</a></li>
+<li><a href="http://blog.csdn.net/u013970991/article/details/52120005" target="_blank">* 作为一名基层管理者如何利用情商管理自己和团队（一）</a></li>
+<li><a href="http://blog.csdn.net/zhangphil/article/details/52130212" target="_blank">* Android CircleImageView圆形ImageView</a></li>
+<li><a href="http://blog.csdn.net/poem_qianmo/article/details/52144086" target="_blank">* 高质量代码的命名法则</a></li>
+
+
+</ul></ul>
+</div>
+
+
+<div id="newcomments" class="panel">
+<ul class="panel_head"><span>最新评论</span></ul>
+<ul class="panel_body itemlist">
+    <li>
+   
+         <a href="http://blog.csdn.net/new_abc/article/details/8971835#comments">SensorService启动分析</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/new_abc" class="user_name">new_abc</a>:
+@u011565090:嗯嗯
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/new_abc/article/details/8971835#comments">SensorService启动分析</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/new_abc" class="user_name">new_abc</a>:
+@u011565090:这不是一样的么
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/new_abc/article/details/8971835#comments">SensorService启动分析</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/u011565090" class="user_name">u011565090</a>:
+@u011565090:找到了， 在博客配置里可以设置！
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/new_abc/article/details/8971835#comments">SensorService启动分析</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/u011565090" class="user_name">u011565090</a>:
+@u011565090:怎么与在我的博客里面显示的不一样啊，，，
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/new_abc/article/details/8971835#comments">SensorService启动分析</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/u011565090" class="user_name">u011565090</a>:
+@new_abc:你是在博客编辑页面， 选择  插入代码 ， 编程语言  选择 C++ 吗？我的怎么...
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/new_abc/article/details/8971835#comments">SensorService启动分析</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/u011565090" class="user_name">u011565090</a>:
+你是在博客编辑页面， 选择  插入代码 ， 编程语言  选择 C++ 吗？我的怎么是下面这种啊？#i...
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/new_abc/article/details/48474045#comments">Android系统修改导航栏显示位置</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/new_abc" class="user_name">new_abc</a>:
+@qq_25283407:activity的位置也需要修改吧
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/new_abc/article/details/48474045#comments">SensorService启动分析</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/new_abc" class="user_name">new_abc</a>:
+@u011565090:我就用的默认的
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/new_abc/article/details/48474045#comments">SensorService启动分析</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/u011565090" class="user_name">u011565090</a>:
+文章写得很好， 另外请教一下， 你博客里插入的代码背景颜色是怎么弄的？ 默认的是床单背景，不好看啊，...
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/new_abc/article/details/48474045#comments">Android系统修改导航栏显示位置</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/chenda_lin" class="user_name">chenda_lin</a>:
+@new_abc:你好 请问悬浮于activity上如何解决呢？能给下具体修改的地方？谢谢！
+    </p>
+    </li>
+</ul>
+</div>
+    </div>
+    <div class="clear">
+    </div>
+
+
+                   <!-- 广告位开始 --> 
+                    <div class="J_adv" data-view="true" data-mod="ad_popu_190" data-mtp="36" data-order="40" data-con="ad_content_1260" style="width: 200px; height: 200px;"><!-- 广告占位容器 --><div id="cpro_u2734128"></div><!-- 投放代码 --><script type="text/javascript">(window['cproStyleApi'] = window['cproStyleApi'] ||{})['u2734128']={at:'3',rsi0:'200',rsi1:'200',pat:'6',tn:'baiduCustNativeAD',rss1:'#FFFFFF',conBW:'1',adp:'1',ptt:'0',titFF:'%E5%BE%AE%E8%BD%AF%E9%9B%85%E9%BB%91',titFS:'',rss2:'#000000',titSU:'0',ptbg:'90',piw:'0',pih:'0',ptp:'0'};/*服务器频道首页置顶Banner960*90，创建于2014-7-3*/(window.cproArray = window.cproArray || []).push({id:'u2734128'});  </script>  <script src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/c.js" type="text/javascript"></script></div> 
+                    <!-- 广告位结束 -->
+
+           </div>   
+
+            <div class="clear">
+            </div>
+        </div>
+
+        
+
+<script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/cnick.js"></script>
+<script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/newblog.min.js"></script>
+
+
+<script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/showblogmedal.ashx"></script>
+<script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/JavaScript1.js"></script><link rel="stylesheet" type="text/css" href="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/pub_footer_2014.css"><div class="pub_fo"><div id="pub_footerall" class="pub_footer_new"><dl><dt></dt> <dd class="foot_sub_menu"><a href="http://www.csdn.net/company/about.html" target="_blank">公司简介</a><span>|</span><a href="http://www.csdn.net/company/recruit.html" target="_blank">招贤纳士</a><span>|</span><a href="http://www.csdn.net/company/marketing.html" target="_blank">广告服务</a><span>|</span><a href="http://www.csdn.net/company/account.html" target="_blank">银行汇款帐号</a><span>|</span><a href="http://www.csdn.net/company/contact.html" target="_blank">联系方式</a><span>|</span><a href="http://www.csdn.net/company/statement.html" target="_blank">版权声明</a><span>|</span><a href="http://www.csdn.net/company/layer.html" target="_blank">法律顾问</a><span>|</span><a href="mailto:webmaster@csdn.net">问题报告</a><span>|</span><a target="_blank" href="http://www.csdn.net/friendlink.html">合作伙伴</a><span>|</span><a href="http://bbs.csdn.net/forums/Service" target="_blank">论坛反馈</a></dd><dd class="foot_contact"><a href="javascript:void(0);" target="_blank" class="qq">网站客服</a><a href="http://wpa.qq.com/msgrd?v=3&uin=2251809102&site=qq&menu=yes" target="_blank" class="qq">杂志客服</a><a href="http://e.weibo.com/csdnsupport/profile" target="_blank" class="weibo">微博客服</a><a href="mailto:webmaster@csdn.net" class="email" title="联系邮箱">webmaster@csdn.net</a><span class="phone" title="服务热线">400-600-2320</span><span class="interval">|</span><span>北京创新乐知信息技术有限公司 版权所有</span><span class="interval">|</span><span>江苏乐知网络技术有限公司 提供商务支持</span></dd><dd class="foot_copyright"><span>京&nbsp;ICP&nbsp;证&nbsp;09002463&nbsp;号</span><span class="interval">|</span><span>Copyright © 1999-2014, CSDN.NET, All Rights Reserved&nbsp;</span><a href="http://www.hd315.gov.cn/beian/view.asp?bianhao=010202001032100010" target="_blank"><img src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/gongshang_logos.gif" alt="GongshangLogo" title=""></a></dd></dl></div></div><script id="noticeScript" type="text/javascript" btnid="header_notice_num" wrapid="note1" count="5" subcount="5" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/notify.js"></script>
+
+    <script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/login.js"></script>
+<script type="text/javascript">document.write("<img src=http://counter.csdn.net/pv.aspx?id=24 border=0 width=0 height=0>");</script><img src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/pv.aspx" border="0" width="0" height="0">
+<script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/counter.js"></script><script type="text/javascript" charset="UTF-8" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/msg.popup.js"></script>
+<script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/ad-blog.js"></script>
+<script type="text/javascript">
+    $(function () {
+        function __get_code_toolbar(snippet_id) {
+            return $("<span class='tracking-ad' data-mod='popu_167'><a href='https://code.csdn.net/snippets/"
+                    + snippet_id
+                    + "' target='_blank' title='在CODE上查看代码片'  style='text-indent:0;'><img src='https://code.csdn.net/assets/CODE_ico.png' width=12 height=12 alt='在CODE上查看代码片' style='position:relative;top:1px;left:2px;'/></a></span>"
+                    + "<span class='tracking-ad' data-mod='popu_170'><a href='https://code.csdn.net/snippets/"
+                    + snippet_id
+                    + "/fork' target='_blank' title='派生到我的代码片' style='text-indent:0;'><img src='https://code.csdn.net/assets/ico_fork.svg' width=12 height=12 alt='派生到我的代码片' style='position:relative;top:2px;left:2px;'/></a></span>");
+        }
+        
+        $("[code_snippet_id]").each(function () {
+            __s_id = $(this).attr("code_snippet_id");
+            if (__s_id != null && __s_id != "" && __s_id != 0 && parseInt(__s_id) > 70020) {
+                __code_tool = __get_code_toolbar(__s_id);
+                $(this).prev().find(".tools").append(__code_tool);
+            }
+        });
+
+        $(".bar").show();
+    });
+</script>
+
+
+
+
+    </div>
+      <!--new top-->
+    
+    <script id="csdn-toolbar-id" btnid="header_notice_num" wrapid="note1" count="5" subcount="5" type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/toolbar.js"></script>
+     <!--new top-->
+   
+    <link href="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/ask_float_block.css" type="text/css" rel="stylesheet">
+    <script language="JavaScript" type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/wmd.js"></script>
+    <script language="JavaScript" type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/showdown.js"></script>
+    <script language="JavaScript" type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/prettify.js"></script>
+    <script language="JavaScript" type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/ask_float_block.js"></script>
+   
+
+  <div id="a52b5334d" style="width: 1px; height: 1px; display: none;">
+                    <script id="adJs52b5334" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/52b5334.js"></script>
+                    <script>document.getElementById("adJs52b5334").src = "http://ads.csdn.net/js/opt/52b5334.js?t=" + Math.random();</script>
+   <div><iframe src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/skip(1).html" style="width: 1px; height: 1px; position: absolute; visibility: hidden;"></iframe></div><div><iframe src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/skip.html" style="width: 1px; height: 1px; position: absolute; visibility: hidden;"></iframe></div></div>
+
+    <link rel="stylesheet" href="http://static.blog.csdn.net/css/blog_code.css">
+    <script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/saveToCode.js"></script>
+      <script type="text/javascript" src="./android启动过程分析--启动init进程 - new_abc的专栏 - 博客频道 - CSDN.NET_files/main(1).js"></script>
+
+   
+ </body></html>

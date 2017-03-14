@@ -1,0 +1,25 @@
+#!/system/bin/sh
+
+LOG_FILE="/data/testlog";
+info=$(ps | grep "ptt"); 
+echo "$info" > "$LOG_FILE";
+echo "$info" | while read user pid other; do 
+    echo "readed" >> "$LOG_FILE";
+    if [[ -z "$pid" ]]; then
+        echo "pid is empty! please check it!";
+        #echo "pid is empty! please check it!" >> "$LOG_FILE";
+        continue;
+    fi;
+    echo "$pid" >> "$LOG_FILE";
+    kill "$pid" >> "$LOG_FILE"; 
+    if [[ $? -eq 0 ]]; then
+        echo "success";
+        #echo "success" >> "$LOG_FILE";
+    else
+        echo "failed";
+        #echo "failed!" >> "$LOG_FILE";
+    fi;
+ptt_socket_app –v –d –f;
+rmmod wlan;
+insmod /system/lib/modules/wlan.ko con_mode=5;
+done;

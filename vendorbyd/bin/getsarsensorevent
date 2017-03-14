@@ -1,0 +1,8 @@
+#!/system/bin/sh
+
+result=$(cat /proc/bus/input/devices | grep -A 4 'Azoteq IQS253 SAR Sensor');
+event=${result##*kbd };
+if [[ $event != "" ]]; then
+    echo $event > /data/sarevent.txt;
+    chmod 777 /data/sarevent.txt;
+fi;

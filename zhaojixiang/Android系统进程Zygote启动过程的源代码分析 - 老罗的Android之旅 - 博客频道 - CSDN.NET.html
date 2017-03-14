@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<!-- saved from url=(0487)http://cache.baiducontent.com/c?m=9d78d513d9901df918b0cf281a16a62e5201dd256bc0d1652488c80e84652b1d1420b8ff703657448dca262147ed5e5d99ed2b22695e75a09bbfd90b8be7852858d470726d42c11c53894ef39e0d769d758d09a9e942b6e4a72fc5f99480840a12d757007e8af1895c&p=9e72c316d9c157f508e2977e097a8b&newp=8b2a9715d9c041ab09a7d63d5a4e81231610db2151d4da146b82c825d7331b001c3bbfb42323130ed0cf7f6d0aae4e58e1f03079370923a3dda5c91d9fb4c57479&user=baidu&fm=sc&query=android+zygoteInitNative&qid=84d14d470007c73f&p1=1 -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=GBK">
+<!--<base href="http://blog.csdn.net/luoshengyang/article/details/6768304">--><base href=".">
+<style>
+body{position:relative}
+body,form{margin:0!important;padding:0!important}
+#bd_snap{font:13px arial;color:#000;background:#fff;text-align:left;padding:13px 0 0 20px}
+#bd_snap_txt{clear:both;padding:10px 0 2px;line-height:24px;color:#333}
+#bd_snap_note{color:#999;padding-bottom:10px}
+#bd_snap a{font:13px arial;color:#00c;text-decoration:underline}
+#bd_snap_note a{color:#999}
+#bd_snap_head{width:860px;height:44px}
+#bd_snap_logo{width:162px;height:38px;display:block;background:url(http://www.baidu.com/img/logo-snap.png) no-repeat;margin-right:15px;float:left}
+#bd_snap_search{width:680px;position:absolute;left:209px;top:17px}
+#bd_snap_kw{width:531px;margin-right: 0;height:24px;padding:4px 7px;padding:6px 7px 2px\9;font:16px arial;vertical-align:top;border: 1px solid #b6b6b6;border-color: #7b7b7b #b6b6b6 #b6b6b6 #7b7b7b;background: #fff;display:inline-block;border-right-width: 0;border-color: #b8b8b8 transparent #ccc #b8b8b8;overflow: hidden;outline:0}
+#bd_snap_kw:hover{border-color: #999 transparent #b3b3b3 #999;}
+#bd_snap_kw:focus{border-color: #4791ff transparent #4791ff #4791ff}
+#bd_snap_su{width:100px;height:34px;font-size:14px;color:#fff;padding:0;letter-spacing: 1px;background: #3385ff; border-bottom: 1px solid #2d78f4;outline: medium;-webkit-appearance: none;-webkit-border-radius: 0;cursor:pointer;border:0}
+#bd_snap_search input.bd_snap_btn_h{background: #3075dc;box-shadow: inset 1px 1px 3px #2964bb;-webkit-box-shadow: inset 1px 1px 3px #2964bb;-moz-box-shadow: inset 1px 1px 3px #2964bb;-o-box-shadow: inset 1px 1px 3px #2964bb;}
+#bd_snap_search input.btnhover{background: #317ef3;border-bottom: 1px solid #2868c8;box-shadow: 1px 1px 1px #ccc;}
+#bd_snap_btn_wr{width:97px;height:34px;display:inline-block;_top:1px;*position:relative}
+#bd_snap_ln{height:1px;border-top:1px solid #ACA899;background:#ECE9D8;overflow:hidden}
+#bd_snap_txt span a{text-decoration:none}
+</style>
+
+
+</head><body><div id="bd_snap">
+    <div id="bd_snap_head">
+        <a href="http://www.baidu.com/" id="bd_snap_logo" title="到百度首页"></a>
+    </div>
+    <div id="bd_snap_txt">您查询的关键词是：<span><a style="color:black;background-color:#ffff66;padding:0 3px;font-weight:bold" href="http://cache.baiducontent.com/c?m=9d78d513d9901df918b0cf281a16a62e5201dd256bc0d1652488c80e84652b1d1420b8ff703657448dca262147ed5e5d99ed2b22695e75a09bbfd90b8be7852858d470726d42c11c53894ef39e0d769d758d09a9e942b6e4a72fc5f99480840a12d757007e8af1895c&p=9e72c316d9c157f508e2977e097a8b&newp=8b2a9715d9c041ab09a7d63d5a4e81231610db2151d4da146b82c825d7331b001c3bbfb42323130ed0cf7f6d0aae4e58e1f03079370923a3dda5c91d9fb4c57479&user=baidu&fm=sc&query=android+zygoteInitNative&qid=84d14d470007c73f&p1=1#baidusnap0">android</a><a style="color:black;background-color:#A0FFFF;padding:0 3px;font-weight:bold" href="http://cache.baiducontent.com/c?m=9d78d513d9901df918b0cf281a16a62e5201dd256bc0d1652488c80e84652b1d1420b8ff703657448dca262147ed5e5d99ed2b22695e75a09bbfd90b8be7852858d470726d42c11c53894ef39e0d769d758d09a9e942b6e4a72fc5f99480840a12d757007e8af1895c&p=9e72c316d9c157f508e2977e097a8b&newp=8b2a9715d9c041ab09a7d63d5a4e81231610db2151d4da146b82c825d7331b001c3bbfb42323130ed0cf7f6d0aae4e58e1f03079370923a3dda5c91d9fb4c57479&user=baidu&fm=sc&query=android+zygoteInitNative&qid=84d14d470007c73f&p1=1#baidusnap1">zygote</a><a style="color:black;background-color:#99ff99;padding:0 3px;font-weight:bold" href="http://cache.baiducontent.com/c?m=9d78d513d9901df918b0cf281a16a62e5201dd256bc0d1652488c80e84652b1d1420b8ff703657448dca262147ed5e5d99ed2b22695e75a09bbfd90b8be7852858d470726d42c11c53894ef39e0d769d758d09a9e942b6e4a72fc5f99480840a12d757007e8af1895c&p=9e72c316d9c157f508e2977e097a8b&newp=8b2a9715d9c041ab09a7d63d5a4e81231610db2151d4da146b82c825d7331b001c3bbfb42323130ed0cf7f6d0aae4e58e1f03079370923a3dda5c91d9fb4c57479&user=baidu&fm=sc&query=android+zygoteInitNative&qid=84d14d470007c73f&p1=1#baidusnap2">init</a><a style="color:black;background-color:#ff9999;padding:0 3px;font-weight:bold" href="http://cache.baiducontent.com/c?m=9d78d513d9901df918b0cf281a16a62e5201dd256bc0d1652488c80e84652b1d1420b8ff703657448dca262147ed5e5d99ed2b22695e75a09bbfd90b8be7852858d470726d42c11c53894ef39e0d769d758d09a9e942b6e4a72fc5f99480840a12d757007e8af1895c&p=9e72c316d9c157f508e2977e097a8b&newp=8b2a9715d9c041ab09a7d63d5a4e81231610db2151d4da146b82c825d7331b001c3bbfb42323130ed0cf7f6d0aae4e58e1f03079370923a3dda5c91d9fb4c57479&user=baidu&fm=sc&query=android+zygoteInitNative&qid=84d14d470007c73f&p1=1#baidusnap3">native</a></span>  <span style="margin-left:5px">以下是该网页在北京时间 2016年08月13日 04:08:07 的快照；</span>
+        <p>如果打开速度慢，可以尝试<a href="http://cache.baiducontent.com/c?m=9d78d513d9901df918b0cf281a16a62e5201dd256bc0d1652488c80e84652b1d1420b8ff703657448dca262147ed5e5d99ed2b22695e75a09bbfd90b8be7852858d470726d42c11c53894ef39e0d769d758d09a9e942b6e4a72fc5f99480840a12d757007e8af1895c&p=9e72c316d9c157f508e2977e097a8b&newp=8b2a9715d9c041ab09a7d63d5a4e81231610db2151d4da146b82c825d7331b001c3bbfb42323130ed0cf7f6d0aae4e58e1f03079370923a3dda5c91d9fb4c57479&user=baidu&fm=sc&query=android+zygoteInitNative&qid=84d14d470007c73f&p1=1&fast=y">快速版</a>；如果想更新或删除快照，可以<a href="http://tousu.baidu.com/webmaster/add?link=http%3A%2F%2Fcache.baiducontent.com%2Fc%3Fm%3D9d78d513d9901df918b0cf281a16a62e5201dd256bc0d1652488c80e84652b1d1420b8ff703657448dca262147ed5e5d99ed2b22695e75a09bbfd90b8be7852858d470726d42c11c53894ef39e0d769d758d09a9e942b6e4a72fc5f99480840a12d757007e8af1895c%26p%3D9e72c316d9c157f508e2977e097a8b%26newp%3D8b2a9715d9c041ab09a7d63d5a4e81231610db2151d4da146b82c825d7331b001c3bbfb42323130ed0cf7f6d0aae4e58e1f03079370923a3dda5c91d9fb4c57479%26user%3Dbaidu%26fm%3Dsc%26query%3Dandroid%2BzygoteInitNative%26qid%3D84d14d470007c73f%26p1%3D1" id="bd_tousu">投诉快照</a>。
+        </p>
+    </div>
+<script>document.getElementById("bd_tousu").href = "http://tousu.baidu.com/webmaster/add?link=" + encodeURIComponent(document.location);</script>
+    <div id="bd_snap_note">百度和网页 <a href="http://blog.csdn.net/luoshengyang/article/details/6768304">http://blog.csdn.net/luoshengyang/article/details/6768304</a> 的作者无关，不对其内容负责。百度快照谨为网络故障时之索引，不代表被搜索网站的即时页面。</div>
+</div>
+<div id="bd_snap_search">
+	<form action="http://www.baidu.com/s"><input name="cl" type="hidden" value="3"><input name="wd" id="bd_snap_kw" maxlength="100"><span id="bd_snap_btn_wr"><input type="submit" id="bd_snap_su" value="百度一下" class="bd_snap_btn" onmouseover="this.className=&#39;bd_snap_btn bd_snap_btn_h&#39;" onmousedown="this.className=&#39;bd_snap_btn btnhover&#39;" onmouseup="this.className=&#39;bd_snap_btn&#39;" onmouseout="this.className=&#39;bd_snap_btn&#39;"></span></form>
+</div>
+<div id="bd_snap_ln"></div>
+<div style="position:relative">
+
+
+     
+    
+    
+   
+   
+
+      
+
+    
+
+  
+ <meta http-equiv="Cache-Control" content="no-siteapp"><link rel="alternate" media="handheld" href="http://blog.csdn.net/luoshengyang/article/details/6768304#">
+
+    <title>Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅
+        - 博客频道 - CSDN.NET</title>
+    
+    <meta name="description" content="From Forum Nokia Wiki摘要:本文介绍怎么在Qt for Symbian程序中即使手机水平状态发生变化的时候强制使用横屏或竖屏。 对于带有水平传感器的Symbian手机，在用户将手机从横屏模式(Landscape)切换到竖屏模式(Portrait)时，系统会自动调整手机的屏幕显示方向，满足用户正常的使用需要。屏幕横宽比的变化，需要应用调整窗口的布局，以保证更好的用户体验。 但是在某些特殊场合中(比如游戏),开发者可能希望即使手机的水平状态已经">
+    
+      
+    
+        <!--new top-->
+       
+        <link rel="stylesheet" href="http://c.csdnimg.cn/public/common/toolbar/css/index.css">
+        <!--new top-->
+    
+      <!-- ad begin -->
+         
+    <!-- ad end-->
+
+    <link rel="Stylesheet" type="text/css" href="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/style.css">
+    <link id="RSSLink" title="RSS" type="application/rss+xml" rel="alternate" href="http://blog.csdn.net/Luoshengyang/rss/list">
+    <link rel="shortcut icon" href="http://c.csdnimg.cn/public/favicon.ico">
+    <link type="text/css" rel="stylesheet" href="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/default.css">
+ 
+
+
+
+
+    <!-- 广告位开始 -->
+        <ins data-revive-zoneid="149" data-revive-id="8c38e720de1c90a6f6ff52f3f89c4d57"></ins>
+    <!-- 广告位结束 -->
+
+    
+   
+      <!--new top-->
+    
+     <!--new top-->
+    <div id="container">
+        <div id="header">
+    <div class="header">
+        <div id="blog_title">
+            <h2>
+                <a name="baidusnap0"></a><a href="http://blog.csdn.net/luoshengyang">老罗的<b style="color:black;background-color:#ffff66">Android</b>之旅</a></h2>
+            <h3>爱生活，爱<b style="color:black;background-color:#ffff66">Android</b></h3>
+            <div class="clear">
+            </div>
+        </div>
+        <div class="clear">
+        </div>
+        
+     
+    </div>
+</div>
+<div id="navigator">
+    <div class="navigator_bg">
+    </div>
+    <div class="navigator">
+        <ul>
+            
+                <li id="btnContents"><a href="http://blog.csdn.net/luoshengyang?viewmode=contents"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_mulu&#39;])">
+                    <img src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/ico_list.gif">目录视图</span></a></li>
+                <li id="btnView"><a href="http://blog.csdn.net/luoshengyang?viewmode=list"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_zhaiyao&#39;])">
+                    <img src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/ico_summary.gif">摘要视图</span></a></li>
+                <li id="btnRss"><a href="http://blog.csdn.net/luoshengyang/rss/list"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_RSS&#39;])">
+                    <img src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/ico_rss.gif">订阅</span></a></li>                
+            
+
+            </ul>
+    </div>
+</div>
+
+
+        <div id="body">
+            <div id="main">
+                <div class="main">
+                        <div class="ad_class">
+<div class="notice tracking-ad" data-mod="popu_3"> 
+
+
+<a href="http://blog.csdn.net/blogdevteam/article/details/51919935">
+<font color="blue">【公告】博客系统优化升级</font></a>
+&nbsp;&nbsp;&nbsp;
+<a href="http://lib.csdn.net/base/scala">
+<font color="red">【收藏】Scala 资源一应俱全
+</font></a>
+&nbsp;&nbsp;&nbsp;
+<a href="http://blog.csdn.net/blogdevteam/article/details/51984275">
+<font color="blue">博乐招募开始啦
+</font></a>
+&nbsp;&nbsp;&nbsp;
+
+<a href="http://geek.csdn.net/news/detail/94222">
+<font color="red">程序员七夕表白礼品指南
+</font></a>
+&nbsp;&nbsp;&nbsp;
+
+
+</div>                        </div>
+                        
+
+
+
+<!-- 广告位开始 -->
+<ins data-revive-zoneid="72" data-revive-id="8c38e720de1c90a6f6ff52f3f89c4d57"></ins>
+<!-- 广告位结束 -->
+
+  
+<link href="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/comment1.css" type="text/css" rel="stylesheet">
+<link href="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/style1.css" type="text/css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="http://static.blog.csdn.net/public/res-min/markdown_views.css?v=1.0">
+<link rel="stylesheet" href="http://static.blog.csdn.net/css/category.css?v=1.0">
+
+
+
+
+
+
+
+  
+<div id="article_details" class="details">
+    <div class="article_title">   
+         <span class="ico ico_type_Original"></span>
+
+
+    <h1>
+        <span class="link_title"><a name="baidusnap1"></a><a href="http://blog.csdn.net/luoshengyang/article/details/6768304">
+        <b style="color:black;background-color:#ffff66">Android</b>系统进程<b style="color:black;background-color:#A0FFFF">Zygote</b>启动过程的源代码分析            
+        </a></span>
+    </h1>
+</div>
+
+   
+
+        <div class="article_manage clearfix">
+        <div class="article_l">
+            <span class="link_categories">
+            标签：
+              <a href="http://www.csdn.net/tag/android" target="_blank" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_tag&#39;]);"><b style="color:black;background-color:#ffff66">android</b></a><a href="http://www.csdn.net/tag/class" target="_blank" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_tag&#39;]);">class</a><a href="http://www.csdn.net/tag/socket" target="_blank" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_tag&#39;]);">socket</a><a href="http://www.csdn.net/tag/string" target="_blank" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_tag&#39;]);">string</a><a href="http://www.csdn.net/tag/%e4%bb%a3%e7%a0%81%e5%88%86%e6%9e%90" target="_blank" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_tag&#39;]);">代码分析</a>
+            </span>
+        </div>
+        <div class="article_r">
+            <span class="link_postdate">2011-09-19 00:59</span>
+            <span class="link_view" title="阅读次数">78651人阅读</span>
+            <span class="link_comments" title="评论次数"> <a href="http://blog.csdn.net/luoshengyang/article/details/6768304#comments" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_pinglun&#39;])">评论</a>(32)</span>
+            <span class="link_collect tracking-ad" data-mod="popu_171"> <a href="javascript:void(0);" onclick="javascript:collectArticle(&#39;Android系统进程Zygote启动过程的源代码分析&#39;,&#39;6768304&#39;);return false;" title="收藏">收藏</a></span>
+             <span class="link_report"> <a href="http://blog.csdn.net/luoshengyang/article/details/6768304#report" onclick="javascript:report(6768304,2);return false;" title="举报">举报</a></span>
+
+        </div>
+    </div>
+    <div class="embody" style="display:none" id="embody">
+        <span class="embody_t">本文章已收录于：</span>
+        <div class="embody_c" id="lib" value="{&quot;err&quot;:0,&quot;msg&quot;:&quot;ok&quot;,&quot;data&quot;:[]}"></div>
+    </div>
+    <style type="text/css">        
+            .embody{
+                padding:10px 10px 10px;
+                margin:0 -20px;
+                border-bottom:solid 1px #ededed;                
+            }
+            .embody_b{
+                margin:0 ;
+                padding:10px 0;
+            }
+            .embody .embody_t,.embody .embody_c{
+                display: inline-block;
+                margin-right:10px;
+            }
+            .embody_t{
+                font-size: 12px;
+                color:#999;
+            }
+            .embody_c{
+                font-size: 12px;
+            }
+            .embody_c img,.embody_c em{
+                display: inline-block;
+                vertical-align: middle;               
+            }
+             .embody_c img{               
+                width:30px;
+                height:30px;
+            }
+            .embody_c em{
+                margin: 0 20px 0 10px;
+                color:#333;
+                font-style: normal;
+            }
+    </style>
+    
+      <div class="category clearfix">
+        <div class="category_l">
+           <img src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/category_icon.jpg">
+            <span>分类：</span>
+        </div>
+        <div class="category_r">
+                    <label onclick="GetCategoryArticles(&#39;838604&#39;,&#39;Luoshengyang&#39;,&#39;top&#39;,&#39;6768304&#39;);">
+                        <span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_fenlei&#39;]);"><b style="color:black;background-color:#ffff66">Android</b><em>（168）</em></span>
+                      <img class="arrow-down" src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/arrow_triangle _down.jpg" style="display:inline;">
+                      <img class="arrow-up" src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/arrow_triangle_up.jpg" style="display:none;">
+                        <div class="subItem">
+                            <div class="subItem_t"><a href="http://blog.csdn.net/Luoshengyang/article/category/838604" target="_blank">作者同类文章</a><i class="J_close">X</i></div>
+                            <ul class="subItem_l" id="top_838604">                            
+                            </ul>
+                        </div>
+                    </label>                    
+        </div>
+    </div>
+      
+        <div class="bog_copyright">         
+            <p class="copyright_p">版权声明：本文为博主原创文章，未经博主允许不得转载。</p>
+        </div>
+
+  
+
+  
+  
+     
+
+<div id="article_content" class="article_content">
+<p align="left">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;在<b style="color:black;background-color:#ffff66">Android</b>系统中，所有的应用程序进程以及系统服务进程SystemServer都是由<b style="color:black;background-color:#A0FFFF">Zygote</b>进程孕育（fork）出来的，这也许就是为什么要把它称为<b style="color:black;background-color:#A0FFFF">Zygote</b>（受精卵）的原因吧。由于<b style="color:black;background-color:#A0FFFF">Zygote</b>进程在<b style="color:black;background-color:#ffff66">Android</b>系统中有着如此重要的地位，本文将详细分析它的启动过程。</p><p align="left">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;在前面一篇文章<a target="_blank" href="http://blog.csdn.net/luoshengyang/article/details/6747696"><b style="color:black;background-color:#ffff66">Android</b>应用程序进程启动过程的源代码分析</a>中，我们看到了，当ActivityManagerService启动一个应用程序的时候，就会通过Socket与<b style="color:black;background-color:#A0FFFF">Zygote</b>进程进行通信，请求它fork一个子进程出来作为这个即将要启动的应用程序的进程；在前面两篇文章<a target="_blank" href="http://blog.csdn.net/luoshengyang/article/details/6766010"><b style="color:black;background-color:#ffff66">Android</b>应用程序安装过程源代码分析</a>和<a target="_blank" href="http://blog.csdn.net/luoshengyang/article/details/6767736"><b style="color:black;background-color:#ffff66">Android</b>系统默认Home应用程序（Launcher）的启动过程源代码分析</a>中，我们又看到了，系统中的两个重要服务PackageManagerService和ActivityManagerService，都是由SystemServer进程来负责启动的，而SystemServer进程本身是<b style="color:black;background-color:#A0FFFF">Zygote</b>进程在启动的过程中fork出来的。</p><p align="left">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;我们知道，<b style="color:black;background-color:#ffff66">Android</b>系统是基于Linux内核的，而在Linux系统中，所有的进程都是<a name="baidusnap2"></a><b style="color:black;background-color:#99ff99">init</b>进程的子孙进程，也就是说，所有的进程都是直接或者间接地由<b style="color:black;background-color:#99ff99">init</b>进程fork出来的。<b style="color:black;background-color:#A0FFFF">Zygote</b>进程也不例外，它是在系统启动的过程，由<b style="color:black;background-color:#99ff99">init</b>进程创建的。在系统启动脚本system/core/rootdir/<b style="color:black;background-color:#99ff99">init</b>.rc文件中，我们可以看到启动<b style="color:black;background-color:#A0FFFF">Zygote</b>进程的脚本命令：</p><p align="left"></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_1_2897318" name="code" class="plain">service <b style="color:black;background-color:#A0FFFF">zygote</b> /system/bin/app_process -Xzygote /system/bin --<b style="color:black;background-color:#A0FFFF">zygote</b> --start-system-server
+    socket <b style="color:black;background-color:#A0FFFF">zygote</b> stream 666
+    onrestart write /sys/<b style="color:black;background-color:#ffff66">android</b>_power/request_state wake
+    onrestart write /sys/power/state on
+    onrestart restart media
+    onrestart restart netd
+</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;前面的关键字service告诉<b style="color:black;background-color:#99ff99">init</b>进程创建一个名为"<b style="color:black;background-color:#A0FFFF">zygote</b>"的进程，这个<b style="color:black;background-color:#A0FFFF">zygote</b>进程要执行的程序是/system/bin/app_process，后面是要传给app_process的参数。<p></p><p align="left">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;接下来的socket关键字表示这个<b style="color:black;background-color:#A0FFFF">zygote</b>进程需要一个名称为"<b style="color:black;background-color:#A0FFFF">zygote</b>"的socket资源，这样，系统启动后，我们就可以在/dev/socket目录下看到有一个名为<b style="color:black;background-color:#A0FFFF">zygote</b>的文件。这里定义的socket的类型为unix domain socket，它是用来作本地进程间通信用的，具体可以参考前面一篇文章<a target="_blank" href="http://blog.csdn.net/luoshengyang/article/details/6557518"><b style="color:black;background-color:#ffff66">Android</b>学习启动篇</a>提到的一书《Linux内核源代码情景分析》的第七章--基于socket的进程间通信。前面我们说到的ActivityManagerService就是通这个socket来和<b style="color:black;background-color:#A0FFFF">zygote</b>进程通信请求fork一个应用程序进程的了。</p><p align="left">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;最后的一系列onrestart关键字表示这个<b style="color:black;background-color:#A0FFFF">zygote</b>进程重启时需要执行的命令。</p><p align="left">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;关于<b style="color:black;background-color:#99ff99">init</b>.rc文件的更多信息，请参考system/core/<b style="color:black;background-color:#99ff99">init</b>/readme.txt文件。</p><p align="left">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;了解了这个信息之后，我们就知道<b style="color:black;background-color:#A0FFFF">Zygote</b>进程要执行的程序便是system/bin/app_process了，它的源代码位于frameworks/base/cmds/app_process/app_main.cpp文件中，入口函数是main。在继续分析<b style="color:black;background-color:#A0FFFF">Zygote</b>进程启动的过程之前，我们先来看看它的启动序列图：</p><p align="left"><img src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/0_1316190384ZuU0.gif" alt=""><br></p><p align="left">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;下面我们就详细分析每一个步骤。</p><p align="left">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;Step 1. app_process.main</p><p align="left">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这个函数定义在frameworks/base/cmds/app_process/app_main.cpp文件中：</p><p align="left"></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_2_1228878" name="code" class="cpp">int main(int argc, const char* const argv[])
+{
+	// These are global variables in ProcessState.cpp
+	mArgC = argc;
+	mArgV = argv;
+
+	mArgLen = 0;
+	for (int i=0; i&lt;argc; i++) {
+		mArgLen += strlen(argv[i]) + 1;
+	}
+	mArgLen--;
+
+	AppRuntime runtime;
+	const char *arg;
+	argv0 = argv[0];
+
+	// Process command line arguments
+	// ignore argv[0]
+	argc--;
+	argv++;
+
+	// Everything up to '--' or first non '-' arg goes to the vm
+
+	int i = runtime.addVmArguments(argc, argv);
+
+	// Next arg is parent directory
+	if (i &lt; argc) {
+		runtime.mParentDir = argv[i++];
+	}
+
+	// Next arg is startup classname or "--<b style="color:black;background-color:#A0FFFF">zygote</b>"
+	if (i &lt; argc) {
+		arg = argv[i++];
+		if (0 == strcmp("--<b style="color:black;background-color:#A0FFFF">zygote</b>", arg)) {
+			bool startSystemServer = (i &lt; argc) ?
+				strcmp(argv[i], "--start-system-server") == 0 : false;
+			setArgv0(argv0, "<b style="color:black;background-color:#A0FFFF">zygote</b>");
+			set_process_name("<b style="color:black;background-color:#A0FFFF">zygote</b>");
+			runtime.start("com.<b style="color:black;background-color:#ffff66">android</b>.internal.os.ZygoteInit",
+				startSystemServer);
+		} else {
+			set_process_name(argv0);
+
+			runtime.mClassName = arg;
+
+			// Remainder of args get passed to startup class main()
+			runtime.mArgC = argc-i;
+			runtime.mArgV = argv+i;
+
+			LOGV("App process is starting with pid=%d, class=%s.\n",
+				getpid(), runtime.getClassName());
+			runtime.start();
+		}
+	} else {
+		LOG_ALWAYS_FATAL("app_process: no class name or --<b style="color:black;background-color:#A0FFFF">zygote</b> supplied.");
+		fprintf(stderr, "Error: no class name or --<b style="color:black;background-color:#A0FFFF">zygote</b> supplied.\n");
+		app_usage();
+		return 10;
+	}
+
+}</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这个函数的主要作用就是创建一个AppRuntime变量，然后调用它的start成员函数。AppRuntime这个类我们在<a target="_blank" href="http://blog.csdn.net/luoshengyang/article/details/6747696"><b style="color:black;background-color:#ffff66">Android</b>应用程序进程启动过程的源代码分析</a>一文中已经有过介绍了，它同样是在frameworks/base/cmds/app_process/app_main.cpp文件中定义：<p align="left" style="margin-top:4px; margin-right:0px; margin-bottom:4px; margin-left:0px; padding-top:2px; padding-right:0px; padding-bottom:2px; padding-left:0px"></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_3_3878837" name="code" class="cpp" style="margin-top: 4px; margin-right: 0px; margin-bottom: 4px; margin-left: 0px; background-color: rgb(240, 240, 240); ">class AppRuntime : public AndroidRuntime
+{
+	......
+};</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;它约继承于AndroidRuntime类，&nbsp;AndroidRuntime类定义在frameworks/base/core/jni/AndroidRuntime.cpp文件中：<br><p align="left" style="margin-top:4px; margin-right:0px; margin-bottom:4px; margin-left:0px; padding-top:2px; padding-right:0px; padding-bottom:2px; padding-left:0px"></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_4_6528795" name="code" class="cpp" style="margin-top: 4px; margin-right: 0px; margin-bottom: 4px; margin-left: 0px; background-color: rgb(240, 240, 240); ">......
+
+static AndroidRuntime* gCurRuntime = NULL;
+
+......
+
+AndroidRuntime::AndroidRuntime()
+{
+	......
+
+	assert(gCurRuntime == NULL);        // one per process
+	gCurRuntime = this;
+}</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;当AppRuntime对象创建时，会调用其父类AndroidRuntime的构造函数，而在AndroidRuntime类的构造函数里面，会将this指针保存在静态全局变量gCurRuntime中，这样，当其它地方需要使用这个AppRuntime对象时，就可以通过同一个文件中的这个函数来获取这个对象的指针：<br><p align="left" style="margin-top:4px; margin-right:0px; margin-bottom:4px; margin-left:0px; padding-top:2px; padding-right:0px; padding-bottom:2px; padding-left:0px"></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_5_5798447" name="code" class="cpp" style="margin-top: 4px; margin-right: 0px; margin-bottom: 4px; margin-left: 0px; background-color: rgb(240, 240, 240); ">AndroidRuntime* AndroidRuntime::getRuntime()
+{
+    return gCurRuntime;
+}
+</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;回到上面的main函数中，由于我们在<b style="color:black;background-color:#99ff99">init</b>.rc文件中，设置了app_process启动参数--<b style="color:black;background-color:#A0FFFF">zygote</b>和--start-system-server，因此，在main函数里面，最终会执行下面语句：<br><p align="left" style="margin-top:4px; margin-right:0px; margin-bottom:4px; margin-left:0px; padding-top:2px; padding-right:0px; padding-bottom:2px; padding-left:0px"></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_6_8448405" name="code" class="cpp" style="margin-top: 4px; margin-right: 0px; margin-bottom: 4px; margin-left: 0px; background-color: rgb(240, 240, 240); ">    runtime.start("com.<b style="color:black;background-color:#ffff66">android</b>.internal.os.ZygoteInit",
+	startSystemServer);</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这里的参数startSystemServer为true，表示要启动SystemServer组件。由于AppRuntime没有实现自己的start函数，它继承了父类AndroidRuntime的start函数，因此，下面会执行AndroidRuntime类的start函数。<br><p align="left" style="margin-top:4px; margin-right:0px; margin-bottom:4px; margin-left:0px; padding-top:2px; padding-right:0px; padding-bottom:2px; padding-left:0px">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;Step 2.&nbsp;AndroidRuntime.start</p><p align="left" style="margin-top:4px; margin-right:0px; margin-bottom:4px; margin-left:0px; padding-top:2px; padding-right:0px; padding-bottom:2px; padding-left:0px">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这个函数定义在frameworks/base/core/jni/AndroidRuntime.cpp文件中：</p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_7_4130007" name="code" class="cpp">/*
+* Start the <b style="color:black;background-color:#ffff66">Android</b> runtime.  This involves starting the virtual machine
+* and calling the "static void main(String[] args)" method in the class
+* named by "className".
+*/
+void AndroidRuntime::start(const char* className, const bool startSystemServer)
+{
+	......
+
+	char* slashClassName = NULL;
+	char* cp;
+	JNIEnv* env;
+
+	......
+
+	/* start the virtual machine */
+	if (startVm(&amp;mJavaVM, &amp;env) != 0)
+		goto bail;
+
+	/*
+	* Register <b style="color:black;background-color:#ffff66">android</b> functions.
+	*/
+	if (startReg(env) &lt; 0) {
+		LOGE("Unable to register all <b style="color:black;background-color:#ffff66">android</b> natives\n");
+		goto bail;
+	}
+
+	/*
+	* We want to call main() with a String array with arguments in it.
+	* At present we only have one argument, the class name.  Create an
+	* array to hold it.
+	*/
+	jclass stringClass;
+	jobjectArray strArray;
+	jstring classNameStr;
+	jstring startSystemServerStr;
+	stringClass = env-&gt;FindClass("java/lang/String");
+	assert(stringClass != NULL);
+	strArray = env-&gt;NewObjectArray(2, stringClass, NULL);
+	assert(strArray != NULL);
+	classNameStr = env-&gt;NewStringUTF(className);
+	assert(classNameStr != NULL);
+	env-&gt;SetObjectArrayElement(strArray, 0, classNameStr);
+	startSystemServerStr = env-&gt;NewStringUTF(startSystemServer ?
+		"true" : "false");
+	env-&gt;SetObjectArrayElement(strArray, 1, startSystemServerStr);
+
+	/*
+	* Start VM.  This thread becomes the main thread of the VM, and will
+	* not return until the VM exits.
+	*/
+	jclass startClass;
+	jmethodID startMeth;
+
+	slashClassName = strdup(className);
+	for (cp = slashClassName; *cp != '\0'; cp++)
+		if (*cp == '.')
+			*cp = '/';
+
+	startClass = env-&gt;FindClass(slashClassName);
+	if (startClass == NULL) {
+		......
+	} else {
+		startMeth = env-&gt;GetStaticMethodID(startClass, "main",
+			"([Ljava/lang/String;)V");
+		if (startMeth == NULL) {
+			......
+		} else {
+			env-&gt;CallStaticVoidMethod(startClass, startMeth, strArray);
+			......
+		}
+	}
+
+	......
+}</pre><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这个函数的作用是启动<b style="color:black;background-color:#ffff66">Android</b>系统运行时库，它主要做了三件事情，一是调用函数startVM启动虚拟机，二是调用函数startReg注册JNI方法，三是调用了com.<b style="color:black;background-color:#ffff66">android</b>.internal.os.ZygoteInit类的main函数。</p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;Step 3.&nbsp;ZygoteInit.main</p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这个函数定义在frameworks/base/core/java/com/<b style="color:black;background-color:#ffff66">android</b>/internal/os/ZygoteInit.java文件中：</p><p></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_8_2876271" name="code" class="java">public class ZygoteInit {
+	......
+
+	public static void main(String argv[]) {
+		try {
+			......
+
+			registerZygoteSocket();
+			
+			......
+
+			......
+
+			if (argv[1].equals("true")) {
+				startSystemServer();
+			} else if (!argv[1].equals("false")) {
+				......
+			}
+
+			......
+
+			if (<b style="color:black;background-color:#A0FFFF">ZYGOTE</b>_FORK_MODE) {
+				......
+			} else {
+				runSelectLoopMode();
+			}
+
+			......
+		} catch (MethodAndArgsCaller caller) {
+			......
+		} catch (RuntimeException ex) {
+			......
+		}
+	}
+
+	......
+}</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; 它主要作了三件事情，一个调用registerZygoteSocket函数创建了一个socket接口，用来和ActivityManagerService通讯，二是调用startSystemServer函数来启动SystemServer组件，三是调用runSelectLoopMode函数进入一个无限循环在前面创建的socket接口上等待ActivityManagerService请求创建新的应用程序进程。<p></p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; Step 4.&nbsp;ZygoteInit.registerZygoteSocket</p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;这个函数定义在frameworks/base/core/java/com/<b style="color:black;background-color:#ffff66">android</b>/internal/os/ZygoteInit.java文件中：<br></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_9_2494588" name="code" class="java">public class ZygoteInit {
+	......
+
+	/**
+	* Registers a server socket for <b style="color:black;background-color:#A0FFFF">zygote</b> command connections
+	*
+	* @throws RuntimeException when open fails
+	*/
+	private static void registerZygoteSocket() {
+		if (sServerSocket == null) {
+			int fileDesc;
+			try {
+				String env = System.getenv(<b style="color:black;background-color:#ffff66">ANDROID</b>_SOCKET_ENV);
+				fileDesc = Integer.parseInt(env);
+			} catch (RuntimeException ex) {
+				......
+			}
+
+			try {
+				sServerSocket = new LocalServerSocket(
+					createFileDescriptor(fileDesc));
+			} catch (IOException ex) {
+				.......
+			}
+		}
+	}
+		
+	......
+}</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; 这个socket接口是通过文件描述符来创建的，这个文件描符代表的就是我们前面说的/dev/socket/<b style="color:black;background-color:#A0FFFF">zygote</b>文件了。这个文件描述符是通过环境变量<b style="color:black;background-color:#ffff66">ANDROID</b>_SOCKET_ENV得到的，它定义为：<p></p><p></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_10_1207832" name="code" class="java">public class ZygoteInit {
+	......
+
+	private static final String <b style="color:black;background-color:#ffff66">ANDROID</b>_SOCKET_ENV = "<b style="color:black;background-color:#ffff66">ANDROID</b>_SOCKET_<b style="color:black;background-color:#A0FFFF">zygote</b>";
+		
+	......
+}</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;那么，这个环境变量的值又是由谁来设置的呢？我们知道，系统启动脚本文件system/core/rootdir/<b style="color:black;background-color:#99ff99">init</b>.rc是由<b style="color:black;background-color:#99ff99">init</b>进程来解释执行的，而<b style="color:black;background-color:#99ff99">init</b>进程的源代码位于system/core/<b style="color:black;background-color:#99ff99">init</b>目录中，在<b style="color:black;background-color:#99ff99">init</b>.c文件中，是由service_start函数来解释<b style="color:black;background-color:#99ff99">init</b>.rc文件中的service命令的：<p></p><p></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_11_9397687" name="code" class="cpp">void service_start(struct service *svc, const char *dynamic_args)
+{
+	......
+
+	pid_t pid;
+
+	......
+
+	pid = fork();
+
+	if (pid == 0) {
+		struct socketinfo *si;
+
+		......
+
+		for (si = svc-&gt;sockets; si; si = si-&gt;next) {
+			int socket_type = (
+				!strcmp(si-&gt;type, "stream") ? SOCK_STREAM :
+				(!strcmp(si-&gt;type, "dgram") ? SOCK_DGRAM : SOCK_SEQPACKET));
+			int s = create_socket(si-&gt;name, socket_type,
+				si-&gt;perm, si-&gt;uid, si-&gt;gid);
+			if (s &gt;= 0) {
+				publish_socket(si-&gt;name, s);
+			}
+		}
+
+		......
+	}
+
+	......
+}</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;每一个service命令都会促使<b style="color:black;background-color:#99ff99">init</b>进程调用fork函数来创建一个新的进程，在新的进程里面，会分析里面的socket选项，对于每一个socket选项，都会通过create_socket函数来在/dev/socket目录下创建一个文件，在这个场景中，这个文件便是<b style="color:black;background-color:#A0FFFF">zygote</b>了，然后得到的文件描述符通过publish_socket函数写入到环境变量中去：<p></p><p></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_12_2604054" name="code" class="cpp">static void publish_socket(const char *name, int fd)
+{
+    char key[64] = <b style="color:black;background-color:#ffff66">ANDROID</b>_SOCKET_ENV_PREFIX;
+    char val[64];
+
+    strlcpy(key + sizeof(<b style="color:black;background-color:#ffff66">ANDROID</b>_SOCKET_ENV_PREFIX) - 1,
+            name,
+            sizeof(key) - sizeof(<b style="color:black;background-color:#ffff66">ANDROID</b>_SOCKET_ENV_PREFIX));
+    snprintf(val, sizeof(val), "%d", fd);
+    add_environment(key, val);
+
+    /* make sure we don't close-on-exec */
+    fcntl(fd, F_SETFD, 0);
+}
+</pre>&nbsp;&nbsp; &nbsp; &nbsp; 这里传进来的参数name值为"<b style="color:black;background-color:#A0FFFF">zygote</b>"，而<b style="color:black;background-color:#ffff66">ANDROID</b>_SOCKET_ENV_PREFIX在system/core/include/cutils/sockets.h定义为：<p></p><p></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_13_5254013" name="code" class="cpp">#define <b style="color:black;background-color:#ffff66">ANDROID</b>_SOCKET_ENV_PREFIX	"<b style="color:black;background-color:#ffff66">ANDROID</b>_SOCKET_"
+</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;因此，这里就把上面得到的文件描述符写入到以"<b style="color:black;background-color:#ffff66">ANDROID</b>_SOCKET_<b style="color:black;background-color:#A0FFFF">zygote</b>"为key值的环境变量中。又因为上面的ZygoteInit.registerZygoteSocket函数与这里创建socket文件的create_socket函数是运行在同一个进程中，因此，上面的ZygoteInit.registerZygoteSocket函数可以直接使用这个文件描述符来创建一个Java层的LocalServerSocket对象。如果其它进程也需要打开这个/dev/socket/<b style="color:black;background-color:#A0FFFF">zygote</b>文件来和<b style="color:black;background-color:#A0FFFF">Zygote</b>进程进行通信，那就必须要通过文件名来连接这个LocalServerSocket了，参考<a target="_blank" href="http://blog.csdn.net/luoshengyang/article/details/6747696"><b style="color:black;background-color:#ffff66">Android</b>应用程序进程启动过程的源代码分析</a>一文中的Step 4，ActivityManagerService是通过Process.start函数来创建一个新的进程的，而Process.start函数会首先通过Socket连接到<b style="color:black;background-color:#A0FFFF">Zygote</b>进程中，最终由<b style="color:black;background-color:#A0FFFF">Zygote</b>进程来完成创建新的应用程序进程，而Process类是通过openZygoteSocketIfNeeded函数来连接到<b style="color:black;background-color:#A0FFFF">Zygote</b>进程中的Socket的：<p></p><p></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_14_9540174" name="code" class="java">public class Process {  
+	......  
+ 
+	private static void openZygoteSocketIfNeeded()  
+			throws ZygoteStartFailedEx {  
+
+		......
+
+		for (int retry = 0  
+			; (sZygoteSocket == null) &amp;&amp; (retry &lt; (retryCount + 1))  
+			; retry++ ) {  
+
+				......
+
+				try {  
+					sZygoteSocket = new LocalSocket();  
+					sZygoteSocket.connect(new LocalSocketAddress(<b style="color:black;background-color:#A0FFFF">ZYGOTE</b>_SOCKET,  
+						LocalSocketAddress.Namespace.RESERVED));  
+
+					sZygoteInputStream  
+						= new DataInputStream(sZygoteSocket.getInputStream());  
+
+					sZygoteWriter =  
+						new BufferedWriter(  
+						new OutputStreamWriter(  
+						sZygoteSocket.getOutputStream()),  
+						256);  
+
+					......  
+				} catch (IOException ex) {  
+					......  
+				}  
+		}  
+
+		......  
+	}  
+
+	......  
+}</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这里的<b style="color:black;background-color:#A0FFFF">ZYGOTE</b>_SOCKET定义为：<p></p><p></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_15_9681878" name="code" class="java">public class Process {  
+	......  
+ 
+	private static final String <b style="color:black;background-color:#A0FFFF">ZYGOTE</b>_SOCKET = "<b style="color:black;background-color:#A0FFFF">zygote</b>";  
+
+	......  
+} </pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;它刚好就是对应/dev/socket目录下的<b style="color:black;background-color:#A0FFFF">zygote</b>文件了。<p></p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;<b style="color:black;background-color:#ffff66">Android</b>系统中的socket机制和binder机制一样，都是可以用来进行进程间通信，读者可以自己对比一下这两者的不同之处，Binder进程间通信机制可以参考<a target="_blank" href="http://blog.csdn.net/luoshengyang/article/details/6618363"><b style="color:black;background-color:#ffff66">Android</b>进程间通信（IPC）机制Binder简要介绍和学习计划</a>一文。</p><p>&nbsp;&nbsp; &nbsp; &nbsp; Socket对象创建完成之后，回到Step 3中的ZygoteInit.main函数中，startSystemServer函数来启动SystemServer组件。</p><p>&nbsp;&nbsp; &nbsp; &nbsp; Step 5.&nbsp;ZygoteInit.startSystemServer<br>&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;这个函数定义在frameworks/base/core/java/com/<b style="color:black;background-color:#ffff66">android</b>/internal/os/ZygoteInit.java文件中：</p><p></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_16_7315327" name="code" class="java">public class ZygoteInit {
+	......
+
+	private static boolean startSystemServer()
+			throws MethodAndArgsCaller, RuntimeException {
+		/* Hardcoded command line to start the system server */
+		String args[] = {
+			"--setuid=1000",
+			"--setgid=1000",
+			"--setgroups=1001,1002,1003,1004,1005,1006,1007,1008,1009,1010,1018,3001,3002,3003",
+			"--capabilities=130104352,130104352",
+			"--runtime-<b style="color:black;background-color:#99ff99">init</b>",
+			"--nice-name=system_server",
+			"com.<b style="color:black;background-color:#ffff66">android</b>.server.SystemServer",
+		};
+		ZygoteConnection.Arguments parsedArgs = null;
+
+		int pid;
+
+		try {
+			parsedArgs = new ZygoteConnection.Arguments(args);
+
+			......
+
+			/* Request to fork the system server process */
+			pid = <b style="color:black;background-color:#A0FFFF">Zygote</b>.forkSystemServer(
+				parsedArgs.uid, parsedArgs.gid,
+				parsedArgs.gids, debugFlags, null,
+				parsedArgs.permittedCapabilities,
+				parsedArgs.effectiveCapabilities);
+		} catch (IllegalArgumentException ex) {
+			......
+		}
+
+		/* For child process */
+		if (pid == 0) {
+			handleSystemServerProcess(parsedArgs);
+		}
+
+		return true;
+	}
+	
+	......
+}</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这里我们可以看到，<b style="color:black;background-color:#A0FFFF">Zygote</b>进程通过<b style="color:black;background-color:#A0FFFF">Zygote</b>.forkSystemServer函数来创建一个新的进程来启动SystemServer组件，返回值pid等0的地方就是新的进程要执行的路径，即新创建的进程会执行handleSystemServerProcess函数。<p></p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;Step 6.&nbsp;ZygoteInit.handleSystemServerProcess<br>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这个函数定义在frameworks/base/core/java/com/<b style="color:black;background-color:#ffff66">android</b>/internal/os/ZygoteInit.java文件中：<br></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_17_8569846" name="code" class="java">public class ZygoteInit {
+	......
+
+	private static void handleSystemServerProcess(
+			ZygoteConnection.Arguments parsedArgs)
+			throws ZygoteInit.MethodAndArgsCaller {
+		closeServerSocket();
+
+		/*
+		* Pass the remaining arguments to SystemServer.
+		* "--nice-name=system_server com.<b style="color:black;background-color:#ffff66">android</b>.server.SystemServer"
+		*/
+		RuntimeInit.zygoteInit(parsedArgs.remainingArgs);
+		/* should never reach here */
+	}
+
+	......
+} </pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;由于由<b style="color:black;background-color:#A0FFFF">Zygote</b>进程创建的子进程会继承<b style="color:black;background-color:#A0FFFF">Zygote</b>进程在前面Step 4中创建的Socket文件描述符，而这里的子进程又不会用到它，因此，这里就调用closeServerSocket函数来关闭它。这个函数接着调用RuntimeInit.zygoteInit函数来进一步执行启动SystemServer组件的操作。<p></p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;Step 7.&nbsp;RuntimeInit.zygoteInit</p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这个函数定义在frameworks/base/core/java/com/<b style="color:black;background-color:#ffff66">android</b>/internal/os/RuntimeInit.java文件中：</p><p></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_18_1776213" name="code" class="java">public class RuntimeInit {  
+	......  
+
+	public static final void zygoteInit(String[] argv)  
+			throws ZygoteInit.MethodAndArgsCaller {  
+		......  
+  
+		zygoteInitNative();  
+
+		......  
+
+
+		// Remaining arguments are passed to the start class's static main  
+
+		String startClass = argv[curArg++];  
+		String[] startArgs = new String[argv.length - curArg];  
+
+		System.arraycopy(argv, curArg, startArgs, 0, startArgs.length);  
+		invokeStaticMain(startClass, startArgs);  
+	}  
+
+	......  
+}</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; 这个函数会执行两个操作，一个是调用zygoteInitNative函数来执行一个Binder进程间通信机制的初始化工作，这个工作完成之后，这个进程中的Binder对象就可以方便地进行进程间通信了，另一个是调用上面Step 5传进来的com.<b style="color:black;background-color:#ffff66">android</b>.server.SystemServer类的main函数。<p></p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp; Step 8.&nbsp;RuntimeInit.zygoteInitNative</p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;这个函数定义在frameworks/base/core/java/com/<b style="color:black;background-color:#ffff66">android</b>/internal/os/RuntimeInit.java文件中：</p><p></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_19_7806478" name="code" class="java">public class RuntimeInit {  
+	......  
+
+	public static final <a name="baidusnap3"></a><b style="color:black;background-color:#ff9999">native</b> void zygoteInitNative();  
+
+	......  
+}</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这里可以看出，函数zygoteInitNative是一个<b style="color:black;background-color:#ff9999">Native</b>函数，实现在frameworks/base/core/jni/AndroidRuntime.cpp文件中，这里我们就不再细看了，具体可以参考<a target="_blank" href="http://blog.csdn.net/luoshengyang/article/details/6747696"><b style="color:black;background-color:#ffff66">Android</b>应用程序进程启动过程的源代码分析</a>一文的Step 9，完成这一步后，这个进程的Binder进程间通信机制基础设施就准备好了。<p></p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;回到Step 7中的RuntimeInit.zygoteInitNative函数，下一步它就要执行com.<b style="color:black;background-color:#ffff66">android</b>.server.SystemServer类的main函数了。</p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;Step 9.&nbsp;SystemServer.main</p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这个函数定义在frameworks/base/services/java/com/<b style="color:black;background-color:#ffff66">android</b>/server/SystemServer.java文件中：</p><p></p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_20_4044487" name="code" class="java">public class SystemServer  
+{  
+	......  
+
+	<b style="color:black;background-color:#ff9999">native</b> public static void <b style="color:black;background-color:#99ff99">init</b>1(String[] args);  
+
+	......  
+
+	public static void main(String[] args) {  
+		......  
+
+		<b style="color:black;background-color:#99ff99">init</b>1(args);  
+
+		......  
+	} 
+
+	public static final void <b style="color:black;background-color:#99ff99">init</b>2() {  
+		Slog.i(TAG, "Entered the <b style="color:black;background-color:#ffff66">Android</b> system server!");  
+		Thread thr = new ServerThread();  
+		thr.setName("<b style="color:black;background-color:#ffff66">android</b>.server.ServerThread");  
+		thr.start();  
+	}  
+
+	......  
+}</pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这里的main函数首先会执行JNI方法<b style="color:black;background-color:#99ff99">init</b>1，然后<b style="color:black;background-color:#99ff99">init</b>1会调用这里的<b style="color:black;background-color:#99ff99">init</b>2函数，在<b style="color:black;background-color:#99ff99">init</b>2函数里面，会创建一个ServerThread线程对象来执行一些系统关键服务的启动操作，例如我们在前面两篇文章<a target="_blank" href="http://blog.csdn.net/luoshengyang/article/details/6766010"><b style="color:black;background-color:#ffff66">Android</b>应用程序安装过程源代码分析</a>和<a target="_blank" href="http://blog.csdn.net/luoshengyang/article/details/6767736"><b style="color:black;background-color:#ffff66">Android</b>系统默认Home应用程序（Launcher）的启动过程源代码分析</a>中提到的PackageManagerService和ActivityManagerService。<br>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这一步的具体执行过程可以参考<a target="_blank" href="http://blog.csdn.net/luoshengyang/article/details/6766010"><b style="color:black;background-color:#ffff66">Android</b>应用程序安装过程源代码分析</a>一文，这里就不再详述了。<p></p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这里执行完成后，层层返回，最后回到上面的Step 3中的ZygoteInit.main函数中，接下来它就要调用runSelectLoopMode函数进入一个无限循环在前面Step 4中创建的socket接口上等待ActivityManagerService请求创建新的应用程序进程了。</p><p style="margin-top:4px; margin-right:0px; margin-bottom:4px; margin-left:0px; padding-top:2px; padding-right:0px; padding-bottom:2px; padding-left:0px">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;Step 10.&nbsp;ZygoteInit.runSelectLoopMode</p><p style="margin-top:4px; margin-right:0px; margin-bottom:4px; margin-left:0px; padding-top:2px; padding-right:0px; padding-bottom:2px; padding-left:0px">&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这个函数定义在frameworks/base/core/java/com/<b style="color:black;background-color:#ffff66">android</b>/internal/os/ZygoteInit.java文件中：</p><pre code_snippet_id="130110" snippet_file_name="blog_20131227_21_6138038" name="code" class="java">public class ZygoteInit {
+	......
+
+	private static void runSelectLoopMode() throws MethodAndArgsCaller {
+		ArrayList&lt;FileDescriptor&gt; fds = new ArrayList();
+		ArrayList&lt;ZygoteConnection&gt; peers = new ArrayList();
+		FileDescriptor[] fdArray = new FileDescriptor[4];
+
+		fds.add(sServerSocket.getFileDescriptor());
+		peers.add(null);
+
+		int loopCount = GC_LOOP_COUNT;
+		while (true) {
+			int index;
+
+			......
+
+
+			try {
+				fdArray = fds.toArray(fdArray);
+				index = selectReadable(fdArray);
+			} catch (IOException ex) {
+				throw new RuntimeException("Error in select()", ex);
+			}
+
+			if (index &lt; 0) {
+				throw new RuntimeException("Error in select()");
+			} else if (index == 0) {
+				ZygoteConnection newPeer = acceptCommandPeer();
+				peers.add(newPeer);
+				fds.add(newPeer.getFileDesciptor());
+			} else {
+				boolean done;
+				done = peers.get(index).runOnce();
+
+				if (done) {
+					peers.remove(index);
+					fds.remove(index);
+				}
+			}
+		}
+	}
+
+	......
+}      </pre>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这个函数我们已经在<a target="_blank" href="http://blog.csdn.net/luoshengyang/article/details/6747696"><b style="color:black;background-color:#ffff66">Android</b>应用程序进程启动过程的源代码分析</a>一文的Step 5中分析过了，这就是在等待ActivityManagerService来连接这个Socket，然后调用ZygoteConnection.runOnce函数来创建新的应用程序，有兴趣的读者可以参考<a target="_blank" href="http://blog.csdn.net/luoshengyang/article/details/6747696"><b style="color:black;background-color:#ffff66">Android</b>应用程序进程启动过程的源代码分析</a>这篇文章，这里就不再详述了。<p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;这样，<b style="color:black;background-color:#A0FFFF">Zygote</b>进程就启动完成了，学习到这里，我们终于都对<b style="color:black;background-color:#ffff66">Android</b>系统中的进程有了一个深刻的认识了，这里总结一下：<br></p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;1. 系统启动时<b style="color:black;background-color:#99ff99">init</b>进程会创建<b style="color:black;background-color:#A0FFFF">Zygote</b>进程，<b style="color:black;background-color:#A0FFFF">Zygote</b>进程负责后续<b style="color:black;background-color:#ffff66">Android</b>应用程序框架层的其它进程的创建和启动工作。</p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;2. <b style="color:black;background-color:#A0FFFF">Zygote</b>进程会首先创建一个SystemServer进程，SystemServer进程负责启动系统的关键服务，如包管理服务PackageManagerService和应用程序组件管理服务ActivityManagerService。</p><p>&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;3. 当我们需要启动一个<b style="color:black;background-color:#ffff66">Android</b>应用程序时，ActivityManagerService会通过Socket进程间通信机制，通知<b style="color:black;background-color:#A0FFFF">Zygote</b>进程为这个应用程序创建一个新的进程。</p><p style="text-align: center;"><span style="font-size:14px;color:#cc0000;"><strong>老罗的新浪微博：<a target="_blank" href="http://weibo.com/shengyangluo">http://weibo.com/shengyangluo</a>，欢迎关注！</strong></span><br></p><p></p>   
+</div>
+
+
+
+
+<!-- Baidu Button BEGIN -->
+
+
+
+
+<div class="bdsharebuttonbox tracking-ad" style="float: right;" data-mod="popu_172">
+<a href="http://blog.csdn.net/luoshengyang/article/details/6768304#" class="bds_more" data-cmd="more" style="background-position:0 0 !important; background-image: url(http://bdimg.share.baidu.com/static/api/img/share/icons_0_16.png?v=d754dcc0.png) !important"></a>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6768304#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间" style="background-position:0 -52px !important"></a>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6768304#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博" style="background-position:0 -104px !important"></a>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6768304#" class="bds_tqq" data-cmd="tqq" title="分享到腾讯微博" style="background-position:0 -260px !important"></a>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6768304#" class="bds_renren" data-cmd="renren" title="分享到人人网" style="background-position:0 -208px !important"></a>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6768304#" class="bds_weixin" data-cmd="weixin" title="分享到微信" style="background-position:0 -1612px !important"></a>
+</div>
+
+<!-- Baidu Button END -->
+
+   <link rel="stylesheet" href="http://static.blog.csdn.net/css/blog_detail.css">
+
+    
+<!--172.16.140.13-->
+
+<!-- Baidu Button BEGIN -->
+
+
+
+<!-- Baidu Button END -->
+
+ 
+
+        <div id="digg" articleid="6768304">
+            <dl id="btnDigg" class="digg digg_disable" onclick="btndigga();">
+               
+                 <dt>顶</dt>
+                <dd>48</dd>
+            </dl>
+           
+              
+            <dl id="btnBury" class="digg digg_disable" onclick="btnburya();">
+              
+                  <dt>踩</dt>
+                <dd>5</dd>               
+            </dl>
+            
+        </div>
+     <div class="tracking-ad" data-mod="popu_222"><a href="javascript:void(0);">&nbsp;</a>   </div>
+    <div class="tracking-ad" data-mod="popu_223"> <a href="javascript:void(0);">&nbsp;</a></div>
+    
+
+   <ul class="article_next_prev">
+                <li class="prev_article"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_shangyipian&#39;]);location.href=&#39;/luoshengyang/article/details/6767736&#39;;">上一篇</span><a href="http://blog.csdn.net/luoshengyang/article/details/6767736" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_shangyipian&#39;])"><b style="color:black;background-color:#ffff66">Android</b>系统默认Home应用程序（Launcher）的启动过程源代码分析</a></li>
+                <li class="next_article"><span onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_xiayipian&#39;]);location.href=&#39;/luoshengyang/article/details/6786239&#39;;">下一篇</span><a href="http://blog.csdn.net/luoshengyang/article/details/6786239" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_xiayipian&#39;])"><b style="color:black;background-color:#ffff66">Android</b>系统的智能指针（轻量级指针、强指针和弱指针）的实现原理分析</a></li>
+    </ul>
+
+    <div style="clear:both; height:10px;"></div>
+
+
+        <div class="similar_article" style="display:none">
+                <h4>我的同类文章</h4>
+                <div class="similar_c" style="margin:20px 0px 0px 0px">
+                    <div class="similar_c_t">
+                                <label class="similar_cur">
+                                    <span style="cursor:pointer" onclick="GetCategoryArticles(&#39;838604&#39;,&#39;Luoshengyang&#39;,&#39;foot&#39;,&#39;6768304&#39;);"><b style="color:black;background-color:#ffff66">Android</b><em>（168）</em></span>
+                                </label>
+                    </div>
+                   
+                    <div class="similar_wrap tracking-ad" data-mod="popu_141" style="max-height:195px;">
+                        <a href="http://blog.csdn.net/" style="display:none">http://blog.csdn.net</a>
+                        <ul class="similar_list fl">                          
+                        </ul>
+
+                        <ul class="similar_list fr">                           
+                        </ul>
+                    </div>
+                </div>
+            </div>    
+    
+      
+</div>
+<div id="suggest"></div>
+           
+
+
+<style>
+.blog-ass-articl dd {
+color: #369;
+width: 99%; /*修改行*/
+float: left;
+overflow: hidden;
+font: normal normal 12px/23px "SimSun";
+height: 23px;
+margin: 0;
+padding: 0 0 0 10px;
+margin-right: 30px;
+background: url(http://static.blog.csdn.net/skin/default/images/blog-dot-red3.gif) no-repeat 0 10px;
+}
+</style>
+
+ <link rel="stylesheet" href="http://static.blog.csdn.net/css/replace.css">
+
+<div id="relate" data-mod="popu_218" class="tracking-ad">
+        <div class="relate_t">
+            <h3><span>参考知识库</span></h3>
+        </div>
+        <div class="relate_c">
+        </div>
+</div>
+ 
+
+<dl class="blog-ass-articl" id="res-relatived"> 
+    <div class="embody embody_b" id="libkeyparent" style="display:none">
+            <span class="embody_t">更多资料请参考：</span>
+            <div class="embody_c" id="libkey"></div>
+    </div>
+
+
+     <dt><span>猜你在找</span></dt>    
+
+
+   
+
+
+    <div id="adCollege" style="width: 42%;float: left;"> 
+         
+         
+    </div>  
+
+    
+     <div id="res" data-mod="popu_36" class="tracking-ad" style="width: 42%;float: left;margin-right: 30px;"></div>
+   
+</dl>
+
+
+  
+
+    <div id="ad_cen">        
+<!-- 广告位开始 -->
+<ins data-revive-zoneid="71" data-revive-id="8c38e720de1c90a6f6ff52f3f89c4d57"></ins>
+<!-- 广告位结束 -->    </div>  
+
+<div class="comment_class">
+    <div id="comment_title" class="panel_head">
+        <span class="see_comment">查看评论</span><a name="comments"></a></div>
+    <div id="comment_list">
+    </div>
+    <div id="comment_bar">
+    </div>
+    <div id="comment_form">
+    </div>
+    <div class="announce">
+        * 以上用户言论只代表其个人观点，不代表CSDN网站的观点或立场<a name="reply"></a><a name="quote"></a></div>
+</div>
+
+
+
+    <div id="ad_bot">
+    </div>
+<div id="report_dialog">
+</div>
+
+<div id="d-top" style="bottom:60px;">
+        <a id="quick-reply" class="btn btn-top q-reply" title="快速回复" style="display:none;">
+            <img src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/blog-icon-reply.png" alt="快速回复">
+        </a>    
+
+    <a id="d-top-a" class="btn btn-top backtop" style="display: none;" title="返回顶部" onclick="_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_huidaodingbu&#39;])">         
+         <img src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/top.png" alt="TOP">
+    </a>
+</div>
+
+<style type="text/css">
+    .tag_list
+    {
+        background: none repeat scroll 0 0 #FFFFFF;
+        border: 1px solid #D7CBC1;
+        color: #000000;
+        font-size: 12px;
+        line-height: 20px;
+        list-style: none outside none;
+        margin: 10px 2% 0 1%;
+        padding: 1px;
+    }
+    .tag_list h5
+    {
+        background: none repeat scroll 0 0 #E0DBD3;
+        color: #47381C;
+        font-size: 12px;
+        height: 24px;
+        line-height: 24px;
+        padding: 0 5px;
+        margin: 0;
+    }
+    .tag_list h5 a
+    {
+        color: #47381C;
+    }
+    .classify
+    {
+        margin: 10px 0;
+        padding: 4px 12px 8px;
+    }
+    .classify a
+    {
+        margin-right: 20px;
+        white-space: nowrap;
+    }
+</style>
+
+
+<div class="tag_list" style="display:none"></div>
+   
+
+
+<div id="pop_win" style="display:none ;position: absolute; z-index: 10000; border: 1px solid rgb(220, 220, 220); top: 222.5px; left: 630px; opacity: 1; background: none 0px 0px repeat scroll rgb(255, 255, 255);">
+    
+</div>
+<div id="popup_mask"></div>
+<style>
+    #popup_mask
+    {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        z-index: 9999;
+        left: 0px;
+        top: 0px;
+        opacity: 0.3;
+        filter: alpha(opacity=30);
+        display: none;
+    }
+
+</style>
+
+
+
+
+
+       
+
+
+                        <div class="clear">
+                        </div>
+                    </div>                   
+                
+            </div>
+                   
+           <div id="side">
+    <div class="side">
+<div id="panel_Profile" class="panel">
+<ul class="panel_head"><span>个人资料</span></ul>
+<ul class="panel_body profile">
+<div id="blog_userface">
+    <a href="http://my.csdn.net/Luoshengyang" target="_blank">
+    <img src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/1_luoshengyang.jpg" title="访问我的空间" style="max-width:90%">
+    </a>
+    <br>
+    <span><a href="http://my.csdn.net/Luoshengyang" class="user_name" target="_blank">Luoshengyang</a></span>
+</div>
+<div class="interact">
+
+    <a href="javascript:void(0);" class="attent" id="span_add_follow" title="[加关注]"></a>
+
+ <a href="javascript:void(0);" class="letter" title="[发私信]" onclick="window.open(&#39;http://msg.csdn.net/letters/model?receiver=Luoshengyang&#39;,&#39;_blank&#39;,&#39;height=350,width=700&#39;);_gaq.push([&#39;_trackEvent&#39;,&#39;function&#39;, &#39;onclick&#39;, &#39;blog_articles_sixin&#39;])"></a>  
+</div>
+<div id="blog_medal">
+                       <div class="ico_expert" onclick="javascript:location=&#39;http://blog.csdn.net/experts/rule.html&#39;" title="CSDN认证专家" style="cursor:pointer;width:60px;height:60px;background:url(&#39;http://c.csdnimg.cn/jifen/images/xunzhang/xunzhang/bokezhuanjiamiddle.png&#39;) no-repeat"></div>
+                <div id="bms_box">
+                                            <a target="_blank">
+                                                    <img src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/zhuanlandaren.png" onmouseover="m_over_m(this,2)" onmouseout="m_out_m()" alt="2">
+                                            </a>
+                                            <a target="_blank">
+                                                    <img src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/chizhiyiheng.png" onmouseover="m_over_m(this,4)" onmouseout="m_out_m()" alt="2">
+                                            </a>
+                                            <a target="_blank">
+                                                    <img src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/bokezhixing.png" onmouseover="m_over_m(this,6)" onmouseout="m_out_m()" alt="1">
+                                            </a>
+               </div>
+</div>
+<ul id="blog_rank">
+    <li>访问：<span>8279100次</span></li>
+    <li>积分：<span>38932</span> </li>    
+    <li>等级： <span style="position:relative;display:inline-block;z-index:1">
+            <img src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/blog8.png" alt="" style="vertical-align: middle;" id="leveImg">
+            <div id="smallTittle" style=" position: absolute;  left: -24px;  top: 25px;  text-align: center;  width: 101px;  height: 32px;  background-color: #fff;  line-height: 32px;  border: 2px #DDDDDD solid;  box-shadow: 0px 2px 2px rgba (0,0,0,0.1);  display: none;   z-index: 999;">
+            <div style="left: 42%;  top: -8px;  position: absolute;  width: 0;  height: 0;  border-left: 10px solid transparent;  border-right: 10px solid transparent;  border-bottom: 8px solid #EAEAEA;"></div>
+            积分：38932 </div>
+        </span>  </li>
+    <li>排名：<span>第68名</span></li>
+</ul>
+<ul id="blog_statistics">
+    <li>原创：<span>170篇</span></li>
+    <li>转载：<span>0篇</span></li>
+    <li>译文：<span>0篇</span></li>
+    <li>评论：<span>7522条</span></li>
+</ul>
+</ul>
+</div>
+
+
+
+
+<div id="custom_column_6567056" class="panel">
+<ul class="panel_head"><span>博客公告</span></ul>
+<ul class="panel_body">
+<b><font color="red" size="2">本博客所有文章均为原创，欢迎交流，欢迎转载；转载请勿篡改内容，并且注明出处，禁止用于商业目的，谢谢！</font></b>
+</ul>
+</div>
+
+<div id="custom_column_36982715" class="panel">
+<ul class="panel_head"><span>新浪微博</span></ul>
+<ul class="panel_body">
+<iframe width="100%" height="75" class="share_self" frameborder="0" scrolling="no" src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/index.html"></iframe>
+</ul>
+</div>
+
+<div id="custom_column_21664874" class="panel">
+<ul class="panel_head"><span>图书信息</span></ul>
+<ul class="panel_body">
+<font color="red"><b>书名：</b></font>
+<p>《<b style="color:black;background-color:#ffff66">Android</b>系统源代码情景分析》</p>
+
+<p><a href="http://wenku.it168.com/d_000574719.shtml" target="_blank">试读请点击</a></p>
+
+<p><font color="red"><b>出版社：</b></font></p>
+<p>电子工业出版社</p>
+
+<p><font color="red"><b>网店：</b></font></p>
+
+<p>1. <a href="http://product.dangdang.com/23837163.html" target="_blank">当当网（满100减20，满200减50）</a></p><p></p>
+
+<p>2. <a href="http://item.jd.com/11838754.html" target="_blank">京东网（满99减20）</a></p><p></p>
+
+<p>3. <a href="http://www.amazon.cn/Android%E7%B3%BB%E7%BB%9F%E6%BA%90%E4%BB%A3%E7%A0%81%E6%83%85%E6%99%AF%E5%88%86%E6%9E%90-%E7%BD%97%E5%8D%87%E9%98%B3/dp/B019FSLVUU" target="_blank">亚马逊网（满100减20，满200减50）</a></p><p></p>
+
+<p>4. <a href="http://product.china-pub.com/4901762" target="_blank">互动出版网</a></p><p></p>
+
+<p>5. <a href="http://product.suning.com/141811846.html" target="_blank">苏宁易购网</a></p><p></p>
+
+<p><a href="http://s.etao.com/search?q=Android%CF%B5%CD%B3%D4%B4%B4%FA%C2%EB%C7%E9%BE%B0%B7%D6%CE%F6&eq=Android%25E7%25B3%25BB%25E7%25BB%259F%25E6%25BA%2590%25E4%25BB%25A3%25E7%25A0%2581%25E6%2583%2585%25E6%2599%25AF%25E5%2588%2586%25E6%259E%2590&initiative_id=wwwetao_20160422&spm=1002.1.8.1" target="_blank">比一比谁更实惠</a></p>
+
+<p><font color="red"><b>号外：</b></font></p>
+
+<p>本书繁体版已经成功输出到台湾</p>
+
+<p></p>
+</ul>
+</div>
+
+<div id="custom_column_21603386" class="panel">
+<ul class="panel_head"><span>联系方式</span></ul>
+<ul class="panel_body">
+<font color="red"><b>新浪微博：</b></font>
+<p><a href="http://weibo.com/shengyangluo" target="_blank">http://weibo.com/shengyangluo</a></p><p></p>
+
+<font color="red"><b>QQ交流群：</b></font>
+<p>130112760</p>
+</ul>
+</div><div id="panel_Category" class="panel">
+    <ul class="panel_head"><span>博客专栏</span></ul>
+    <ul class="panel_body" id="sp_column">
+    <table cellpadding="0" cellspacing="0"><tbody><tr>
+    <td style="padding:10px 10px 0 0;">
+    <a href="http://blog.csdn.net/column/details/androidluo.html" target="_blank"><img src="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/20151123174935442" style="width:75px;height:75px;"></a>
+    </td>
+    <td style="padding:10px 0; vertical-align:top;">
+    <a href="http://blog.csdn.net/column/details/androidluo.html" target="_blank">老罗的<b style="color:black;background-color:#ffff66">Android</b>之旅</a>
+    <p>文章：170篇</p>
+    <span>阅读：8258453</span>
+    </td>
+    </tr></tbody></table>
+    </ul>
+</div><div id="hotarticls" class="panel">
+<ul class="panel_head">
+    <span>       
+阅读排行    </span>
+</ul>
+
+<ul class="panel_body itemlist">
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/8923485" title="那两年炼就的Android内功修养">那两年炼就的<b style="color:black;background-color:#ffff66">Android</b>内功修养</a><span>(298081)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6618363" title="Android进程间通信（IPC）机制Binder简要介绍和学习计划"><b style="color:black;background-color:#ffff66">Android</b>进程间通信（IPC）机制Binder简要介绍和学习计划</a><span>(266428)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6559955" title="在Ubuntu上下载、编译和安装Android最新源代码">在Ubuntu上下载、编译和安装<b style="color:black;background-color:#ffff66">Android</b>最新源代码</a><span>(217496)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6689748" title="Android应用程序启动过程源代码分析"><b style="color:black;background-color:#ffff66">Android</b>应用程序启动过程源代码分析</a><span>(208193)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6567257" title="Android硬件抽象层（HAL）概要介绍和学习计划"><b style="color:black;background-color:#ffff66">Android</b>硬件抽象层（HAL）概要介绍和学习计划</a><span>(156040)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6568411" title="在Ubuntu上为Android系统编写Linux内核驱动程序">在Ubuntu上为<b style="color:black;background-color:#ffff66">Android</b>系统编写Linux内核驱动程序</a><span>(144954)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/8661317" title="Android视图SurfaceView的实现原理分析"><b style="color:black;background-color:#ffff66">Android</b>视图SurfaceView的实现原理分析</a><span>(130197)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6557518" title="Android学习启动篇"><b style="color:black;background-color:#ffff66">Android</b>学习启动篇</a><span>(129739)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6566662" title="如何单独编译Android源代码中的模块">如何单独编译<b style="color:black;background-color:#ffff66">Android</b>源代码中的模块</a><span>(127442)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6621566" title="浅谈Service Manager成为Android进程间通信（IPC）机制Binder守护进程之路">浅谈Service Manager成为<b style="color:black;background-color:#ffff66">Android</b>进程间通信（IPC）机制Binder守护进程之路</a><span>(122296)</span>
+</li>
+</ul>
+</div>
+<div id="hotarticls2" class="panel">
+<ul class="panel_head"><span>评论排行</span></ul>
+<ul class="panel_body itemlist">
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6689748" title="Android应用程序启动过程源代码分析"><b style="color:black;background-color:#ffff66">Android</b>应用程序启动过程源代码分析</a><span>(379)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/8923485" title="那两年炼就的Android内功修养">那两年炼就的<b style="color:black;background-color:#ffff66">Android</b>内功修养</a><span>(335)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6559955" title="在Ubuntu上下载、编译和安装Android最新源代码">在Ubuntu上下载、编译和安装<b style="color:black;background-color:#ffff66">Android</b>最新源代码</a><span>(292)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/8116866" title="《Android系统源代码情景分析》一书勘误">《<b style="color:black;background-color:#ffff66">Android</b>系统源代码情景分析》一书勘误</a><span>(264)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6882903" title="Android应用程序键盘（Keyboard）消息处理机制分析"><b style="color:black;background-color:#ffff66">Android</b>应用程序键盘（Keyboard）消息处理机制分析</a><span>(205)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6568411" title="在Ubuntu上为Android系统编写Linux内核驱动程序">在Ubuntu上为<b style="color:black;background-color:#ffff66">Android</b>系统编写Linux内核驱动程序</a><span>(194)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/6580267" title="在Ubuntu上为Android系统内置Java应用程序测试Application Frameworks层的硬件服务">在Ubuntu上为<b style="color:black;background-color:#ffff66">Android</b>系统内置Java应用程序测试Application Frameworks层的硬件服务</a><span>(185)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/7409491" title="Android博客文章整理"><b style="color:black;background-color:#ffff66">Android</b>博客文章整理</a><span>(178)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/8452527" title="2012年的Android之旅：梦想、学习、坚持、自信、淡定">2012年的<b style="color:black;background-color:#ffff66">Android</b>之旅：梦想、学习、坚持、自信、淡定</a><span>(175)</span>
+</li>
+<li>
+<a href="http://blog.csdn.net/luoshengyang/article/details/12957169" title="《老罗的Android之旅》导读PPT">《老罗的<b style="color:black;background-color:#ffff66">Android</b>之旅》导读PPT</a><span>(161)</span>
+</li>
+</ul>
+</div>
+<div id="newcomments" class="panel">
+<ul class="panel_head"><span>最新评论</span></ul>
+<ul class="panel_body itemlist">
+    <li>
+   
+         <a href="http://blog.csdn.net/luoshengyang/article/details/6689748#comments"><b style="color:black;background-color:#ffff66">Android</b>应用程序启动过程源代码分析</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/u013680507" class="user_name">u013680507</a>:
+好腻害！！1
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/luoshengyang/article/details/48947685#comments">Chromium硬件加速渲染的OpenGL上下文绘图表面创建过程分析</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/rkshuai" class="user_name">rkshuai</a>:
+1. "并且将该SurfaceInfo对象包含的绘图表面句柄修改为参数handle描述的图表面句柄"...
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/luoshengyang/article/details/52009477#comments">Chromium视频标签&lt;video&gt;简要介绍和学习计划</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/wdong_love_cl" class="user_name">wdong_love_cl</a>:
+罗大师真是能够与时俱进啊，不错，现在手机直播是越来越火了！
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/luoshengyang/article/details/8923485#comments">那两年炼就的<b style="color:black;background-color:#ffff66">Android</b>内功修养</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/chen249191508" class="user_name">chen249191508</a>:
+请教一个问题，您是如何调试<b style="color:black;background-color:#ffff66">android</b>系统源码的？特别是<b style="color:black;background-color:#ffff66">android</b>中的C/C++代码的？
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/luoshengyang/article/details/8923485#comments">那两年炼就的<b style="color:black;background-color:#ffff66">Android</b>内功修养</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/chen249191508" class="user_name">chen249191508</a>:
+请教一个问题，您是如何调试<b style="color:black;background-color:#ffff66">android</b>系统源码的？ 特别是<b style="color:black;background-color:#ffff66">android</b>中的C/C++代码的？
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/luoshengyang/article/details/47433765#comments">Chromium的Render进程启动过程分析</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/remygo" class="user_name">remygo</a>:
+一起学习Chromium之Browser进程启动分析http://blog.csdn.net/rem...
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/luoshengyang/article/details/47433765#comments">Chromium视频标签&lt;video&gt;简要介绍和学习计划</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/sofinelulu" class="user_name">sofinelulu</a>:
+呵呵，感觉自己意识与罗老师挺同步的，最近也想看这块，真是太好了。之前因为做一个小需求，大致分析过相关...
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/luoshengyang/article/details/47433765#comments">那两年炼就的<b style="color:black;background-color:#ffff66">Android</b>内功修养</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/u014732537" class="user_name">u014732537</a>:
+不得不膜拜
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/luoshengyang/article/details/7409491#comments"><b style="color:black;background-color:#ffff66">Android</b>博客文章整理</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/justgogo324" class="user_name">justgogo324</a>:
+为什么图书没有减免活动呢？
+    </p>
+    </li>
+    <li>
+   
+         <a href="http://blog.csdn.net/luoshengyang/article/details/8372924#comments"><b style="color:black;background-color:#ffff66">Android</b>应用程序窗口（Activity）的测量（Measure）、布局（Layout）和绘制（Draw）过程分析</a>
+    <p style="margin:0px;"><a href="http://blog.csdn.net/alexwan19890702" class="user_name">alexwan19890702</a>:
+如果不使用缓冲方式来会绘制，那么子视图child的剪裁区域就需要同时考虑它在X轴和Y轴上的起始位置（...
+    </p>
+    </li>
+</ul>
+</div>
+    </div>
+    <div class="clear">
+    </div>
+ </div>   
+            <div class="clear">
+            </div>
+        </div>
+
+        
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+    </div>
+      <!--new top-->
+    
+    
+     <!--new top-->
+   
+    <link href="./Android系统进程Zygote启动过程的源代码分析 - 老罗的Android之旅 - 博客频道 - CSDN.NET_files/ask_float_block.css" type="text/css" rel="stylesheet">
+    
+    
+    
+    
+   
+
+  <div id="a52b5334d" style="width: 1px; height: 1px; display: none;">
+                    
+                    
+   </div>
+
+    <link rel="stylesheet" href="http://static.blog.csdn.net/css/blog_code.css">
+    
+      
+
+   
+ 
+</div>
+
+
+
+</body></html>

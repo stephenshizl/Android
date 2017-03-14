@@ -1,0 +1,1037 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0063)http://www.cnblogs.com/nokiaguy/archive/2013/04/14/3020774.html -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-cn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Android的init过程详解（一） - 银河使者 - 博客园</title>
+<link type="text/css" rel="stylesheet" href="./Android的init过程详解（一） - 银河使者 - 博客园_files/blog-common.css">
+<link id="MainCss" type="text/css" rel="stylesheet" href="./Android的init过程详解（一） - 银河使者 - 博客园_files/bundle-AnotherEon001.css">
+<link title="RSS" type="application/rss+xml" rel="alternate" href="http://www.cnblogs.com/nokiaguy/rss">
+<link title="RSD" type="application/rsd+xml" rel="EditURI" href="http://www.cnblogs.com/nokiaguy/rsd.xml">
+<link type="application/wlwmanifest+xml" rel="wlwmanifest" href="http://www.cnblogs.com/nokiaguy/wlwmanifest.xml">
+<script type="text/javascript" src="./Android的init过程详解（一） - 银河使者 - 博客园_files/encoder.js"></script><script src="./Android的init过程详解（一） - 银河使者 - 博客园_files/jquery.js" type="text/javascript"></script>  
+<script type="text/javascript">var currentBlogApp = 'nokiaguy', cb_enable_mathjax=false;</script>
+<script src="./Android的init过程详解（一） - 银河使者 - 博客园_files/blog-common.js" type="text/javascript"></script>
+</head>
+<body>
+<a name="top"></a>
+
+<div id="wrapper">
+<div id="header">
+
+<div id="top">
+<h1><a id="Header1_HeaderTitle" class="headermaintitle" href="http://www.cnblogs.com/nokiaguy/">李宁的极客世界</a></h1>
+<div id="subtitle"></div>
+</div>
+<div id="sub">
+<div class="BlogStats">随笔 - 149, 文章 - 0, 评论 - 1207, 引用 - 29</div>
+</div>
+
+
+
+</div>
+<div id="main_container">
+<div id="main_content">
+<div id="content">
+	
+<div id="post_detail">
+	<div class="post">
+		<h2>
+			<a id="cb_post_title_url" href="./Android的init过程详解（一） - 银河使者 - 博客园_files/Android的init过程详解（一） - 银河使者 - 博客园.html">Android的init过程详解（一）</a>
+		</h2>
+		<div class="postbody">
+		<div id="cnblogs_post_body"><h2><a id="cb_post_title_url" href="http://www.cnblogs.com/nokiaguy/p/3164799.html">Android的init过程（二）：初始化语言（init.rc）解析</a></h2>
+<p>本文使用的软件版本</p>
+<p>Android：<span style="color: #ff0000;">4.2.2</span></p>
+<p>Linux内核：<span style="color: #ff0000;">3.1.10</span></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 本文及后续几篇文章将对Android的初始化（init）过程进行详细地、剥丝抽茧式地分析，并且在其中穿插了大量的知识，希望对读者了解Android的启动过程又所帮助。本章主要介绍了与硬件相关初始化文件名的确定以及属性服务的原理和实现。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; Android本质上就是一个基于Linux内核的操作系统。与Ubuntu Linux、Fedora Linux类似。只是Android在应用层专门为移动设备添加了一些特有的支持。既然Android是Linux内核的系统，那么基本的启动过程也应符合Linux的规则。如果研究过其他Linux系统应该了解，一个完整的Linux系统首先会将一个Linux内核装载到内存，也就是编译Linux内核源代码生成的bzImage文件，对于为Android优化的Linux内核源代码会生成zImage文件。该文件就是Linux内核的二进制版本。由于zImage在内核空间运行，而我们平常使用的软件都是在应用空间运行（关于内核空间和应用空间的详细描述，可以参考<a href="http://product.dangdang.com/main/product.aspx?product_id=23043311&amp;_ddclickunion=P-263982|ad_type=0|sys_id=1#dd_refer=http%3A%2F%2Fblog.csdn.net%2Fnokiaguy">《Android深度探索（卷1）：HAL与驱动开发》</a>一书的内容，在后续的各卷中将会对Android的整体体系进行全方位的剖析）。内核空间和应用空间是不能直接通过内存地址级别访问的，所以就需要建立某种通讯机制。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 目前Linux有很多通讯机制可以在用户空间和内核空间之间交互，例如设备驱动文件（位于/dev目录中）、内存文件（/proc、/sys目录等）。了解Linux的同学都应该知道Linux的重要特征之一就是一切都是以文件的形式存在的，例如，一个设备通常与一个或多个设备文件对应。这些与内核空间交互的文件都在用户空间，所以在Linux内核装载完，需要首先建立这些文件所在的目录。而完成这些工作的程序就是本文要介绍的init。Init是一个命令行程序。其主要工作之一就是建立这些与内核空间交互的文件所在的目录。当Linux内核加载完后，要做的第一件事就是调用init程序，也就是说，init是用户空间执行的第一个程序。</p>
+<p>在分析init的核心代码之前，还需要初步了解init除了建立一些目录外，还做了如下的工作</p>
+<p>1. 初始化属性</p>
+<p>2. 处理配置文件的命令（主要是init.rc文件），包括处理各种Action。</p>
+<p>3. 性能分析（使用bootchart工具）。</p>
+<p>4. 无限循环执行command（启动其他的进程）。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 尽管init完成的工作不算很多，不过代码还是非常复杂的。Init程序并不是由一个源代码文件组成的，而是由一组源代码文件的目标文件链接而成的。这些文件位于如下的目录。</p>
+<p>&lt;Android源代码本目录&gt;/system/core/init</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 其中init.c是init的主文件，现在打开该文件，看看其中的内容。由于init是命令行程序，所以分析init.c首先应从main函数开始，现在好到main函数，代码如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #0000ff;">int</span> main(<span style="color: #0000ff;">int</span> argc, <span style="color: #0000ff;">char</span> **<span style="color: #000000;">argv)
+{
+    </span><span style="color: #0000ff;">int</span> fd_count = <span style="color: #800080;">0</span><span style="color: #000000;">;
+    </span><span style="color: #0000ff;">struct</span> pollfd ufds[<span style="color: #800080;">4</span><span style="color: #000000;">];
+    </span><span style="color: #0000ff;">char</span> *<span style="color: #000000;">tmpdev;
+    </span><span style="color: #0000ff;">char</span>*<span style="color: #000000;"> debuggable;
+    </span><span style="color: #0000ff;">char</span> tmp[<span style="color: #800080;">32</span><span style="color: #000000;">];
+    </span><span style="color: #0000ff;">int</span> property_set_fd_init = <span style="color: #800080;">0</span><span style="color: #000000;">;
+    </span><span style="color: #0000ff;">int</span> signal_fd_init = <span style="color: #800080;">0</span><span style="color: #000000;">;
+    </span><span style="color: #0000ff;">int</span> keychord_fd_init = <span style="color: #800080;">0</span><span style="color: #000000;">;
+    </span><span style="color: #0000ff;">bool</span> is_charger = <span style="color: #0000ff;">false</span><span style="color: #000000;">;
+
+    </span><span style="color: #0000ff;">if</span> (!strcmp(basename(argv[<span style="color: #800080;">0</span>]), <span style="color: #800000;">"</span><span style="color: #800000;">ueventd</span><span style="color: #800000;">"</span><span style="color: #000000;">))
+        </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> ueventd_main(argc, argv);
+
+    </span><span style="color: #0000ff;">if</span> (!strcmp(basename(argv[<span style="color: #800080;">0</span>]), <span style="color: #800000;">"</span><span style="color: #800000;">watchdogd</span><span style="color: #800000;">"</span><span style="color: #000000;">))
+        </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> watchdogd_main(argc, argv);
+
+    </span><span style="color: #008000;">/*</span><span style="color: #008000;"> clear the umask </span><span style="color: #008000;">*/</span><span style="color: #000000;">
+    umask(</span><span style="color: #800080;">0</span><span style="color: #000000;">);
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  下面的代码开始建立各种用户空间的目录，如/dev、/proc、/sys等</span>
+    mkdir(<span style="color: #800000;">"</span><span style="color: #800000;">/dev</span><span style="color: #800000;">"</span>, <span style="color: #800080;">0755</span><span style="color: #000000;">);
+    mkdir(</span><span style="color: #800000;">"</span><span style="color: #800000;">/proc</span><span style="color: #800000;">"</span>, <span style="color: #800080;">0755</span><span style="color: #000000;">);
+    mkdir(</span><span style="color: #800000;">"</span><span style="color: #800000;">/sys</span><span style="color: #800000;">"</span>, <span style="color: #800080;">0755</span><span style="color: #000000;">);
+
+    mount(</span><span style="color: #800000;">"</span><span style="color: #800000;">tmpfs</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">/dev</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">tmpfs</span><span style="color: #800000;">"</span>, MS_NOSUID, <span style="color: #800000;">"</span><span style="color: #800000;">mode=0755</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+    mkdir(</span><span style="color: #800000;">"</span><span style="color: #800000;">/dev/pts</span><span style="color: #800000;">"</span>, <span style="color: #800080;">0755</span><span style="color: #000000;">);
+    mkdir(</span><span style="color: #800000;">"</span><span style="color: #800000;">/dev/socket</span><span style="color: #800000;">"</span>, <span style="color: #800080;">0755</span><span style="color: #000000;">);
+    mount(</span><span style="color: #800000;">"</span><span style="color: #800000;">devpts</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">/dev/pts</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">devpts</span><span style="color: #800000;">"</span>, <span style="color: #800080;">0</span><span style="color: #000000;">, NULL);
+    mount(</span><span style="color: #800000;">"</span><span style="color: #800000;">proc</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">/proc</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">proc</span><span style="color: #800000;">"</span>, <span style="color: #800080;">0</span><span style="color: #000000;">, NULL);
+    mount(</span><span style="color: #800000;">"</span><span style="color: #800000;">sysfs</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">/sys</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">sysfs</span><span style="color: #800000;">"</span>, <span style="color: #800080;">0</span><span style="color: #000000;">, NULL);
+
+        </span><span style="color: #008000;">/*</span><span style="color: #008000;"> 检测/dev/.booting文件是否可读写和创建</span><span style="color: #008000;">*/</span><span style="color: #000000;">
+    close(open(</span><span style="color: #800000;">"</span><span style="color: #800000;">/dev/.booting</span><span style="color: #800000;">"</span>, O_WRONLY | O_CREAT, <span style="color: #800080;">0000</span><span style="color: #000000;">));
+
+    open_devnull_stdio();
+    klog_init();
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  初始化属性</span>
+<span style="color: #000000;">    property_init();
+
+    get_hardware_name(hardware, </span>&amp;<span style="color: #000000;">revision);
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  处理内核命令行</span>
+<span style="color: #000000;">    process_kernel_cmdline();
+    … …
+
+    is_charger </span>= !strcmp(bootmode, <span style="color: #800000;">"</span><span style="color: #800000;">charger</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+
+    INFO(</span><span style="color: #800000;">"</span><span style="color: #800000;">property init\n</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+    </span><span style="color: #0000ff;">if</span> (!<span style="color: #000000;">is_charger)
+        property_load_boot_defaults();
+
+    INFO(</span><span style="color: #800000;">"</span><span style="color: #800000;">reading config file\n</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  分析/init.rc文件的内容</span>
+    init_parse_config_file(<span style="color: #800000;">"</span><span style="color: #800000;">/init.rc</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+    … …</span><span style="color: #008000;">//</span><span style="color: #008000;">  执行初始化文件中的动作</span>
+    action_for_each_trigger(<span style="color: #800000;">"</span><span style="color: #800000;">init</span><span style="color: #800000;">"</span><span style="color: #000000;">, action_add_queue_tail);
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  在charger模式下略过mount文件系统的工作</span>
+    <span style="color: #0000ff;">if</span> (!<span style="color: #000000;">is_charger) {
+        action_for_each_trigger(</span><span style="color: #800000;">"</span><span style="color: #800000;">early-fs</span><span style="color: #800000;">"</span><span style="color: #000000;">, action_add_queue_tail);
+        action_for_each_trigger(</span><span style="color: #800000;">"</span><span style="color: #800000;">fs</span><span style="color: #800000;">"</span><span style="color: #000000;">, action_add_queue_tail);
+        action_for_each_trigger(</span><span style="color: #800000;">"</span><span style="color: #800000;">post-fs</span><span style="color: #800000;">"</span><span style="color: #000000;">, action_add_queue_tail);
+        action_for_each_trigger(</span><span style="color: #800000;">"</span><span style="color: #800000;">post-fs-data</span><span style="color: #800000;">"</span><span style="color: #000000;">, action_add_queue_tail);
+    }
+
+    queue_builtin_action(property_service_init_action, </span><span style="color: #800000;">"</span><span style="color: #800000;">property_service_init</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+    queue_builtin_action(signal_init_action, </span><span style="color: #800000;">"</span><span style="color: #800000;">signal_init</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+    queue_builtin_action(check_startup_action, </span><span style="color: #800000;">"</span><span style="color: #800000;">check_startup</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+
+    </span><span style="color: #0000ff;">if</span><span style="color: #000000;"> (is_charger) {
+        action_for_each_trigger(</span><span style="color: #800000;">"</span><span style="color: #800000;">charger</span><span style="color: #800000;">"</span><span style="color: #000000;">, action_add_queue_tail);
+    } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+        action_for_each_trigger(</span><span style="color: #800000;">"</span><span style="color: #800000;">early-boot</span><span style="color: #800000;">"</span><span style="color: #000000;">, action_add_queue_tail);
+        action_for_each_trigger(</span><span style="color: #800000;">"</span><span style="color: #800000;">boot</span><span style="color: #800000;">"</span><span style="color: #000000;">, action_add_queue_tail);
+    }
+
+        </span><span style="color: #008000;">/*</span><span style="color: #008000;"> run all property triggers based on current state of the properties </span><span style="color: #008000;">*/</span><span style="color: #000000;">
+    queue_builtin_action(queue_property_triggers_action, </span><span style="color: #800000;">"</span><span style="color: #800000;">queue_property_triggers</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+
+
+</span><span style="color: #0000ff;">#if</span> BOOTCHART<span style="color: #000000;">
+    queue_builtin_action(bootchart_init_action, </span><span style="color: #800000;">"</span><span style="color: #800000;">bootchart_init</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+</span><span style="color: #0000ff;">#endif</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">  进入无限循环，建立init的子进程（init是所有进程的父进程）</span>
+    <span style="color: #0000ff;">for</span><span style="color: #000000;">(;;) {
+        </span><span style="color: #0000ff;">int</span> nr, i, timeout = -<span style="color: #800080;">1</span><span style="color: #000000;">;
+        </span><span style="color: #008000;">//</span><span style="color: #008000;">  执行命令（子进程对应的命令）</span>
+<span style="color: #000000;">        execute_one_command();
+        restart_processes();
+
+        </span><span style="color: #0000ff;">if</span> (!property_set_fd_init &amp;&amp; get_property_set_fd() &gt; <span style="color: #800080;">0</span><span style="color: #000000;">) {
+            ufds[fd_count].fd </span>=<span style="color: #000000;"> get_property_set_fd();
+            ufds[fd_count].events </span>=<span style="color: #000000;"> POLLIN;
+            ufds[fd_count].revents </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;
+            fd_count</span>++<span style="color: #000000;">;
+            property_set_fd_init </span>= <span style="color: #800080;">1</span><span style="color: #000000;">;
+        }
+        </span><span style="color: #0000ff;">if</span> (!signal_fd_init &amp;&amp; get_signal_fd() &gt; <span style="color: #800080;">0</span><span style="color: #000000;">) {
+            ufds[fd_count].fd </span>=<span style="color: #000000;"> get_signal_fd();
+            ufds[fd_count].events </span>=<span style="color: #000000;"> POLLIN;
+            ufds[fd_count].revents </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;
+            fd_count</span>++<span style="color: #000000;">;
+            signal_fd_init </span>= <span style="color: #800080;">1</span><span style="color: #000000;">;
+        }
+        </span><span style="color: #0000ff;">if</span> (!keychord_fd_init &amp;&amp; get_keychord_fd() &gt; <span style="color: #800080;">0</span><span style="color: #000000;">) {
+            ufds[fd_count].fd </span>=<span style="color: #000000;"> get_keychord_fd();
+            ufds[fd_count].events </span>=<span style="color: #000000;"> POLLIN;
+            ufds[fd_count].revents </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;
+            fd_count</span>++<span style="color: #000000;">;
+            keychord_fd_init </span>= <span style="color: #800080;">1</span><span style="color: #000000;">;
+        }
+
+        </span><span style="color: #0000ff;">if</span><span style="color: #000000;"> (process_needs_restart) {
+            timeout </span>= (process_needs_restart - gettime()) * <span style="color: #800080;">1000</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">if</span> (timeout &lt; <span style="color: #800080;">0</span><span style="color: #000000;">)
+                timeout </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;
+        }
+
+        </span><span style="color: #0000ff;">if</span> (!action_queue_empty() ||<span style="color: #000000;"> cur_action)
+            timeout </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;
+</span><span style="color: #008000;">//</span><span style="color: #008000;">  bootchart是一个性能统计工具，用于搜集硬件和系统的信息，并将其写入磁盘，以便其
+</span><span style="color: #008000;">//</span><span style="color: #008000;">  他程序使用</span>
+<span style="color: #0000ff;">#if</span> BOOTCHART
+        <span style="color: #0000ff;">if</span> (bootchart_count &gt; <span style="color: #800080;">0</span><span style="color: #000000;">) {
+            </span><span style="color: #0000ff;">if</span> (timeout &lt; <span style="color: #800080;">0</span> || timeout &gt;<span style="color: #000000;"> BOOTCHART_POLLING_MS)
+                timeout </span>=<span style="color: #000000;"> BOOTCHART_POLLING_MS;
+            </span><span style="color: #0000ff;">if</span> (bootchart_step() &lt; <span style="color: #800080;">0</span> || --bootchart_count == <span style="color: #800080;">0</span><span style="color: #000000;">) {
+                bootchart_finish();
+                bootchart_count </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;
+            }
+        }
+</span><span style="color: #0000ff;">#endif</span>
+        <span style="color: #008000;">//</span><span style="color: #008000;">  等待下一个命令的提交</span>
+        nr =<span style="color: #000000;"> poll(ufds, fd_count, timeout);
+        </span><span style="color: #0000ff;">if</span> (nr &lt;= <span style="color: #800080;">0</span><span style="color: #000000;">)
+            </span><span style="color: #0000ff;">continue</span><span style="color: #000000;">;
+
+        </span><span style="color: #0000ff;">for</span> (i = <span style="color: #800080;">0</span>; i &lt; fd_count; i++<span style="color: #000000;">) {
+            </span><span style="color: #0000ff;">if</span> (ufds[i].revents ==<span style="color: #000000;"> POLLIN) {
+                </span><span style="color: #0000ff;">if</span> (ufds[i].fd ==<span style="color: #000000;"> get_property_set_fd())
+                    handle_property_set_fd();
+                </span><span style="color: #0000ff;">else</span> <span style="color: #0000ff;">if</span> (ufds[i].fd ==<span style="color: #000000;"> get_keychord_fd())
+                    handle_keychord();
+                </span><span style="color: #0000ff;">else</span> <span style="color: #0000ff;">if</span> (ufds[i].fd ==<span style="color: #000000;"> get_signal_fd())
+                    handle_signal();
+            }
+        }
+    }
+
+    </span><span style="color: #0000ff;">return</span> <span style="color: #800080;">0</span><span style="color: #000000;">;
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 我们可以看到main函数是非常复杂的，不过我们也不需要每条语句都弄得非常清楚（因为这样弄是非常困难的），通常只需要了解init的主线即可。其实从init的main函数可以看出。Init实际上就分为如下两部分。</p>
+<p>1.&nbsp; 初始化（包括建立/dev、/proc等目录、初始化属性、执行init.rc等初始化文件中的action等）。</p>
+<p>2.&nbsp; 使用for循环无限循环建立子进程。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 第一项工作很好理解。而第二项工作是init中的核心。在Linux系统中init是一切应用空间进程的父进程。所以我们平常在Linux终端执行的命令，并建立进程。实际上都是在这个无限的for循环中完成的。也就是说，在Linux终端执行ps –e 命令后，看到的所有除了init外的其他进程，都是由init负责创建的。而且init也会常驻内容。当然，如果init挂了，Linux系统基本上就崩溃了。</p>
+<p>&nbsp;&nbsp;&nbsp; 由于init比较复杂，所以本文只分析其中的一部分，在后续文章中将详细分析init的各个核心组成部分。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 对于main函数最开始完成的建立目录的工作比较简单，这部分也没什么可以分析的。就是调用了一些普通的API（mkdir）建立一些目录。现在说一些题外话，由于Android的底层源代码（包括init）实际上是属于Linux应用编程领域，所以要想充分理解Android源代码，除了Linux的基本结构要了解外，Linux应用层的API需要熟悉。为了满足这些读者的需要，后续我会写一些关于Linux应用编程的文章。Ok，现在言归正传，接下来分析一个比较重要的部分：配置文件的解析。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 这里的配置文件主要指init.rc。读者可以进到Android的shell，会看到根目录有一个init.rc文件。该文件是只读的，即使有了root权限，可以修改该文件也没有。因为我们在根目录看到的文件只是内存文件的镜像。也就是说，android启动后，会将init.rc文件装载到内存。而修改init.rc文件的内容实际上只是修改内存中的init.rc文件的内容。一旦重启android，init.rc文件的内容又会恢复到最初的装载。想彻底修改init.rc文件内容的唯一方式是修改Android的ROM中的内核镜像（boot.img）。其实boot.img名曰内核镜像，不过该文件除了包含完整的Linux内核文件（zImage）外，还包括另外一个镜像文件（ramdisk.img）。ramdisk.img就包含了init.rc文件和init命令。所以只有修改ramdisk.img文件中的init.rc文件，并且重新打包boot.img文件，并刷机，才能彻底修改init.rc文件。如果读者有Android源代码，编译后，就会看到out目录中的相关子目录会生成一个root目录，该目录实际上就是ramdisk.img解压后的内容。会看到有init命令和init.rc文件。在后续的文章中将会讨论具体如何修改init.rc文件，如何刷机。不过这些内容与本文关系不大，所以不做详细的讨论。</p>
+<p>现在回到main函数，在创建完目录后，会看到执行了如下3个函数。</p>
+<p>&nbsp;&nbsp;&nbsp; property_init();<br>&nbsp;&nbsp;&nbsp; get_hardware_name(hardware, &amp;revision);<br>&nbsp;&nbsp;&nbsp; process_kernel_cmdline();</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 其中property_init主要是为属性分配一些存储空间，该函数并不是核心。不过当我们查看init.rc文件时会发现该文件开始部分用一些import语句导入了其他的配置文件，例如，/init.usb.rc。大多数配置文件都直接使用了确定的文件名，只有如下的代码使用了一个变量（${ro.hardware}）执行了配置文件名的一部分。那么这个变量值是从哪获得的呢？</p>
+<p>import /init.${ro.hardware}.rc</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 首先要了解init.${ro.hardware}.rc配置文件的内容通常与当前的硬件有关。现在我们先来关注get_hardware_name函数，代码如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #0000ff;">void</span> get_hardware_name(<span style="color: #0000ff;">char</span> *hardware, unsigned <span style="color: #0000ff;">int</span> *<span style="color: #000000;">revision)
+{
+    </span><span style="color: #0000ff;">char</span> data[<span style="color: #800080;">1024</span><span style="color: #000000;">];
+    </span><span style="color: #0000ff;">int</span><span style="color: #000000;"> fd, n;
+    </span><span style="color: #0000ff;">char</span> *x, *hw, *<span style="color: #000000;">rev;
+
+    </span><span style="color: #008000;">/*</span><span style="color: #008000;"> 如果hardware已经有值了，说明hardware通过内核命令行提供，直接返回 </span><span style="color: #008000;">*/</span>
+    <span style="color: #0000ff;">if</span> (hardware[<span style="color: #800080;">0</span><span style="color: #000000;">])
+        </span><span style="color: #0000ff;">return</span><span style="color: #000000;">;
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  打开/proc/cpuinfo文件</span>
+    fd = open(<span style="color: #800000;">"</span><span style="color: #800000;">/proc/cpuinfo</span><span style="color: #800000;">"</span><span style="color: #000000;">, O_RDONLY);
+    </span><span style="color: #0000ff;">if</span> (fd &lt; <span style="color: #800080;">0</span>) <span style="color: #0000ff;">return</span><span style="color: #000000;">;
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  读取/proc/cpuinfo文件的内容</span>
+    n = read(fd, data, <span style="color: #800080;">1023</span><span style="color: #000000;">);
+    close(fd);
+    </span><span style="color: #0000ff;">if</span> (n &lt; <span style="color: #800080;">0</span>) <span style="color: #0000ff;">return</span><span style="color: #000000;">;
+
+    data[n] </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  从/proc/cpuinfo文件中获取Hardware字段的值</span>
+    hw = strstr(data, <span style="color: #800000;">"</span><span style="color: #800000;">\nHardware</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+    rev </span>= strstr(data, <span style="color: #800000;">"</span><span style="color: #800000;">\nRevision</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  成功获取Hardware字段的值</span>
+    <span style="color: #0000ff;">if</span><span style="color: #000000;"> (hw) {
+        x </span>= strstr(hw, <span style="color: #800000;">"</span><span style="color: #800000;">: </span><span style="color: #800000;">"</span><span style="color: #000000;">);
+        </span><span style="color: #0000ff;">if</span><span style="color: #000000;"> (x) {
+            x </span>+= <span style="color: #800080;">2</span><span style="color: #000000;">;
+            n </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;
+            </span><span style="color: #0000ff;">while</span> (*x &amp;&amp; *x != <span style="color: #800000;">'</span><span style="color: #800000;">\n</span><span style="color: #800000;">'</span><span style="color: #000000;">) {
+                </span><span style="color: #0000ff;">if</span> (!isspace(*<span style="color: #000000;">x))
+                    </span><span style="color: #008000;">//</span><span style="color: #008000;">  将Hardware字段的值都转换为小写，并更新hardware参数的值
+                    </span><span style="color: #008000;">//</span><span style="color: #008000;">  hardware也就是在init.c文件中定义的hardware数组</span>
+                    hardware[n++] = tolower(*<span style="color: #000000;">x);
+                x</span>++<span style="color: #000000;">;
+                </span><span style="color: #0000ff;">if</span> (n == <span style="color: #800080;">31</span>) <span style="color: #0000ff;">break</span><span style="color: #000000;">;
+            }
+            hardware[n] </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;
+        }
+    }
+
+    </span><span style="color: #0000ff;">if</span><span style="color: #000000;"> (rev) {
+        x </span>= strstr(rev, <span style="color: #800000;">"</span><span style="color: #800000;">: </span><span style="color: #800000;">"</span><span style="color: #000000;">);
+        </span><span style="color: #0000ff;">if</span><span style="color: #000000;"> (x) {
+            </span>*revision = strtoul(x + <span style="color: #800080;">2</span>, <span style="color: #800080;">0</span>, <span style="color: #800080;">16</span><span style="color: #000000;">);
+        }
+    }
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 从get_hardware_name方法的代码可以得知，该方法主要用于确定hardware和revision的变量的值。Revision这里先不讨论，只要研究hardware。获取hardware的来源是从Linux内核命令行或/proc/cpuinfo文件中的内容。Linux内核命令行暂且先不讨论（因为很少传递该值），先看看/proc/cpuinfo，该文件是虚拟文件（内存文件），执行cat /proc/cpuinfo命令会看到该文件中的内容，如图1所示。在白框中就是Hardware字段的值。由于该设备是Nexus 7，所以值为grouper。如果程序就到此位置，那么与硬件有关的配置文件名是init.grouper.rc。有Nexus 7的读者会看到在根目录下确实有一个init.grouper.rc文件。说明Nexus 7的原生ROM并没有在其他的地方设置配置文件名，所以配置文件名就是从/proc/cpuinfo文件的Hardware字段中取的值。</p>
+<p><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/14193940-bbffc9d5e63e4e8095a132bbdd7333b0.jpg" alt="" width="508" height="325"></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 图1</p>
+<p>现在来看在get_hardware_name函数后面调用的process_kernel_cmdline函数，代码如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #0000ff;">static</span> <span style="color: #0000ff;">void</span> process_kernel_cmdline(<span style="color: #0000ff;">void</span><span style="color: #000000;">)
+{
+    </span><span style="color: #008000;">/*</span><span style="color: #008000;"> don't expose the raw commandline to nonpriv processes </span><span style="color: #008000;">*/</span><span style="color: #000000;">
+    chmod(</span><span style="color: #800000;">"</span><span style="color: #800000;">/proc/cmdline</span><span style="color: #800000;">"</span>, <span style="color: #800080;">0440</span><span style="color: #000000;">);
+
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  导入内核命令行参数</span>
+    import_kernel_cmdline(<span style="color: #800080;">0</span><span style="color: #000000;">, import_kernel_nv);
+    </span><span style="color: #0000ff;">if</span> (qemu[<span style="color: #800080;">0</span><span style="color: #000000;">])
+        import_kernel_cmdline(</span><span style="color: #800080;">1</span><span style="color: #000000;">, import_kernel_nv);
+
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  用属性值设置内核变量</span>
+<span style="color: #000000;">    export_kernel_boot_props();
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在process_kernel_cmdline函数中除了使用import_kernel_cmdline函数导入内核变量外，主要的功能就是调用export_kernel_boot_props函数通过属性设置内核变量，例如，通过ro.boot.hardware属性设置hardware变量，也就是说可以通过ro.boot.hardware属性值可以修改get_hardware_name函数中从/proc/cpuinfo文件中得到的hardware字段值。下面看一下export_kernel_boot_props函数的代码。</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #0000ff;">static</span> <span style="color: #0000ff;">void</span> export_kernel_boot_props(<span style="color: #0000ff;">void</span><span style="color: #000000;">)
+{
+    </span><span style="color: #0000ff;">char</span><span style="color: #000000;"> tmp[PROP_VALUE_MAX];
+    </span><span style="color: #0000ff;">const</span> <span style="color: #0000ff;">char</span> *<span style="color: #000000;">pval;
+    unsigned i;
+    </span><span style="color: #0000ff;">struct</span><span style="color: #000000;"> {
+        </span><span style="color: #0000ff;">const</span> <span style="color: #0000ff;">char</span> *<span style="color: #000000;">src_prop;
+        </span><span style="color: #0000ff;">const</span> <span style="color: #0000ff;">char</span> *<span style="color: #000000;">dest_prop;
+        </span><span style="color: #0000ff;">const</span> <span style="color: #0000ff;">char</span> *<span style="color: #000000;">def_val;
+    } prop_map[] </span>=<span style="color: #000000;"> {
+        { </span><span style="color: #800000;">"</span><span style="color: #800000;">ro.boot.serialno</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">ro.serialno</span><span style="color: #800000;">"</span>, <span style="color: #800000;">""</span><span style="color: #000000;">, },
+        { </span><span style="color: #800000;">"</span><span style="color: #800000;">ro.boot.mode</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">ro.bootmode</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">unknown</span><span style="color: #800000;">"</span><span style="color: #000000;">, },
+        { </span><span style="color: #800000;">"</span><span style="color: #800000;">ro.boot.baseband</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">ro.baseband</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">unknown</span><span style="color: #800000;">"</span><span style="color: #000000;">, },
+        { </span><span style="color: #800000;">"</span><span style="color: #800000;">ro.boot.bootloader</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">ro.bootloader</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">unknown</span><span style="color: #800000;">"</span><span style="color: #000000;">, },
+    };
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  通过内核的属性设置应用层配置文件的属性</span>
+    <span style="color: #0000ff;">for</span> (i = <span style="color: #800080;">0</span>; i &lt; ARRAY_SIZE(prop_map); i++<span style="color: #000000;">) {
+        pval </span>=<span style="color: #000000;"> property_get(prop_map[i].src_prop);
+        property_set(prop_map[i].dest_prop, pval </span>?<span style="color: #000000;">: prop_map[i].def_val);
+    }
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  根据ro.boot.console属性的值设置console变量</span>
+    pval = property_get(<span style="color: #800000;">"</span><span style="color: #800000;">ro.boot.console</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+    </span><span style="color: #0000ff;">if</span><span style="color: #000000;"> (pval)
+        strlcpy(console, pval, </span><span style="color: #0000ff;">sizeof</span><span style="color: #000000;">(console));
+
+    </span><span style="color: #008000;">/*</span><span style="color: #008000;"> save a copy for init's usage during boot </span><span style="color: #008000;">*/</span><span style="color: #000000;">
+    strlcpy(bootmode, property_get(</span><span style="color: #800000;">"</span><span style="color: #800000;">ro.bootmode</span><span style="color: #800000;">"</span>), <span style="color: #0000ff;">sizeof</span><span style="color: #000000;">(bootmode));
+
+    </span><span style="color: #008000;">/*</span><span style="color: #008000;"> if this was given on kernel command line, override what we read
+     * before (e.g. from /proc/cpuinfo), if anything </span><span style="color: #008000;">*/</span>
+    <span style="color: #008000;">//</span><span style="color: #008000;">  获取ro.boot.hardware属性的值</span>
+    pval = property_get(<span style="color: #800000;">"</span><span style="color: #800000;">ro.boot.hardware</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+    </span><span style="color: #0000ff;">if</span><span style="color: #000000;"> (pval)<br>        <span style="color: #008000;">//</span><span style="color: #008000;"> 这里通过ro.boot.hardware属性再次改变hardware变量<span style="color: #000000;"><span style="color: #008000;">的值</span></span></span>
+        strlcpy(hardware, pval, </span><span style="color: #0000ff;">sizeof</span><span style="color: #000000;">(hardware));
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  利用hardware变量的值设置设置ro.hardware属性<br>    //  这个属性就是前面提到的设置初始化文件名的属性，实际上是通过hardware变量设置的<br></span>    property_set(<span style="color: #800000;">"</span><span style="color: #800000;">ro.hardware</span><span style="color: #800000;">"</span><span style="color: #000000;">, hardware);
+
+    snprintf(tmp, PROP_VALUE_MAX, </span><span style="color: #800000;">"</span><span style="color: #800000;">%d</span><span style="color: #800000;">"</span><span style="color: #000000;">, revision);
+    property_set(</span><span style="color: #800000;">"</span><span style="color: #800000;">ro.revision</span><span style="color: #800000;">"</span><span style="color: #000000;">, tmp);
+
+    </span><span style="color: #008000;">/*</span><span style="color: #008000;"> TODO: these are obsolete. We should delete them </span><span style="color: #008000;">*/</span>
+    <span style="color: #0000ff;">if</span> (!strcmp(bootmode,<span style="color: #800000;">"</span><span style="color: #800000;">factory</span><span style="color: #800000;">"</span><span style="color: #000000;">))
+        property_set(</span><span style="color: #800000;">"</span><span style="color: #800000;">ro.factorytest</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">1</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+    </span><span style="color: #0000ff;">else</span> <span style="color: #0000ff;">if</span> (!strcmp(bootmode,<span style="color: #800000;">"</span><span style="color: #800000;">factory2</span><span style="color: #800000;">"</span><span style="color: #000000;">))
+        property_set(</span><span style="color: #800000;">"</span><span style="color: #800000;">ro.factorytest</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">2</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+    </span><span style="color: #0000ff;">else</span><span style="color: #000000;">
+        property_set(</span><span style="color: #800000;">"</span><span style="color: #800000;">ro.factorytest</span><span style="color: #800000;">"</span>, <span style="color: #800000;">"</span><span style="color: #800000;">0</span><span style="color: #800000;">"</span><span style="color: #000000;">);
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 从export_kernel_boot_props函数的代码可以看出，该函数实际上就是来回设置一些属性值，并且利用某些属性值修改console、hardware等变量。其中hardware变量（就是一个长度为32的字符数组）在get_hardware_name函数中已经从/proc/cpuinfo文件中获得过一次值了，在export_kernel_boot_props函数中又通过ro.boot.hardware属性设置了一次值，不过在Nexus 7中并没有设置该属性，所以hardware的值仍为grouper。最后用hardware变量设置ro.hardware属性，所以最后的初始化文件名为init.grouper.rc。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 这里还有一个问题，前面多次提到属性或属性文件，那么这些属性文件指的是什么呢？是init.rc？当然不是。实际上这些属性文件是一些列位于不同目录，系统依次读取的配置文件。</p>
+<p><strong>属性服务（Property Service）</strong></p>
+<p><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </strong>在研究这些配置文件之前应先了解init是如何处理这些属性的。编写过Windows本地应用的读者都应了解，在windows中有一个注册表机制，在注册表中提供了大量的属性。在Linux中也有类似的机制，这就是属性服务。init在启动的过程中会启动属性服务（Socket服务），并且在内存中建立一块存储区域，用来存储这些属性。当读取这些属性时，直接从这一内存区域读取，如果修改属性值，需要通过Socket连接属性服务完成。在init.c文件中的一个action函数中调用了start_property_service函数来启动属性服务，action是init.rc及其类似文件中的一种执行机制，由于内容比较多，所以关于init.rc文件中的执行机制将在下一篇文章中详细讨论。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 现在顺藤摸瓜，找到start_property_service函数，该函数在Property_service.c文件中，该文件与init.c文件中同一个目录。</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #0000ff;">void</span> start_property_service(<span style="color: #0000ff;">void</span><span style="color: #000000;">)
+{
+    </span><span style="color: #0000ff;">int</span><span style="color: #000000;"> fd;
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  装载不同的属性文件</span>
+<span style="color: #000000;">    load_properties_from_file(PROP_PATH_SYSTEM_BUILD);
+    load_properties_from_file(PROP_PATH_SYSTEM_DEFAULT);
+    load_override_properties();
+    </span><span style="color: #008000;">/*</span><span style="color: #008000;"> Read persistent properties after all default values have been loaded. </span><span style="color: #008000;">*/</span><span style="color: #000000;">
+    load_persistent_properties();
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  创建socket服务（属性服务）</span>
+    fd = create_socket(PROP_SERVICE_NAME, SOCK_STREAM, <span style="color: #800080;">0666</span>, <span style="color: #800080;">0</span>, <span style="color: #800080;">0</span><span style="color: #000000;">);
+    </span><span style="color: #0000ff;">if</span>(fd &lt; <span style="color: #800080;">0</span>) <span style="color: #0000ff;">return</span><span style="color: #000000;">;
+    fcntl(fd, F_SETFD, FD_CLOEXEC);
+    fcntl(fd, F_SETFL, O_NONBLOCK);
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  开始服务监听</span>
+    listen(fd, <span style="color: #800080;">8</span><span style="color: #000000;">);
+    property_set_fd </span>=<span style="color: #000000;"> fd;
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 现在我们已经知道属性服务的启动方式了，那么在start_property_service函数中还涉及到如下两个宏。</p>
+<p>PROP_PATH_SYSTEM_BUILD</p>
+<p>PROP_PATH_SYSTEM_DEFAULT</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 这两个宏都是系统预定义的属性文件名的路径。为了获取这些宏的定义，我们先进行另外一个函数的分析。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在前面读取属性值时使用过一个property_get函数，该函数在Property_service.c中实现，代码如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #0000ff;">const</span> <span style="color: #0000ff;">char</span>* property_get(<span style="color: #0000ff;">const</span> <span style="color: #0000ff;">char</span> *<span style="color: #000000;">name)
+{
+    prop_info </span>*<span style="color: #000000;">pi;
+    </span><span style="color: #0000ff;">if</span>(strlen(name) &gt;= PROP_NAME_MAX) <span style="color: #0000ff;">return</span> <span style="color: #800080;">0</span><span style="color: #000000;">;
+    pi </span>= (prop_info*<span style="color: #000000;">) __system_property_find(name);
+    </span><span style="color: #0000ff;">if</span>(pi != <span style="color: #800080;">0</span><span style="color: #000000;">) {
+        </span><span style="color: #0000ff;">return</span> pi-&gt;<span style="color: #000000;">value;
+    } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+        </span><span style="color: #0000ff;">return</span> <span style="color: #800080;">0</span><span style="color: #000000;">;
+    }
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 可以看到，在property_get函数中调用了一个核心函数__system_property_find，该函数真正实现了获取属性值的功能。该函数属于bionic的一个library，在system_properties.c文件中实现，读者可以在如下的目录找到该文件。</p>
+<p>&lt;Android源代码根目录&gt;/bionic/libc/bionic</p>
+<p>__system_property_find函数的代码如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #0000ff;">const</span> prop_info *__system_property_find(<span style="color: #0000ff;">const</span> <span style="color: #0000ff;">char</span> *<span style="color: #000000;">name)
+{
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  获取属性存储内存区域的首地址</span>
+    prop_area *pa =<span style="color: #000000;"> __system_property_area__;
+    unsigned count </span>= pa-&gt;<span style="color: #000000;">count;
+    unsigned </span>*toc = pa-&gt;<span style="color: #000000;">toc;
+    unsigned len </span>=<span style="color: #000000;"> strlen(name);
+    prop_info </span>*<span style="color: #000000;">pi;
+
+    </span><span style="color: #0000ff;">while</span>(count--<span style="color: #000000;">) {
+        unsigned entry </span>= *toc++<span style="color: #000000;">;
+        </span><span style="color: #0000ff;">if</span>(TOC_NAME_LEN(entry) != len) <span style="color: #0000ff;">continue</span><span style="color: #000000;">;
+        
+        pi </span>=<span style="color: #000000;"> TOC_TO_INFO(pa, entry);
+        </span><span style="color: #0000ff;">if</span>(memcmp(name, pi-&gt;name, len)) <span style="color: #0000ff;">continue</span><span style="color: #000000;">;
+        </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> pi;
+    }
+
+    </span><span style="color: #0000ff;">return</span> <span style="color: #800080;">0</span><span style="color: #000000;">;
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 从__system_property_find函数的代码很容易看出，第一行使用了一个__system_property_area__变量，该变量是全局的。在前面分析main函数时涉及到一个property_init函数，该函数调用了init_property_area函数，该函数用于初始化属性内存区域，也就是__system_property_area__变量。</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #0000ff;">static</span> <span style="color: #0000ff;">int</span> init_property_area(<span style="color: #0000ff;">void</span><span style="color: #000000;">)
+{
+    prop_area </span>*<span style="color: #000000;">pa;
+    </span><span style="color: #0000ff;">if</span><span style="color: #000000;">(pa_info_array)
+        </span><span style="color: #0000ff;">return</span> -<span style="color: #800080;">1</span><span style="color: #000000;">;
+    </span><span style="color: #0000ff;">if</span>(init_workspace(&amp;<span style="color: #000000;">pa_workspace, PA_SIZE))
+        </span><span style="color: #0000ff;">return</span> -<span style="color: #800080;">1</span><span style="color: #000000;">;
+    fcntl(pa_workspace.fd, F_SETFD, FD_CLOEXEC);
+
+    pa_info_array </span>= (<span style="color: #0000ff;">void</span>*) (((<span style="color: #0000ff;">char</span>*) pa_workspace.data) +<span style="color: #000000;"> PA_INFO_START);
+
+    pa </span>=<span style="color: #000000;"> pa_workspace.data;
+    memset(pa, </span><span style="color: #800080;">0</span><span style="color: #000000;">, PA_SIZE);
+    pa</span>-&gt;magic =<span style="color: #000000;"> PROP_AREA_MAGIC;
+    pa</span>-&gt;version =<span style="color: #000000;"> PROP_AREA_VERSION;
+
+    </span><span style="color: #008000;">/*</span><span style="color: #008000;"> 初始化属性内存区域，属性服务会使用该区域 </span><span style="color: #008000;">*/</span><span style="color: #000000;">
+    __system_property_area__ </span>=<span style="color: #000000;"> pa;
+    property_area_inited </span>= <span style="color: #800080;">1</span><span style="color: #000000;">;
+    </span><span style="color: #0000ff;">return</span> <span style="color: #800080;">0</span><span style="color: #000000;">;
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在前面涉及到的system_properties.c文件对应的头文件system_properties.h中定义了前面提到的两个表示属性文件路径的宏，其实还有另外两个表示路径的宏，一共4个属性文件。system_properties.h文件可以在&lt;Android源代码根目录&gt;/bionic/libc/include/sys目录中找到。这4个宏定义如下：</p>
+<div class="cnblogs_code">
+<pre><span style="color: #0000ff;">#define</span> PROP_PATH_RAMDISK_DEFAULT  "/default.prop"
+<span style="color: #0000ff;">#define</span> PROP_PATH_SYSTEM_BUILD     "/system/build.prop"
+<span style="color: #0000ff;">#define</span> PROP_PATH_SYSTEM_DEFAULT   "/system/default.prop"
+<span style="color: #0000ff;">#define</span> PROP_PATH_LOCAL_OVERRIDE   "/data/local.prop"</pre>
+</div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 现在读者可以进入Android设备的相应目录，通常可以找到上述4个文件，如一般会在根目录，会发现一个default.prop文件，cat default.prop会看到该文件的内容。而属性服务就是装载所有这4个属性文件中的所有属性以及使用property_set设置的属性。在Android设备的终端可以直接使用getprop命令从属性服务获取所有的属性值。如图2所示。getprop命令还可以直接根属性名还获取具体的属性值，例如，getprop ro.build.product。</p>
+<p><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/14194439-1ade0f67bfdd4a8283edaa989fb33c7e.jpg" alt="" width="613" height="330"></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 图2</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 如果读者感兴趣，可以看一下getprop是如何通过属性服务读写属性的。getprop命令的源代码文件是getprop.c。读者可以在&lt;Android源代码根目录&gt;/system/core/toolbox目录中找到该文件。实际上，getprop获取属性值也是通过property_get函数完成的。在前面分析过该函数，实际上调用了__system_property_find函数从__system_property_area__变量指定的内存区域获取相应的属性值。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 此外在system_properties.c文件中还有如下两个函数用于通过属性服务修改或添加某个属性的值。</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #0000ff;">static</span> <span style="color: #0000ff;">int</span> send_prop_msg(prop_msg *<span style="color: #000000;">msg)
+{
+    </span><span style="color: #0000ff;">struct</span> pollfd pollfds[<span style="color: #800080;">1</span><span style="color: #000000;">];
+    </span><span style="color: #0000ff;">struct</span><span style="color: #000000;"> sockaddr_un addr;
+    socklen_t alen;
+    size_t namelen;
+    </span><span style="color: #0000ff;">int</span><span style="color: #000000;"> s;
+    </span><span style="color: #0000ff;">int</span><span style="color: #000000;"> r;
+    </span><span style="color: #0000ff;">int</span> result = -<span style="color: #800080;">1</span><span style="color: #000000;">;
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  创建用于连接属性服务的socket</span>
+    s = socket(AF_LOCAL, SOCK_STREAM, <span style="color: #800080;">0</span><span style="color: #000000;">);
+    </span><span style="color: #0000ff;">if</span>(s &lt; <span style="color: #800080;">0</span><span style="color: #000000;">) {
+        </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> result;
+    }
+
+    memset(</span>&amp;addr, <span style="color: #800080;">0</span>, <span style="color: #0000ff;">sizeof</span><span style="color: #000000;">(addr));
+    </span><span style="color: #008000;">//</span><span style="color: #008000;"> property_service_socket是Socket设备文件名称</span>
+    namelen =<span style="color: #000000;"> strlen(property_service_socket);
+    strlcpy(addr.sun_path, property_service_socket, </span><span style="color: #0000ff;">sizeof</span><span style="color: #000000;"> addr.sun_path);
+    addr.sun_family </span>=<span style="color: #000000;"> AF_LOCAL;
+    alen </span>= namelen + offsetof(<span style="color: #0000ff;">struct</span> sockaddr_un, sun_path) + <span style="color: #800080;">1</span><span style="color: #000000;">;
+
+    </span><span style="color: #0000ff;">if</span>(TEMP_FAILURE_RETRY(connect(s, (<span style="color: #0000ff;">struct</span> sockaddr *) &amp;addr, alen)) &lt; <span style="color: #800080;">0</span><span style="color: #000000;">) {
+        close(s);
+        </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> result;
+    }
+
+    r </span>= TEMP_FAILURE_RETRY(send(s, msg, <span style="color: #0000ff;">sizeof</span>(prop_msg), <span style="color: #800080;">0</span><span style="color: #000000;">));
+
+    </span><span style="color: #0000ff;">if</span>(r == <span style="color: #0000ff;">sizeof</span><span style="color: #000000;">(prop_msg)) {
+        pollfds[</span><span style="color: #800080;">0</span>].fd =<span style="color: #000000;"> s;
+        pollfds[</span><span style="color: #800080;">0</span>].events = <span style="color: #800080;">0</span><span style="color: #000000;">;
+        r </span>= TEMP_FAILURE_RETRY(poll(pollfds, <span style="color: #800080;">1</span>, <span style="color: #800080;">250</span> <span style="color: #008000;">/*</span><span style="color: #008000;"> ms </span><span style="color: #008000;">*/</span><span style="color: #000000;">));
+        </span><span style="color: #0000ff;">if</span> (r == <span style="color: #800080;">1</span> &amp;&amp; (pollfds[<span style="color: #800080;">0</span>].revents &amp; POLLHUP) != <span style="color: #800080;">0</span><span style="color: #000000;">) {
+            result </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;
+        } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {
+         
+          
+            result </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;
+        }
+    }
+
+    close(s);
+    </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> result;
+}
+</span><span style="color: #008000;">//</span><span style="color: #008000;"> 用户可以直接调用该函数设置属性值</span>
+<span style="color: #0000ff;">int</span> __system_property_set(<span style="color: #0000ff;">const</span> <span style="color: #0000ff;">char</span> *key, <span style="color: #0000ff;">const</span> <span style="color: #0000ff;">char</span> *<span style="color: #000000;">value)
+{
+    </span><span style="color: #0000ff;">int</span><span style="color: #000000;"> err;
+    </span><span style="color: #0000ff;">int</span> tries = <span style="color: #800080;">0</span><span style="color: #000000;">;
+    </span><span style="color: #0000ff;">int</span> update_seen = <span style="color: #800080;">0</span><span style="color: #000000;">;
+    prop_msg msg;
+
+    </span><span style="color: #0000ff;">if</span>(key == <span style="color: #800080;">0</span>) <span style="color: #0000ff;">return</span> -<span style="color: #800080;">1</span><span style="color: #000000;">;
+    </span><span style="color: #0000ff;">if</span>(value == <span style="color: #800080;">0</span>) value = <span style="color: #800000;">""</span><span style="color: #000000;">;
+    </span><span style="color: #0000ff;">if</span>(strlen(key) &gt;= PROP_NAME_MAX) <span style="color: #0000ff;">return</span> -<span style="color: #800080;">1</span><span style="color: #000000;">;
+    </span><span style="color: #0000ff;">if</span>(strlen(value) &gt;= PROP_VALUE_MAX) <span style="color: #0000ff;">return</span> -<span style="color: #800080;">1</span><span style="color: #000000;">;
+
+    memset(</span>&amp;msg, <span style="color: #800080;">0</span>, <span style="color: #0000ff;">sizeof</span><span style="color: #000000;"> msg);
+    msg.cmd </span>=<span style="color: #000000;"> PROP_MSG_SETPROP;
+    strlcpy(msg.name, key, </span><span style="color: #0000ff;">sizeof</span><span style="color: #000000;"> msg.name);
+    strlcpy(msg.value, value, </span><span style="color: #0000ff;">sizeof</span><span style="color: #000000;"> msg.value);
+    </span><span style="color: #008000;">//</span><span style="color: #008000;">  设置属性值</span>
+    err = send_prop_msg(&amp;<span style="color: #000000;">msg);
+    </span><span style="color: #0000ff;">if</span>(err &lt; <span style="color: #800080;">0</span><span style="color: #000000;">) {
+        </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> err;
+    }
+    </span><span style="color: #0000ff;">return</span> <span style="color: #800080;">0</span><span style="color: #000000;">;
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp; 在send_prop_msg函数中涉及到一个property_service_socket变量，定义如下：</p>
+<div class="cnblogs_code">
+<pre><span style="color: #0000ff;">static</span> <span style="color: #0000ff;">const</span> <span style="color: #0000ff;">char</span> property_service_socket[] = <span style="color: #800000;">"</span><span style="color: #800000;">/dev/socket/</span><span style="color: #800000;">"</span> PROP_SERVICE_NAME;</pre>
+</div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 实际上，send_prop_msg通过这个设备文件与属性服务通讯的。读者可以在Android设备的终端进入/dev/socket目录，通常会看到一个property_service文件，该文件就是属性服务映射的设备文件。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 现在已经分析完了init如何确定与硬件相关的初始化文件名（init.grouper.rc），并且讨论了4个属性文件及其装载过程，以及属性服务实现的基本原理。在下一篇文章中将讨论更深入的内容，例如，init.rc文件中提供了很多action，那么什么是aciton呢，init有是如何解析init.rc文件呢？这些内容都将在下一篇文章中揭晓。</p>
+<div id="xunlei_com_thunder_helper_plugin_d462f475-c18e-46be-bd10-327458d045bd">&nbsp;</div></div><div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+<div id="BlogPostCategory">分类: <a href="http://www.cnblogs.com/nokiaguy/category/137117.html"> 原创</a>, <a href="http://www.cnblogs.com/nokiaguy/category/250234.html">Android</a>, <a href="http://www.cnblogs.com/nokiaguy/category/174001.html">linux</a></div>
+<div id="EntryTag">标签: <a href="http://www.cnblogs.com/nokiaguy/tag/linux/">linux</a>, <a href="http://www.cnblogs.com/nokiaguy/tag/android/">android</a>, <a href="http://www.cnblogs.com/nokiaguy/tag/init/">init</a></div>
+<div id="blog_post_info"><div id="green_channel">
+<a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(3020774,cb_blogId,1);green_channel_success(this,&#39;谢谢推荐！&#39;);">好文要顶</a>
+<a id="green_channel_follow" onclick="c_follow();" href="javascript:void(0);">关注我</a>
+<a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a><a id="green_channel_contact" href="http://msg.cnblogs.com/send/%E9%93%B6%E6%B2%B3%E4%BD%BF%E8%80%85" target="_blank">联系我</a>
+<a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/icon_weibo_24.png" alt=""></a>
+<a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+<div id="author_profile_info" class="author_profile_info">
+<a href="http://home.cnblogs.com/u/nokiaguy/" target="_blank"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/u32818.jpg" class="author_avatar" alt=""></a>
+<div id="author_profile_detail" class="author_profile_info">
+<a href="http://home.cnblogs.com/u/nokiaguy/">银河使者</a><br>
+<a href="http://home.cnblogs.com/u/nokiaguy/followees">关注 - 3</a><br>
+<a href="http://home.cnblogs.com/u/nokiaguy/followers">粉丝 - 334</a>
+</div>
+</div>
+<div class="clear"></div>
+<div id="author_profile_honor"></div>
+<div id="author_profile_follow">
+    <a href="javascript:void(0);" onclick="c_follow();return false;">+加关注</a>
+</div>
+</div>
+<div id="div_digg">										
+    <div class="diggit" onclick="votePost(3020774,&#39;Digg&#39;)">
+        <span class="diggnum" id="digg_count">6</span>
+    </div>
+	<div class="buryit" onclick="votePost(3020774,&#39;Bury&#39;)"> 
+		<span class="burynum" id="bury_count">0</span>
+	</div>
+	<div class="clear"></div>	
+	<div class="diggword" id="digg_tips">
+    (请您对文章做出评价)
+    </div>	
+</div>
+</div>
+<div class="clear"></div>
+<div id="post_next_prev"><a href="http://www.cnblogs.com/nokiaguy/archive/2013/03/26/2983268.html" class="p_n_p_prefix">« </a> 上一篇：<a href="http://www.cnblogs.com/nokiaguy/archive/2013/03/26/2983268.html" title="发布于2013-03-26 20:29">《Android深度探索（卷1）：HAL与驱动开发》虚拟实验环境（Ubuntu Linux）免费下载，不需要CPU虚拟化支持</a><br><a href="http://www.cnblogs.com/nokiaguy/archive/2013/05/05/3061431.html" class="p_n_p_prefix">» </a> 下一篇：<a href="http://www.cnblogs.com/nokiaguy/archive/2013/05/05/3061431.html" title="发布于2013-05-05 20:09">Android双机（网络和USB）调试及其完美ROOT</a><br></div>
+</div>
+
+
+		</div>
+		<p class="postfoot">
+			posted on <span id="post-date">2013-04-14 19:47</span> <a href="http://www.cnblogs.com/nokiaguy/">银河使者</a> 阅读(<span id="post_view_count">26436</span>) 评论(<span id="post_comment_count">1</span>)  <a href="http://i.cnblogs.com/EditPosts.aspx?postid=3020774" rel="nofollow">编辑</a> <a href="http://www.cnblogs.com/nokiaguy/archive/2013/04/14/3020774.html#" onclick="AddToWz(3020774);return false;">收藏</a>
+		</p>
+	</div>
+	<script type="text/javascript">var allowComments=true,isLogined=false,cb_blogId=36378,cb_entryId=3020774,cb_blogApp=currentBlogApp,cb_blogUserGuid='9437420b-63cf-dd11-9e4d-001cf0cd104b',cb_entryCreatedDate='2013/4/14 19:47:00';loadViewCount(cb_entryId);</script>
+	
+	</div><a name="!comments"></a><div id="blog-comments-placeholder"><div id="comments_pager_top"></div>
+<a name="评论"></a>
+<div id="comments">
+<h3>评论</h3>
+	
+	
+			<div class="post">
+				<h2>
+					<a href="http://www.cnblogs.com/nokiaguy/archive/2013/04/14/3020774.html#3120146" class="layer">#1楼</a><a name="3120146" id="comment_anchor_3120146"></a><span id="comment-maxId" style="display:none;">3120146</span><span id="comment-maxDate" style="display:none;">2015/1/30 20:08:40</span>
+					&nbsp;&nbsp;<span class="comment_actions"></span>
+				</h2>
+				<div id="comment_body_3120146" class="blog_comment_body">老师分析的太经典了，我自己尝试看这部分看了好几遍没有看懂，这两天读您的博文一下子明白了很多！</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3120146,&#39;Digg&#39;,this)">支持(1)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(3120146,&#39;Bury&#39;,this)">反对(0)</a></div>
+				<div class="postfoot">
+					 <span class="comment_date">2015-01-30 20:08</span> | <a id="a_comment_author_3120146" href="http://home.cnblogs.com/u/584395/" target="_blank">xiangyanghua</a> <a href="http://msg.cnblogs.com/send/xiangyanghua" title="发送站内短消息" class="sendMsg2This">&nbsp;</a>
+				</div>
+			</div>
+		
+</div>
+<div id="comments_pager_bottom"></div></div><script type="text/javascript">var commentManager = new blogCommentManager();commentManager.renderComments(0);</script>
+<div id="comment_form" class="commentform">
+<a name="commentform"></a>
+<div id="divCommentShow"></div>
+<div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="http://www.cnblogs.com/nokiaguy/archive/2013/04/14/3020774.html#" onclick="return RefreshPage();">刷新页面</a><a href="http://www.cnblogs.com/nokiaguy/archive/2013/04/14/3020774.html#top">返回顶部</a></div>
+<div id="comment_form_container"><div class="login_tips">注册用户登录后才能发表评论，请 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return login(&#39;commentform&#39;);">登录</a> 或 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return register();">注册</a>，<a href="http://www.cnblogs.com/">访问</a>网站首页。</div></div>
+<div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+<div id="ad_t2"><a href="http://www.ucancode.com/index.htm" target="_blank">【推荐】50万行VC++源码: 大型组态工控、电力仿真CAD与GIS源码库</a><br><a href="http://www.rongcloud.cn/" target="_blank">【推荐】融云即时通讯云－专注为 App 开发者提供IM云服务</a><br><a href="http://www.ucloud.cn/site/active/new_gift.html?utm_source=cost&amp;utm_campaign=bokeyuan1&amp;utm_medium=display&amp;utm_content=3yuecu" target="_blank">【推荐】UCloud开年大礼，充5000返1000；买云主机送CDN，详情点击</a><br></div>
+<div id="opt_under_post"></div>
+<div id="ad_c1" class="c_ad_block"><a href="https://bce.baidu.com/event/promotion-march/index.html?t=cp:online-media|pf:pc|pp:mar|pu:244" target="_blank"><img width="300" height="250" src="./Android的init过程详解（一） - 银河使者 - 博客园_files/24442-20160324115230854-2017204765.png" alt="百度云_20160324" title="百度云_20160324"></a></div>
+<div id="under_post_news"><div class="itnews c_ad_block"><b>最新IT新闻</b>:<br> ·  <a href="http://news.cnblogs.com/n/542131/" target="_blank">微软陷“质量门” 第二代手环腕带大量开裂</a><br> ·  <a href="http://news.cnblogs.com/n/542133/" target="_blank">支付宝服务下沉 蚂蚁金服欲打造千个支付宝县</a><br> ·  <a href="http://news.cnblogs.com/n/542132/" target="_blank">再不担心密码泄露了!谷歌发布新版Chrome浏览器</a><br> ·  <a href="http://news.cnblogs.com/n/542130/" target="_blank">微软Build 2016开发者大会开幕在即，这6点值得期待</a><br> ·  <a href="http://news.cnblogs.com/n/542129/" target="_blank">雅虎要求潜在收购方4月11日前提交初步报价</a><br>» <a href="http://news.cnblogs.com/" title="IT新闻" target="_blank">更多新闻...</a></div></div>
+<div id="ad_c2" class="c_ad_block"><a href="https://www.jpush.cn/?from=cnblogs01" target="_blank"><img width="468" height="60" src="./Android的init过程详解（一） - 银河使者 - 博客园_files/24442-20160307140747632-1210035054.jpg" alt="极光推送20160307" title="极光推送20160307"></a></div>
+<div id="under_post_kb"><div class="itnews c_ad_block" id="kb_block"><b>最新知识库文章</b>:<br><div id="kb_recent"> ·  <a href="http://kb.cnblogs.com/page/541862/" target="_blank">为什么未来是全栈工程师的世界？</a><br> ·  <a href="http://kb.cnblogs.com/page/541805/" target="_blank">程序bug导致了天大的损失，要枪毙程序猿吗？</a><br> ·  <a href="http://kb.cnblogs.com/page/541230/" target="_blank">如何运维千台以上游戏云服务器</a><br> ·  <a href="http://kb.cnblogs.com/page/539160/" target="_blank">架构漫谈（一）：什么是架构？</a><br> ·  <a href="http://kb.cnblogs.com/page/540632/" target="_blank">架构的本质</a><br></div>» <a href="http://kb.cnblogs.com/" target="_blank">更多知识库文章...</a></div></div>
+<div id="HistoryToday" class="c_ad_block"></div>
+<script type="text/javascript">
+$(function () {
+    setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+    deliverAdT2();
+    deliverAdC1();
+    deliverAdC2();    
+    loadNewsAndKb();
+    loadBlogSignature();
+    LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+    GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate);
+    loadOptUnderPost();
+    GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);    
+});
+</script>
+</div>
+
+
+</div>
+</div>
+<div id="leftmenu">
+
+
+<h3>导航</h3>
+<ul>
+<li>
+<a id="MyLinks1_HomeLink" href="http://www.cnblogs.com/">博客园</a></li>
+<li>
+<a id="MyLinks1_MyHomeLink" class="two_words" href="http://www.cnblogs.com/nokiaguy/">首页</a></li>
+<li>
+<a id="MyLinks1_NewPostLink" rel="nofollow" href="http://i.cnblogs.com/EditPosts.aspx?opt=1">新随笔</a></li>
+<li>
+<a id="MyLinks1_ContactLink" accesskey="9" class="two_words" rel="nofollow" href="http://msg.cnblogs.com/send/%E9%93%B6%E6%B2%B3%E4%BD%BF%E8%80%85">联系</a></li>
+<li>
+<a id="MyLinks1_Syndication" class="two_words" href="http://www.cnblogs.com/nokiaguy/rss">订阅</a>
+<a id="MyLinks1_XMLLink" href="http://www.cnblogs.com/nokiaguy/rss"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/xml.gif" alt="订阅"></a>
+</li>
+<li>
+<a id="MyLinks1_Admin" class="two_words" rel="nofollow" href="http://i.cnblogs.com/">管理</a></li>
+</ul>
+
+<div id="blog-calendar" style=""><table id="blogCalendar" class="Cal" cellspacing="0" cellpadding="0" title="Calendar">
+	<tbody><tr><td colspan="7"><table class="CalTitle" cellspacing="0">
+		<tbody><tr><td class="CalNextPrev"><a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2013/03/01&#39;);return false;">&lt;</a></td><td align="center">2013年4月</td><td class="CalNextPrev" align="right"><a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2013/05/01&#39;);return false;">&gt;</a></td></tr>
+	</tbody></table></td></tr><tr><th class="CalDayHeader" align="center" abbr="日" scope="col">日</th><th class="CalDayHeader" align="center" abbr="一" scope="col">一</th><th class="CalDayHeader" align="center" abbr="二" scope="col">二</th><th class="CalDayHeader" align="center" abbr="三" scope="col">三</th><th class="CalDayHeader" align="center" abbr="四" scope="col">四</th><th class="CalDayHeader" align="center" abbr="五" scope="col">五</th><th class="CalDayHeader" align="center" abbr="六" scope="col">六</th></tr><tr><td class="CalOtherMonthDay" align="center">31</td><td align="center">1</td><td align="center">2</td><td align="center">3</td><td align="center">4</td><td align="center">5</td><td class="CalWeekendDay" align="center">6</td></tr><tr><td class="CalWeekendDay" align="center">7</td><td align="center">8</td><td align="center">9</td><td align="center">10</td><td align="center">11</td><td align="center">12</td><td class="CalWeekendDay" align="center">13</td></tr><tr><td class="CalWeekendDay" align="center"><a href="http://www.cnblogs.com/nokiaguy/archive/2013/04/14.html"><u>14</u></a></td><td align="center">15</td><td align="center">16</td><td align="center">17</td><td align="center">18</td><td align="center">19</td><td class="CalWeekendDay" align="center">20</td></tr><tr><td class="CalWeekendDay" align="center">21</td><td align="center">22</td><td align="center">23</td><td align="center">24</td><td align="center">25</td><td align="center">26</td><td class="CalWeekendDay" align="center">27</td></tr><tr><td class="CalWeekendDay" align="center">28</td><td align="center">29</td><td align="center">30</td><td class="CalOtherMonthDay" align="center">1</td><td class="CalOtherMonthDay" align="center">2</td><td class="CalOtherMonthDay" align="center">3</td><td class="CalOtherMonthDay" align="center">4</td></tr><tr><td class="CalOtherMonthDay" align="center">5</td><td class="CalOtherMonthDay" align="center">6</td><td class="CalOtherMonthDay" align="center">7</td><td class="CalOtherMonthDay" align="center">8</td><td class="CalOtherMonthDay" align="center">9</td><td class="CalOtherMonthDay" align="center">10</td><td class="CalOtherMonthDay" align="center">11</td></tr>
+</tbody></table></div><script type="text/javascript">loadBlogDefaultCalendar();</script>
+<meta name="vs_showGrid" content="False">
+
+<h3>公告</h3>
+<div id="blog-news"><span style="color: #FF0000;">本博客的所有文章，未经说明均为原创，如需转载，请注明出处！</span>
+<br><br>
+<strong></strong>
+<h3 class="boxtitle"><span style="color: red;">个人简介</span>&nbsp;
+</h3>
+<strong>李宁（银河使者）</strong>：IT作家、讲师、技术顾问，主要研究领域：移动技术、编译器、Linux内核、电子电路。主要著
+作：<span style="color: #ff6600;">《Android深度探索（卷1）：HAL与驱动开发》</span><span style="color: #339966;">、《</span><span style="color: #339966;">Android应用开发实战（第2版）》</span>、<span style="color: #993366;">《Android开发完全讲义（第2版）》</span>、《Android开发权威指南（第2版）》、《Android高
+薪之路：Android程序员面试宝典 》。<br><br>
+<strong>
+<h3 class="boxtitle"><span style="color: red;">QQ群</span>&nbsp;
+</h3>
+游戏开发：264268059
+<br>
+<br>
+<!--<span style="color: blue;">请各位同学加入自己感兴趣的QQ群</span>
+<br>
+<br>
+-->
+
+<h3 class="boxtitle"><span style="color: red;">我的视频课程</span>&nbsp;
+</h3>
+<strong>
+<p>Cocos2d-x 3.0入门与实战视频教程(基于3.0正式版）
+</p>
+<p>
+<a href="http://edu.51cto.com/course/course_id-1227.html"><img alt="" src="./Android的init过程详解（一） - 银河使者 - 博客园_files/20140429210606953" height="120" width="175"></a></p></strong>
+<br><br>
+<h3 class="boxtitle"><span style="color: red;">我的新浪围脖</span>&nbsp;
+</h3>
+<strong>
+<br>
+<a href="http://weibo.com/androidguy"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/30211130-209df6a265284672a96131b58e245138.png" alt="" height="89" width="185"></a>
+<p>&nbsp;</p><strong>
+<h3 class="boxtitle"><span style="color: red;">我的著作</span>&nbsp;
+</h3>
+<p>Android深度探索(卷2)系统应用源代码分析与ROM定制[<span style="color:red">火热销售中</span>]
+</p>
+<p>
+<a href="http://item.jd.com/11592417.html"><img alt="" src="./Android的init过程详解（一） - 银河使者 - 博客园_files/031740079665555.png" height="225" width="175"></a>
+<a href="http://www.amazon.cn/Android%E6%B7%B1%E5%BA%A6%E6%8E%A2%E7%B4%A2-%E5%8D%B72-%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E6%BA%90%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%8EROM%E5%AE%9A%E5%88%B6-%E6%9D%8E%E5%AE%81/dp/B00QPSOM2S/ref=sr_1_2?ie=UTF8&amp;qid=1420277140&amp;sr=8-2&amp;keywords=android%E6%B7%B1%E5%BA%A6%E6%8E%A2%E7%B4%A2">【1】亚马逊</a></p>
+<p><a href="http://product.dangdang.com/23615864.html#ddclick?act=click&amp;pos=23615864_1_1_q&amp;cat=&amp;key=android%C9%EE%B6%C8%CC%BD%CB%F7&amp;qinfo=11_1_60&amp;pinfo=&amp;minfo=&amp;ninfo=&amp;custid=&amp;permid=20141216211010788468275562016645463&amp;ref=http%3A%2F%2Fwww.dangdang.com%2F&amp;rcount=&amp;type=&amp;t=1420277287000&amp;ver=A">【2】当当网</a></p>
+<p><a href="http://item.jd.com/11592417.html">【3】京东商城</a></p>
+<p><a href="http://product.china-pub.com/4467546">【4】互动网</a></p>
+<p></p>
+
+<br>
+<br>
+<p>Android开发权威指南（第2版）[<span style="color:red">火热销售中</span> ]
+</p>
+<p>
+<a href="http://www.amazon.cn/Android%E5%BC%80%E5%8F%91%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97-%E6%9D%8E%E5%AE%81/dp/B00EOIDFX8/ref=sr_1_1?ie=UTF8&amp;qid=1378380978&amp;sr=8-1&amp;keywords=android+%E6%9D%8E%E5%AE%81"><img alt="" src="./Android的init过程详解（一） - 银河使者 - 博客园_files/05193245-5f70d5ccbc764ee387cb7eb27184f871.png" height="225" width="175"></a></p>
+<p>
+<a href="http://product.suning.com/104327423.html">【1】苏宁易购</a></p>
+<p>
+<a href="http://www.amazon.cn/Android%E5%BC%80%E5%8F%91%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97-%E6%9D%8E%E5%AE%81/dp/B00EOIDFX8/ref=sr_1_1?ie=UTF8&amp;qid=1378380978&amp;sr=8-1&amp;keywords=android+%E6%9D%8E%E5%AE%81">【2】亚马逊</a></p>
+<p><a href="http://product.dangdang.com/23321534.html#ddclick?act=click&amp;pos=23321534_3_1_q&amp;cat=&amp;key=android%2B%C0%EE%C4%FE&amp;qinfo=30_1_48&amp;pinfo=&amp;minfo=&amp;ninfo=&amp;custid=&amp;permid=20130826174028820239899307364377788&amp;ref=http%3A%2F%2Fwww.dangdang.com%2F&amp;rcount=&amp;type=&amp;t=1378381094000">【3】当当网</a></p>
+<p><a href="http://item.jd.com/11306297.html">【4】京东商城</a></p>
+<p><a href="http://product.china-pub.com/3802200">【5】互动网</a></p>
+<p><a href="http://s.taobao.com/search?q=Android%BF%AA%B7%A2%C8%A8%CD%FE%D6%B8%C4%CF%A3%A8%B5%DA2%B0%E6%A3%A9&amp;suggest=history_1&amp;wq=Android%BF%AA%B7%A2&amp;suggest_query=Android%BF%AA%B7%A2&amp;source=suggest&amp;initiative_id=tbindexz_20130905&amp;spm=1.1000386.5803581.d4908513&amp;sourceId=tb.index&amp;search_type=item&amp;commend=all">【6】淘宝网</a></p>
+<p></p>
+
+<br>
+<br>
+<p>Android深度探索（卷1）：HAL与驱动开发[<span style="color:red">火热销售中</span> ]
+</p>
+<p>
+<a href="http://book.360buy.com/11155655.html"><img alt="" src="./Android的init过程详解（一） - 银河使者 - 博客园_files/14215858-813a829d47ef4e37957fcbe9806eeb1b.jpg" height="225" width="175"></a></p>
+<p>
+<a href="http://product.suning.com/103530430.html">【1】苏宁易购（58折）</a></p>
+<p>
+<a href="http://www.amazon.cn/Android%E6%B7%B1%E5%BA%A6%E6%8E%A2%E7%B4%A2-HAL%E4%B8%8E%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91-%E6%9D%8E%E5%AE%81/dp/B00ASIN7L8/ref=sr_1_1?ie=UTF8&amp;qid=1359549360&amp;sr=8-1">【2】亚马逊</a></p>
+<p><a href="http://union.dangdang.com/transfer/transfer.aspx?from=P-263982&amp;backurl=http://product.dangdang.com/main/product.aspx?product_id=23043311">【3】当当网</a></p>
+<p><a href="http://book.360buy.com/11155655.html">【4】京东商城</a></p>
+<p><a href="http://product.china-pub.com/3021757">【5】互动网</a></p>
+<p><a href="http://s.taobao.com/search?q=android%C9%EE%B6%C8%CC%BD%CB%F7&amp;commend=all&amp;ssid=s5-e&amp;search_type=item&amp;sourceId=tb.index&amp;initiative_id=tbindexz_20130130">【6】淘宝网</a></p>
+<p><a href="http://book.douban.com/subject/20480745/">【7】豆瓣网 </a><br>
+</p>
+<p>
+</p>
+<p>&nbsp;</p>
+<p>Android应用开发实战（第2版）[<span style="color:red">火热销售中</span> ] <br>
+</p>
+<p>
+<a href="http://book.360buy.com/11131468.html"><img src="./Android的init过程详解（一） - 银河使者 - 博客园_files/30211855-4a9bc7d2b3314d47b9f97c7a3dd3a00e.jpg" alt="" height="227" width="174"></a></p>
+<p><a href="http://book.360buy.com/11131468.html">【1】京东商城</a></p>
+<p><a href="http://union.dangdang.com/transfer/transfer.aspx?from=P-263982&amp;backurl=http://product.dangdang.com/main/product.aspx?product_id=22915560">【2】当当网</a></p>
+<p><a href="http://www.amazon.cn/Android%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98-%E6%9D%8E%E5%AE%81/dp/B00AAOO42Q/ref=sr_1_6?ie=UTF8&amp;qid=1359550638&amp;sr=8-6">【3】亚马逊</a></p>
+<p><a href="http://product.china-pub.com/3020660">【4】互动网</a></p>
+<p><a href="http://www.suning.com/emall/prd_10052_22001_-7_4091929_.html">【5】苏宁易购</a></p>
+<p><a href="http://s.taobao.com/search?q=Android%D3%A6%D3%C3%BF%AA%B7%A2%CA%B5%D5%BD%A3%A8%B5%DA2%B0%E6%A3%A9&amp;commend=all&amp;ssid=s5-e&amp;search_type=item&amp;sourceId=tb.index&amp;initiative_id=tbindexz_20130130">【6】淘宝网</a></p>
+<p><a href="http://book.douban.com/subject/20396237/">【7】豆瓣网 </a><br>
+</p>
+<p>&nbsp;</p>
+<p>Android开发完全讲义（第2版）[<span style="color:red">火热销售中</span> ]&nbsp; <br>
+</p>
+<p>
+<a href="http://book.360buy.com/10994906.html"><img alt="" src="./Android的init过程详解（一） - 银河使者 - 博客园_files/aa.png" height="225" width="175"></a></p>
+<p><a href="http://union.dangdang.com/transfer/transfer.aspx?from=P-263982&amp;backurl=http://product.dangdang.com/main/product.aspx?product_id=22741502">【1】当当网</a></p>
+<p><a href="http://www.amazon.cn/Android%E5%BC%80%E5%8F%91%E5%AE%8C%E5%85%A8%E8%AE%B2%E4%B9%89-%E6%9D%8E%E5%AE%81/dp/B00827VLLA/ref=sr_1_2?ie=UTF8&amp;qid=1359550638&amp;sr=8-2">【2】亚马逊</a></p>
+<p><a href="http://book.360buy.com/10994906.html">【3】京东商城</a></p>
+<p><a href="http://product.china-pub.com/199758">【4】互动网</a></p>
+<p><a href="http://s.taobao.com/search?q=Android%BF%AA%B7%A2%CD%EA%C8%AB%BD%B2%D2%E5&amp;initiative_id=staobaoz_20130130">【5】淘宝网</a></p>
+<p><a href="http://book.douban.com/subject/10733303/">【6】豆瓣网 </a><br>
+</p>
+<p>&nbsp;<br>
+</p>
+<p>&nbsp;</p>
+</strong>
+<strong>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</strong><div id="profile_block">昵称：<a href="http://home.cnblogs.com/u/nokiaguy/">银河使者</a><br>园龄：<a href="http://home.cnblogs.com/u/nokiaguy/" title="入园时间：2008-04-22">7年11个月</a><br>粉丝：<a href="http://home.cnblogs.com/u/nokiaguy/followers/">334</a><br>关注：<a href="http://home.cnblogs.com/u/nokiaguy/followees/">3</a><div id="p_b_follow"><a href="javascript:void(0);" onclick="cnblogs.UserManager.FollowBlogger(&#39;9437420b-63cf-dd11-9e4d-001cf0cd104b&#39;)">+加关注</a></div></div></strong></strong></div><script type="text/javascript">loadBlogNews();</script>
+
+<div id="blog-sidecolumn"><div id="sidebar_search" class="sidebar-block">
+<div id="sidebar_search" class="mySearch">
+<h3 class="catListTitle">搜索</h3>
+<div id="sidebar_search_box">
+<div id="widget_my_zzk" class="div_my_zzk"><input type="text" id="q" onkeydown="return zzk_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="zzk_go()" type="button" value="找找看" id="btnZzk" class="btn_my_zzk"></div>
+<div id="widget_my_google" class="div_my_zzk"><input type="text" name="google_q" id="google_q" onkeydown="return google_go_enter(event)" class="input_my_zzk">&nbsp;<input onclick="google_go()" type="button" value="谷歌搜索" class="btn_my_zzk"></div>
+</div>
+</div>
+
+</div><div id="sidebar_shortcut" class="sidebar-block">
+<h3 class="catListTitle">常用链接</h3>
+<ul>
+<li><a href="http://www.cnblogs.com/nokiaguy/p/" title="我的博客的随笔列表">我的随笔</a></li><li><a href="http://www.cnblogs.com/nokiaguy/MyComments.html" title="我发表过的评论列表">我的评论</a></li><li><a href="http://www.cnblogs.com/nokiaguy/OtherPosts.html" title="我评论过的随笔列表">我的参与</a></li><li><a href="http://www.cnblogs.com/nokiaguy/RecentComments.html" title="我的博客的评论列表">最新评论</a></li><li><a href="http://www.cnblogs.com/nokiaguy/tag/" title="我的博客的标签列表">我的标签</a></li>
+</ul>
+<div id="itemListLin_con" style="display:none;">
+
+</div></div><div id="sidebar_toptags" class="sidebar-block">
+<h3 class="catListTitle">我的标签</h3>
+<div id="MyTag">
+<ul>
+<li><a href="http://www.cnblogs.com/nokiaguy/tag/android/">android</a>(28)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/java/">java</a>(9)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/linux/">linux</a>(6)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/ophone/">ophone</a>(6)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/%E7%AE%97%E6%B3%95/">算法</a>(6)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>(4)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/SQL%20Server/">SQL Server</a>(4)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91/">交叉编译</a>(4)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/CodeSourcery/">CodeSourcery</a>(4)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/C%23/">C#</a>(4)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/">更多</a></li>
+</ul>
+</div></div><div id="sidebar_categories">
+		<h3>随笔分类<span style="font-size:11px;font-weight:normal">(287)</span></h3>
+		
+				<ul>
+			
+				<li><a id="CatList_LinkList_0_Link_0" href="http://www.cnblogs.com/nokiaguy/category/177252.html">获奖作品(3)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_1" href="http://www.cnblogs.com/nokiaguy/category/137117.html">原创(95)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_2" href="http://www.cnblogs.com/nokiaguy/category/136726.html">.net高级技术(7)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_3" href="http://www.cnblogs.com/nokiaguy/category/136727.html">.net入门技术(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_4" href="http://www.cnblogs.com/nokiaguy/category/139675.html">.net新特性(2)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_5" href="http://www.cnblogs.com/nokiaguy/category/136142.html">ajax(4)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_6" href="http://www.cnblogs.com/nokiaguy/category/135618.html">algorithm(18)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_7" href="http://www.cnblogs.com/nokiaguy/category/250234.html">Android(27)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_8" href="http://www.cnblogs.com/nokiaguy/category/135708.html">C#(13)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_9" href="http://www.cnblogs.com/nokiaguy/category/135889.html">C/C++(13)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_10" href="http://www.cnblogs.com/nokiaguy/category/137462.html">database(11)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_11" href="http://www.cnblogs.com/nokiaguy/category/136315.html">delphi(3)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_12" href="http://www.cnblogs.com/nokiaguy/category/182507.html">IE（6至8）(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_13" href="http://www.cnblogs.com/nokiaguy/category/455402.html">iOS(2)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_14" href="http://www.cnblogs.com/nokiaguy/category/255288.html">Java(15)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_15" href="http://www.cnblogs.com/nokiaguy/category/136144.html">javascript(5)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_16" href="http://www.cnblogs.com/nokiaguy/category/174001.html">linux(11)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_17" href="http://www.cnblogs.com/nokiaguy/category/135707.html">MSIL(2)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_18" href="http://www.cnblogs.com/nokiaguy/category/137461.html">mysql(4)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_19" href="http://www.cnblogs.com/nokiaguy/category/719702.html">nginx(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_20" href="http://www.cnblogs.com/nokiaguy/category/455404.html">Objective-C</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_21" href="http://www.cnblogs.com/nokiaguy/category/135890.html">open source(3)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_22" href="http://www.cnblogs.com/nokiaguy/category/538168.html">Python(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_23" href="http://www.cnblogs.com/nokiaguy/category/135420.html">SQL Server(12)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_24" href="http://www.cnblogs.com/nokiaguy/category/138650.html">VBA(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_25" href="http://www.cnblogs.com/nokiaguy/category/136143.html">web(9)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_26" href="http://www.cnblogs.com/nokiaguy/category/177251.html">WPF(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_27" href="http://www.cnblogs.com/nokiaguy/category/174002.html">wxWidgets(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_28" href="http://www.cnblogs.com/nokiaguy/category/133688.html">安全(2)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_29" href="http://www.cnblogs.com/nokiaguy/category/144877.html">进程、线程、并发(5)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_30" href="http://www.cnblogs.com/nokiaguy/category/177027.html">设计模式(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_31" href="http://www.cnblogs.com/nokiaguy/category/174026.html">网络营销(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_32" href="http://www.cnblogs.com/nokiaguy/category/137983.html">宇宙探秘(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_33" href="http://www.cnblogs.com/nokiaguy/category/136347.html">杂七杂八(11)</a></li>
+			
+				</ul>
+			
+	
+		<h3>随笔档案<span style="font-size:11px;font-weight:normal">(149)</span></h3>
+		
+				<ul>
+			
+				<li><a id="CatList_LinkList_1_Link_0" href="http://www.cnblogs.com/nokiaguy/archive/2015/08.html">2015年8月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_1" href="http://www.cnblogs.com/nokiaguy/archive/2015/05.html">2015年5月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_2" href="http://www.cnblogs.com/nokiaguy/archive/2014/11.html">2014年11月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_3" href="http://www.cnblogs.com/nokiaguy/archive/2014/08.html">2014年8月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_4" href="http://www.cnblogs.com/nokiaguy/archive/2014/04.html">2014年4月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_5" href="http://www.cnblogs.com/nokiaguy/archive/2013/12.html">2013年12月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_6" href="http://www.cnblogs.com/nokiaguy/archive/2013/11.html">2013年11月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_7" href="http://www.cnblogs.com/nokiaguy/archive/2013/09.html">2013年9月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_8" href="http://www.cnblogs.com/nokiaguy/archive/2013/07.html">2013年7月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_9" href="http://www.cnblogs.com/nokiaguy/archive/2013/06.html">2013年6月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_10" href="http://www.cnblogs.com/nokiaguy/archive/2013/05.html">2013年5月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_11" href="http://www.cnblogs.com/nokiaguy/archive/2013/04.html">2013年4月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_12" href="http://www.cnblogs.com/nokiaguy/archive/2013/03.html">2013年3月 (6)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_13" href="http://www.cnblogs.com/nokiaguy/archive/2013/02.html">2013年2月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_14" href="http://www.cnblogs.com/nokiaguy/archive/2013/01.html">2013年1月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_15" href="http://www.cnblogs.com/nokiaguy/archive/2011/10.html">2011年10月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_16" href="http://www.cnblogs.com/nokiaguy/archive/2011/09.html">2011年9月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_17" href="http://www.cnblogs.com/nokiaguy/archive/2011/04.html">2011年4月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_18" href="http://www.cnblogs.com/nokiaguy/archive/2010/11.html">2010年11月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_19" href="http://www.cnblogs.com/nokiaguy/archive/2010/10.html">2010年10月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_20" href="http://www.cnblogs.com/nokiaguy/archive/2010/09.html">2010年9月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_21" href="http://www.cnblogs.com/nokiaguy/archive/2010/08.html">2010年8月 (5)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_22" href="http://www.cnblogs.com/nokiaguy/archive/2010/07.html">2010年7月 (8)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_23" href="http://www.cnblogs.com/nokiaguy/archive/2010/06.html">2010年6月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_24" href="http://www.cnblogs.com/nokiaguy/archive/2010/05.html">2010年5月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_25" href="http://www.cnblogs.com/nokiaguy/archive/2010/04.html">2010年4月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_26" href="http://www.cnblogs.com/nokiaguy/archive/2010/03.html">2010年3月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_27" href="http://www.cnblogs.com/nokiaguy/archive/2010/01.html">2010年1月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_28" href="http://www.cnblogs.com/nokiaguy/archive/2009/12.html">2009年12月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_29" href="http://www.cnblogs.com/nokiaguy/archive/2009/11.html">2009年11月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_30" href="http://www.cnblogs.com/nokiaguy/archive/2009/09.html">2009年9月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_31" href="http://www.cnblogs.com/nokiaguy/archive/2009/08.html">2009年8月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_32" href="http://www.cnblogs.com/nokiaguy/archive/2009/07.html">2009年7月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_33" href="http://www.cnblogs.com/nokiaguy/archive/2009/06.html">2009年6月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_34" href="http://www.cnblogs.com/nokiaguy/archive/2009/03.html">2009年3月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_35" href="http://www.cnblogs.com/nokiaguy/archive/2009/02.html">2009年2月 (6)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_36" href="http://www.cnblogs.com/nokiaguy/archive/2009/01.html">2009年1月 (5)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_37" href="http://www.cnblogs.com/nokiaguy/archive/2008/12.html">2008年12月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_38" href="http://www.cnblogs.com/nokiaguy/archive/2008/10.html">2008年10月 (4)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_39" href="http://www.cnblogs.com/nokiaguy/archive/2008/09.html">2008年9月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_40" href="http://www.cnblogs.com/nokiaguy/archive/2008/08.html">2008年8月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_41" href="http://www.cnblogs.com/nokiaguy/archive/2008/07.html">2008年7月 (6)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_42" href="http://www.cnblogs.com/nokiaguy/archive/2008/06.html">2008年6月 (9)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_43" href="http://www.cnblogs.com/nokiaguy/archive/2008/05.html">2008年5月 (36)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_44" href="http://www.cnblogs.com/nokiaguy/archive/2008/04.html">2008年4月 (1)</a></li>
+			
+				</ul>
+			
+	
+		<h3>相册<span style="font-size:11px;font-weight:normal">(4)</span></h3>
+		
+				<ul>
+			
+				<li><a id="CatList_LinkList_2_Link_0" href="http://www.cnblogs.com/nokiaguy/gallery/136562.html" rel="nofollow">images(2)</a></li>
+			
+				<li><a id="CatList_LinkList_2_Link_1" href="http://www.cnblogs.com/nokiaguy/gallery/139674.html" rel="nofollow">其他</a></li>
+			
+				<li><a id="CatList_LinkList_2_Link_2" href="http://www.cnblogs.com/nokiaguy/gallery/136978.html" rel="nofollow">微软认证(2)</a></li>
+			
+				</ul>
+			
+	</div><div id="sidebar_scorerank" class="sidebar-block">
+<h3>积分与排名</h3>
+<ul>
+	<li>
+		积分 -
+		369374
+	</li><li>
+		排名 -
+		293
+	</li>
+</ul>
+</div><div id="sidebar_recentcomments" class="sidebar-block"><div id="recent_comments_wrap">
+<h3 class="catListTitle">最新评论</h3>
+<div class="RecentComment" id="RecentComments">
+	<div id="RecentCommentsBlock"><ul>
+    <li class="recent_comment_title"><a href="http://www.cnblogs.com/nokiaguy/archive/2008/05/11/1191914.html#3372452">1. Re:全排列算法原理和实现</a></li>
+    <li class="recent_comment_body">/*全排列非递归实现，超快的哦*/#include int main() { int a,b,c,d,e,n=0;	for(a=1;a&lt;=5;a++)	{ for(b=1;b&lt;=5;b+......</li>
+    <li class="recent_comment_author">--goodgoodluck</li>
+    <li class="recent_comment_title"><a href="http://www.cnblogs.com/nokiaguy/archive/2008/05/29/1209858.html#3321790">2. Re:Web上传文件的原理及实现</a></li>
+    <li class="recent_comment_body">思路不错～</li>
+    <li class="recent_comment_author">--规格严格-功夫到家</li>
+    <li class="recent_comment_title"><a href="http://www.cnblogs.com/nokiaguy/archive/2008/09/06/1285794.html#3291312">3. Re:向C#的String类添加按字节截取字符串的扩展方法</a></li>
+    <li class="recent_comment_body">哈哈用到了！</li>
+    <li class="recent_comment_author">--阿水</li>
+    <li class="recent_comment_title"><a href="http://www.cnblogs.com/nokiaguy/archive/2010/07/28/1787271.html#3262047">4. Re:不使用中间变量交换两个数（Java版）</a></li>
+    <li class="recent_comment_body">@极地雪狼将操作系统的时候说过，使用异或的方式可以实现一个空间达到双向链表的效果...</li>
+    <li class="recent_comment_author">--tianxia2s</li>
+    <li class="recent_comment_title"><a href="http://www.cnblogs.com/nokiaguy/archive/2010/07/28/1787271.html#3262045">5. Re:不使用中间变量交换两个数（Java版）</a></li>
+    <li class="recent_comment_body">@DiryBoy相对来说使用异或不会存在溢出问题...</li>
+    <li class="recent_comment_author">--tianxia2s</li>
+</ul>
+</div>
+</div>
+</div></div><div id="sidebar_topviewedposts" class="sidebar-block"><div id="topview_posts_wrap">
+<h3 class="catListTitle">阅读排行榜</h3>
+<div class="RecentComment" id="TopViewPosts"> 
+	<div id="TopViewPostsBlock"><ul><li><a href="http://www.cnblogs.com/nokiaguy/archive/2008/05/11/1191914.html">1. 全排列算法原理和实现(73757)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2010/08/15/1799944.html">2. 哈佛大学凌晨4点半的景象(52826)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2008/07/13/1241817.html">3. C#线程系列讲座(1)：BeginInvoke和EndInvoke方法(30535)</a></li><li><a href="./Android的init过程详解（一） - 银河使者 - 博客园_files/Android的init过程详解（一） - 银河使者 - 博客园.html">4. Android的init过程详解（一）(26436)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2010/08/23/1806870.html">5. 可循环显示图像的Android Gallery组件(22413)</a></li></ul></div>
+</div>
+</div></div><div id="sidebar_topcommentedposts" class="sidebar-block"><div id="topfeedback_posts_wrap">
+<h3 class="catListTitle">评论排行榜</h3>
+<div class="RecentComment" id="TopCommentsPosts">
+	<div id="TopFeedbackPostsBlock"><ul><li><a href="http://www.cnblogs.com/nokiaguy/archive/2013/01/29/2881476.html">1. 百度面试题：求绝对值最小的数(87)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2010/03/23/1692170.html">2. Google搜索服务退出中国(55)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/p/3691921.html">3. 一道淘汰85%面试者的百度开发者面试题(43)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2008/04/28/1174529.html">4. 用VC实现洪水攻击程序(39)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2008/07/13/1241817.html">5. C#线程系列讲座(1)：BeginInvoke和EndInvoke方法(36)</a></li></ul></div>
+</div></div></div><div id="sidebar_topdiggedposts" class="sidebar-block"><div id="topdigg_posts_wrap">
+<h3 class="catListTitle">推荐排行榜</h3>
+<div class="RecentComment">
+	<div id="TopDiggPostsBlock"><ul><li><a href="http://www.cnblogs.com/nokiaguy/archive/2008/07/13/1241817.html">1. C#线程系列讲座(1)：BeginInvoke和EndInvoke方法(19)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2008/05/11/1191914.html">2. 全排列算法原理和实现(12)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2010/08/23/1806870.html">3. 可循环显示图像的Android Gallery组件(12)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2010/08/15/1799944.html">4. 哈佛大学凌晨4点半的景象(12)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2013/03/12/2955128.html">5. 疯狂极客前传：用最快的速度设计一种新的编程语言(7)</a></li></ul></div>
+</div></div></div></div><script type="text/javascript">loadBlogSideColumn();</script>
+
+</div>
+</div>
+<div class="clear"></div>
+<div id="footer">
+
+<p id="footer">
+	Powered by: 
+	<br>
+	
+	<a id="Footer1_Hyperlink3" name="Hyperlink1" href="http://www.cnblogs.com/" style="font-family:Verdana;font-size:12px;">博客园</a>
+	<br>
+	Copyright © 银河使者
+</p>
+</div>
+</div>
+
+
+
+</body></html>

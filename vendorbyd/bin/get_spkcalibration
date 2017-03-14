@@ -1,0 +1,80 @@
+#!/system/bin/sh
+#set -x
+
+tinymix "ES705 RX1 Enable" 1;
+echo 1 > /sys/bus/i2c/devices/3-003e/gpio_reset;
+echo 0x8000 0x0000 > /dev/adnc0 && cat /dev/adnc0;
+cat /etc/firmware/audience/es705/audience-es705-ca.bin > /dev/adnc1;
+sleep 5;
+echo 0x8000 0x0000 > /dev/adnc0 && cat /dev/adnc0;
+tinymix "Preset" 510 && tinymix "Preset" 1175;
+sleep 11;
+echo 0x8017 0xE302 > /dev/adnc0 && echo 0x8018 0x0001 > /dev/adnc0
+sleep 7;
+#read data
+echo 0x8016 0xE330 > /dev/adnc0;
+result=$(cat /dev/adnc0);
+echo ${result##* } > /userstore/spkcalibration_330_imp_acc_high;
+echo 0x8016 0xE303 > /dev/adnc0;
+result=$(cat /dev/adnc0);
+echo ${result##* } > /userstore/spkcalibration_303_imp_acc_low;
+echo 0x8016 0xE304 > /dev/adnc0;
+result=$(cat /dev/adnc0);
+echo ${result##* } > /userstore/spkcalibration_304_imp_count;
+echo 0x8016 0xE305 > /dev/adnc0;
+result=$(cat /dev/adnc0);
+echo ${result##* } > /userstore/spkcalibration_305_f0;
+echo 0x8016 0xE306 > /dev/adnc0;
+result=$(cat /dev/adnc0);
+echo ${result##* } > /userstore/spkcalibration_306_ref_diff;
+
+#spkcalibration
+result=$(cat /userstore/spkcalibration_303_imp_acc_low 2>&1);
+echo 0xE307 $result > /dev/adnc0;
+result=$(cat /userstore/spkcalibration_330_imp_acc_high 2>&1);
+echo 0xE370 $result > /dev/adnc0;
+result=$(cat /userstore/spkcalibration_304_imp_count 2>&1);
+echo 0xE308 $result > /dev/adnc0;
+result=$(cat /userstore/spkcalibration_temp 2>&1);
+echo 0xE309 $result > /dev/adnc0;
+#echo 0x8016 0xE309 > /dev/adnc0;
+#cat /dev/adnc0 > /userstore/spkcalibration_temp;
+
+#read calibration data to show
+echo 0x8016 0xE330 > /dev/adnc0;
+result=$(cat /dev/adnc0);
+echo ${result##* } > /data/spkcalibration_330_imp_acc_high;
+chmod 777 /data/spkcalibration_330_imp_acc_high;
+chown system:system /data/spkcalibration_330_imp_acc_high;
+echo 0x8016 0xE303 > /dev/adnc0;
+result=$(cat /dev/adnc0);
+echo ${result##* } > /data/spkcalibration_303_imp_acc_low;
+chmod 777 /data/spkcalibration_303_imp_acc_low;
+chown system:system /data/spkcalibration_303_imp_acc_low;
+echo 0x8016 0xE304 > /dev/adnc0;
+result=$(cat /dev/adnc0);
+echo ${result##* } > /data/spkcalibration_304_imp_count;
+chmod 777 /data/spkcalibration_304_imp_count;
+chown system:system /data/spkcalibration_304_imp_count;
+result=$(cat /userstore/spkcalibration_temp 2>&1);
+echo $result > /data/spkcalibration_temp;
+chmod 777 /data/spkcalibration_temp;
+chown system:system /data/spkcalibration_temp;
+result=$(cat /userstore/spkcalibration_305_f0 2>&1);
+echo $result > /data/spkcalibration_305_f0;
+chmod 777 /data/spkcalibration_305_f0;
+chown system:system /data/spkcalibration_305_f0;
+result=$(cat /userstore/spkcalibration_306_ref_diff 2>&1);
+echo $result > /data/spkcalibration_306_ref_diff;
+chmod 777 /data/spkcalibration_306_ref_diff;
+chown system:system /data/spkcalibration_306_ref_diff;
+
+echo 0x8017 0xE302 > /dev/adnc0 && echo 0x8018 0x0000 > /dev/adnc0;
+echo 1 > /sys/bus/i2c/devices/3-003e/gpio_reset;
+echo 0x8000 0x0000 > /dev/adnc0 && cat /dev/adnc0;
+cat /etc/firmware/audience/es705/audience-es705-fw.bin > /dev/adnc1;
+echo 0x8000 0x0000 > /dev/adnc0 && cat /dev/adnc0;
+tinymix "ES705 RX1 Enable" 0;
+
+
+

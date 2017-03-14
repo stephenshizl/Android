@@ -1,0 +1,1170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0046)http://www.cnblogs.com/nokiaguy/p/3164799.html -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-cn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园</title>
+<link type="text/css" rel="stylesheet" href="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/blog-common.css">
+<link id="MainCss" type="text/css" rel="stylesheet" href="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/bundle-AnotherEon001.css">
+<link title="RSS" type="application/rss+xml" rel="alternate" href="http://www.cnblogs.com/nokiaguy/rss">
+<link title="RSD" type="application/rsd+xml" rel="EditURI" href="http://www.cnblogs.com/nokiaguy/rsd.xml">
+<link type="application/wlwmanifest+xml" rel="wlwmanifest" href="http://www.cnblogs.com/nokiaguy/wlwmanifest.xml">
+<script type="text/javascript" src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/encoder.js"></script><script src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/jquery.js" type="text/javascript"></script>  
+<script type="text/javascript">var currentBlogApp = 'nokiaguy', cb_enable_mathjax=false;</script>
+<script src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/blog-common.js" type="text/javascript"></script>
+</head>
+<body>
+<a name="top"></a>
+
+<div id="wrapper">
+<div id="header">
+
+<div id="top">
+<h1><a id="Header1_HeaderTitle" class="headermaintitle" href="http://www.cnblogs.com/nokiaguy/">李宁的极客世界</a></h1>
+<div id="subtitle"></div>
+</div>
+<div id="sub">
+<div class="BlogStats">随笔 - 149, 文章 - 0, 评论 - 1207, 引用 - 29</div>
+</div>
+
+
+
+</div>
+<div id="main_container">
+<div id="main_content">
+<div id="content">
+	
+<div id="post_detail">
+	<div class="post">
+		<h2>
+			<a id="cb_post_title_url" href="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园.html">Android的init过程（二）：初始化语言（init.rc）解析</a>
+		</h2>
+		<div class="postbody">
+		<div id="cnblogs_post_body"><p><a href="http://www.cnblogs.com/nokiaguy/archive/2013/04/14/3020774.html">Android的init过程（一）</a></p>
+<p>本文使用的软件版本</p>
+<p>Android：4.2.2</p>
+<p>Linux内核：3.1.10</p>
+<p>&nbsp;&nbsp;&nbsp; 在上一篇文章中介绍了init的初始化第一阶段，也就是处理各种属性。在本文将会详细分析init最重要的一环：解析init.rc文件。</p>
+<p>init.rc 文件并不是普通的配置文件，而是由一种被称为“Android初始化语言”（Android Init Language，这里简称为AIL）的脚本写成的文件。在了解init如何解析init.rc文件之前，先了解AIL非常必要，否则机械地分析 init.c及其相关文件的源代码毫无意义。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 为了学习AIL，读者可以到自己Android手机的根目录寻找init.rc文件，最好下载到本地以便查看，如果有编译好的Android源代码， 在&lt;Android源代码根目录&gt;out/target/product/generic/root目录也可找到init.rc文件。</p>
+<p>AIL由如下4部分组成。</p>
+<p>1.&nbsp; 动作（Actions）</p>
+<p>2.&nbsp; 命令（Commands）</p>
+<p>3． 服务（Services）</p>
+<p>4.&nbsp; 选项（Options）</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 这4部分都是面向行的代码，也就是说用回车换行符作为每一条语句的分隔符。而每一行的代码由多个符号（Tokens）表示。可以使用反斜杠转义符在 Token中插入空格。双引号可以将多个由空格分隔的Tokens合成一个Tokens。如果一行写不下，可以在行尾加上反斜杠，来连接下一行。也就是 说，可以用反斜杠将多行代码连接成一行代码。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; AIL的注释与很多Shell脚本一行，以#开头。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; AIL在编写时需要分成多个部分（Section），而每一部分的开头需要指定Actions或Services。也就是说，每一个Actions或 Services确定一个Section。而所有的Commands和Options只能属于最近定义的Section。如果Commands和 Options在第一个Section之前被定义，它们将被忽略。</p>
+<p>Actions和Services的名称必须唯一。如果有两个或多个Action或Service拥有同样的名称，那么init在执行它们时将抛出错误，并忽略这些Action和Service。</p>
+<p>下面来看看Actions、Services、Commands和Options分别应如何设置。</p>
+<p>Actions的语法格式如下：</p>
+<div class="cnblogs_code">
+<pre>on &lt;trigger&gt;  
+   &lt;command&gt;  
+   &lt;command&gt;  
+   &lt;command&gt;</pre>
+</div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 也就是说Actions是以关键字on开头的，然后跟一个触发器，接下来是若干命令。例如，下面就是一个标准的Action。</p>
+<div class="cnblogs_code">
+<pre><span style="color: #000000;">    on boot  
+        ifup lo  
+        hostname localhost  
+        domainname localdomain  </span></pre>
+</div>
+<p>其中boot是触发器，下面三行是command</p>
+<p>那么init.rc到底支持哪些触发器呢？目前init.rc支持如下5类触发器。</p>
+<p>1.&nbsp; boot</p>
+<p>&nbsp;&nbsp; 这是init执行后第一个被触发Trigger，也就是在 /init.rc被装载之后执行该Trigger</p>
+<p>2.&nbsp; &lt;name&gt;=&lt;value&gt;</p>
+<p>&nbsp;&nbsp; 当属性&lt;name&gt;被设置成&lt;value&gt;时被触发。例如，</p>
+<p>on property:vold.decrypt=trigger_reset_main</p>
+<p>&nbsp;&nbsp;&nbsp; class_reset main</p>
+<p>3.&nbsp; device-added-&lt;path&gt;</p>
+<p>&nbsp;&nbsp;&nbsp; 当设备节点被添加时触发</p>
+<p>4.&nbsp; device-removed-&lt;path&gt;</p>
+<p>&nbsp;&nbsp; 当设备节点被移除时添加</p>
+<p>5. service-exited-&lt;name&gt;</p>
+<p>&nbsp;&nbsp; 会在一个特定的服务退出时触发</p>
+<p>Actions后需要跟若干个命令，这些命令如下：</p>
+<p>1.&nbsp; exec &lt;path&gt; [&lt;argument&gt; ]*</p>
+<p>&nbsp; 创建和执行一个程序（&lt;path&gt;）。在程序完全执行前，init将会阻塞。由于它不是内置命令，应尽量避免使用exec ，它可能会引起init执行超时。</p>
+<p>&nbsp;&nbsp;&nbsp; 2.&nbsp; export &lt;name&gt; &lt;value&gt;</p>
+<p>在全局环境中将 &lt;name&gt;变量的值设为&lt;value&gt;。（这将会被所有在这命令之后运行的进程所继承）</p>
+<p>3.&nbsp; ifup &lt;interface&gt;</p>
+<p>&nbsp;&nbsp; 启动网络接口</p>
+<p>4.&nbsp; import &lt;filename&gt;</p>
+<p>&nbsp;&nbsp; 指定要解析的其他配置文件。常被用于当前配置文件的扩展</p>
+<p>5.&nbsp; hostname &lt;name&gt;</p>
+<p>&nbsp;&nbsp; 设置主机名</p>
+<p>6.&nbsp; chdir &lt;directory&gt;</p>
+<p>&nbsp;&nbsp; 改变工作目录</p>
+<p>7.&nbsp; chmod &lt;octal-mode&gt;&lt;path&gt;</p>
+<p>&nbsp;&nbsp; 改变文件的访问权限</p>
+<p>8.&nbsp; chown &lt;owner&gt;&lt;group&gt; &lt;path&gt;</p>
+<p>&nbsp;&nbsp; 更改文件的所有者和组</p>
+<p>9.&nbsp; chroot &lt;directory&gt;</p>
+<p>&nbsp; 改变处理根目录</p>
+<p>10.&nbsp; class_start&lt;serviceclass&gt;</p>
+<p>&nbsp;&nbsp; 启动所有指定服务类下的未运行服务。</p>
+<p>11&nbsp; class_stop&lt;serviceclass&gt;</p>
+<p>&nbsp; 停止指定服务类下的所有已运行的服务。</p>
+<p>12.&nbsp; domainname &lt;name&gt;</p>
+<p>&nbsp;&nbsp; 设置域名</p>
+<p>13.&nbsp; insmod &lt;path&gt;</p>
+<p>&nbsp;&nbsp; 加载&lt;path&gt;指定的驱动模块</p>
+<p>14.&nbsp; mkdir &lt;path&gt; [mode][owner] [group]</p>
+<p>&nbsp;&nbsp; 创建一个目录&lt;path&gt; ，可以选择性地指定mode、owner以及group。如果没有指定，默认的权限为755，并属于root用户和 root组。</p>
+<p>15. mount &lt;type&gt; &lt;device&gt; &lt;dir&gt; [&lt;mountoption&gt; ]*</p>
+<p>&nbsp;&nbsp; 试图在目录&lt;dir&gt;挂载指定的设备。&lt;device&gt; 可以是mtd@name的形式指定一个mtd块设备。&lt;mountoption&gt;包括 "ro"、"rw"、"re</p>
+<p>16.&nbsp; setkey</p>
+<p>&nbsp;&nbsp; 保留，暂时未用</p>
+<p>17.&nbsp; setprop &lt;name&gt;&lt;value&gt;</p>
+<p>&nbsp;&nbsp; 将系统属性&lt;name&gt;的值设为&lt;value&gt;。</p>
+<p>18. setrlimit &lt;resource&gt; &lt;cur&gt; &lt;max&gt;</p>
+<p>&nbsp;&nbsp; 设置&lt;resource&gt;的rlimit （资源限制）</p>
+<p>19.&nbsp; start &lt;service&gt;</p>
+<p>&nbsp;&nbsp; 启动指定服务（如果此服务还未运行）。</p>
+<p>20．stop&lt;service&gt;</p>
+<p>&nbsp;&nbsp; 停止指定服务（如果此服务在运行中）。</p>
+<p>21. symlink &lt;target&gt; &lt;path&gt;</p>
+<p>&nbsp;&nbsp; 创建一个指向&lt;path&gt;的软连接&lt;target&gt;。</p>
+<p>22. sysclktz &lt;mins_west_of_gmt&gt;</p>
+<p>&nbsp;&nbsp; 设置系统时钟基准（0代表时钟滴答以格林威治平均时（GMT）为准）</p>
+<p>23.&nbsp; trigger &lt;event&gt;</p>
+<p>&nbsp; 触发一个事件。用于Action排队</p>
+<p>24.&nbsp; wait &lt;path&gt; [&lt;timeout&gt; ]</p>
+<p>等待一个文件是否存在，当文件存在时立即返回，或到&lt;timeout&gt;指定的超时时间后返回，如果不指定&lt;timeout&gt;，默认超时时间是5秒。</p>
+<p>25. write &lt;path&gt; &lt;string&gt; [ &lt;string&gt; ]*</p>
+<p>向&lt;path&gt;指定的文件写入一个或多个字符串。&nbsp;&nbsp;</p>
+<p>Services （服务）是一个程序，他在初始化时启动，并在退出时重启（可选）。Services （服务）的形式如下：</p>
+<div class="cnblogs_code">
+<pre>    service &lt;name&gt; &lt;pathname&gt; [ &lt;argument&gt; ]*  
+          &lt;option&gt;  
+          &lt;option&gt;  </pre>
+</div>
+<p>例如，下面是一个标准的Service用法</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre>    service servicemanager /system/bin/<span style="color: #000000;">servicemanager  
+        </span><span style="color: #0000ff;">class</span><span style="color: #000000;"> core  
+        user system  
+        group system  
+        critical  
+        onrestart restart zygote  
+        onrestart restart media  
+        onrestart restart surfaceflinger  
+        onrestart restart drm  </span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>Services的选项是服务的修饰符，可以影响服务如何以及怎样运行。服务支持的选项如下：</p>
+<p>1.&nbsp; critical</p>
+<p>表明这是一个非常重要的服务。如果该服务4分钟内退出大于4次，系统将会重启并进入 Recovery （恢复）模式。</p>
+<p>2. disabled</p>
+<p>&nbsp;表明这个服务不会同与他同trigger （触发器）下的服务自动启动。该服务必须被明确的按名启动。</p>
+<p>3.&nbsp; setenv &lt;name&gt;&lt;value&gt;</p>
+<p>在进程启动时将环境变量&lt;name&gt;设置为&lt;value&gt;。</p>
+<p>4.&nbsp; socket &lt;name&gt;&lt;type&gt; &lt;perm&gt; [ &lt;user&gt; [ &lt;group&gt; ] ]</p>
+<p>&nbsp;&nbsp; Create a unix domain socketnamed /dev/socket/&lt;name&gt; and pass</p>
+<p>&nbsp;&nbsp; its fd to the launchedprocess.&nbsp; &lt;type&gt; must be"dgram", "stream" or "seqpacket".</p>
+<p>&nbsp;&nbsp; User and group default to0.</p>
+<p>&nbsp;&nbsp; 创建一个unix域的名为/dev/socket/&lt;name&gt; 的套接字，并传递它的文件描述符给已启动的进程。&lt;type&gt; 必须是 "dgram","stream" 或"seqpacket"。用户和组默认是0。</p>
+<p>5.&nbsp; user &lt;username&gt;</p>
+<p>在启动这个服务前改变该服务的用户名。此时默认为 root。</p>
+<p>6.&nbsp; group &lt;groupname&gt; [&lt;groupname&gt; ]*</p>
+<p>在启动这个服务前改变该服务的组名。除了（必需的）第一个组名，附加的组名通常被用于设置进程的补充组（通过setgroups函数），档案默认是root。</p>
+<p>7.&nbsp; oneshot</p>
+<p>&nbsp;&nbsp; 服务退出时不重启。</p>
+<p>8.&nbsp; class &lt;name&gt;</p>
+<p>&nbsp;&nbsp; 指定一个服务类。所有同一类的服务可以同时启动和停止。如果不通过class选项指定一个类，则默认为"default"类服务。</p>
+<p>9. onrestart</p>
+<p>&nbsp;&nbsp;&nbsp; 当服务重启，执行一个命令（下详）。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 现在接着分析一下init是如何解析init.rc的。现在打开system/core/init/init.c文件，找到main函数。在上一篇文章中 分析了main函数的前一部分（初始化属性、处理内核命令行等），现在找到init_parse_config_file函数，调用代码如下：</p>
+<p>init_parse_config_file("/init.rc");</p>
+<p>这个方法主要负责初始化和分析init.rc文件。init_parse_config_file函数在init_parser.c文件中实现，代码如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre>    <span style="color: #0000ff;">int</span> init_parse_config_file(<span style="color: #0000ff;">const</span> <span style="color: #0000ff;">char</span> *<span style="color: #000000;">fn)  
+    {  
+        </span><span style="color: #0000ff;">char</span> *<span style="color: #000000;">data;  
+        data </span>= read_file(fn, <span style="color: #800080;">0</span><span style="color: #000000;">);  
+        </span><span style="color: #0000ff;">if</span> (!data) <span style="color: #0000ff;">return</span> -<span style="color: #800080;">1</span><span style="color: #000000;">;  
+        </span><span style="color: #008000;">/*</span><span style="color: #008000;">  实际分析init.rc文件的代码  </span><span style="color: #008000;">*/</span><span style="color: #000000;">  
+        parse_config(fn, data);  
+        DUMP();  
+        </span><span style="color: #0000ff;">return</span> <span style="color: #800080;">0</span><span style="color: #000000;">;  
+    }  </span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; init_parse_config_file方法开始调用了read_file函数打开了/init.rc文件，并返回了文件的内容（char*类 型），然后最核心的函数是parse_config。该函数也在init_parser.c文件中实现，代码如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre>    <span style="color: #0000ff;">static</span> <span style="color: #0000ff;">void</span> parse_config(<span style="color: #0000ff;">const</span> <span style="color: #0000ff;">char</span> *fn, <span style="color: #0000ff;">char</span> *<span style="color: #000000;">s)  
+    {  
+        </span><span style="color: #0000ff;">struct</span><span style="color: #000000;"> parse_state state;  
+        </span><span style="color: #0000ff;">struct</span><span style="color: #000000;"> listnode import_list;  
+        </span><span style="color: #0000ff;">struct</span> listnode *<span style="color: #000000;">node;  
+        </span><span style="color: #0000ff;">char</span> *<span style="color: #000000;">args[INIT_PARSER_MAXARGS];  
+        </span><span style="color: #0000ff;">int</span><span style="color: #000000;"> nargs;  
+      
+        nargs </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;  
+        state.filename </span>=<span style="color: #000000;"> fn;  
+        state.line </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;  
+        state.ptr </span>=<span style="color: #000000;"> s;  
+        state.nexttoken </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;  
+        state.parse_line </span>=<span style="color: #000000;"> parse_line_no_op;  
+      
+        list_init(</span>&amp;<span style="color: #000000;">import_list);  
+        state.priv </span>= &amp;<span style="color: #000000;">import_list;  
+        </span><span style="color: #008000;">/*</span><span style="color: #008000;">  开始获取每一个token，然后分析这些token，每一个token就是有空格、字表符和回车符分隔的字符串 
+       </span><span style="color: #008000;">*/</span>  
+        <span style="color: #0000ff;">for</span><span style="color: #000000;"> (;;) {  
+            </span><span style="color: #008000;">/*</span><span style="color: #008000;">  next_token函数相当于词法分析器  </span><span style="color: #008000;">*/</span>  
+            <span style="color: #0000ff;">switch</span> (next_token(&amp;<span style="color: #000000;">state)) {  
+            </span><span style="color: #0000ff;">case</span> T_EOF:  <span style="color: #008000;">/*</span><span style="color: #008000;">  init.rc文件分析完毕  </span><span style="color: #008000;">*/</span><span style="color: #000000;">  
+                state.parse_line(</span>&amp;state, <span style="color: #800080;">0</span>, <span style="color: #800080;">0</span><span style="color: #000000;">);  
+                </span><span style="color: #0000ff;">goto</span><span style="color: #000000;"> parser_done;  
+            </span><span style="color: #0000ff;">case</span> T_NEWLINE:  <span style="color: #008000;">/*</span><span style="color: #008000;">  分析每一行的命令  </span><span style="color: #008000;">*/</span>  
+                <span style="color: #008000;">/*</span><span style="color: #008000;">  下面的代码相当于语法分析器  </span><span style="color: #008000;">*/</span><span style="color: #000000;">  
+                state.line</span>++<span style="color: #000000;">;  
+                </span><span style="color: #0000ff;">if</span><span style="color: #000000;"> (nargs) {  
+                    </span><span style="color: #0000ff;">int</span> kw = lookup_keyword(args[<span style="color: #800080;">0</span><span style="color: #000000;">]);  
+                    </span><span style="color: #0000ff;">if</span><span style="color: #000000;"> (kw_is(kw, SECTION)) {  
+                        state.parse_line(</span>&amp;state, <span style="color: #800080;">0</span>, <span style="color: #800080;">0</span><span style="color: #000000;">);  
+                        parse_new_section(</span>&amp;<span style="color: #000000;">state, kw, nargs, args);  
+                    } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {  
+                        state.parse_line(</span>&amp;<span style="color: #000000;">state, nargs, args);  
+                    }  
+                    nargs </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;  
+                }  
+                </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+            </span><span style="color: #0000ff;">case</span> T_TEXT:  <span style="color: #008000;">/*</span><span style="color: #008000;">  处理每一个token  </span><span style="color: #008000;">*/</span>  
+                <span style="color: #0000ff;">if</span> (nargs &lt;<span style="color: #000000;"> INIT_PARSER_MAXARGS) {  
+                    args[nargs</span>++] =<span style="color: #000000;"> state.text;  
+                }  
+                </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+            }  
+        }  
+      
+    parser_done:  
+        </span><span style="color: #008000;">/*</span><span style="color: #008000;">  最后处理由import导入的初始化文件  </span><span style="color: #008000;">*/</span><span style="color: #000000;">  
+        list_for_each(node, </span>&amp;<span style="color: #000000;">import_list) {  
+             </span><span style="color: #0000ff;">struct</span> import *import = node_to_item(node, <span style="color: #0000ff;">struct</span><span style="color: #000000;"> import, list);  
+             </span><span style="color: #0000ff;">int</span><span style="color: #000000;"> ret;  
+      
+             INFO(</span><span style="color: #800000;">"</span><span style="color: #800000;">importing '%s'</span><span style="color: #800000;">"</span>, import-&gt;<span style="color: #000000;">filename);  
+             </span><span style="color: #008000;">/*</span><span style="color: #008000;">  递归调用  </span><span style="color: #008000;">*/</span><span style="color: #000000;">   
+             ret </span>= init_parse_config_file(import-&gt;<span style="color: #000000;">filename);  
+             </span><span style="color: #0000ff;">if</span><span style="color: #000000;"> (ret)  
+                 ERROR(</span><span style="color: #800000;">"</span><span style="color: #800000;">could not import file '%s' from '%s'\n</span><span style="color: #800000;">"</span><span style="color: #000000;">,  
+                       import</span>-&gt;<span style="color: #000000;">filename, fn);  
+        }  
+    }  </span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp; parse_config方法的代码就比较复杂了，现在先说说该方法的基本处理流程。首先会调用&nbsp; list_init(&amp;import_list)初始化一个链表，该链表是用于存储通过import语句导入的初始化文件名。然后开始开始在 for循环中分析init.rc文件中的每一行代码。最后将init.rc文件分析完后，就会进入parser_done部分，并递归调用 init_parse_config_file方法分析通过import导入的初始化文件。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 通过分析parse_config方法的原理，感觉也并不是很复杂。不过分析parse_config方法的具体代码，还需要点编译原理的知识（只是概念 上的就可以）。在for循环中调用了一个next_token方法不断从init.rc文件中获取token。这里的token，就是一种编程语言的最小 单元，也就是不可再分。例如，对于传统的编程语言，if、then等关键字、变量名等标识符都属于一个token。而对于init.rc文件来 说，import、on、以及触发器的参数值，都属于一个token。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 一个完整的编译器（或解析器）最开始需要进行词法和语法分析，词法分析就是在源代码文件中挑出一个个的Token，也就是说，词法分析器的返回值是 Token，而语法分析器的输入就是词法分析器的输出。也就是说，语法分析器需要分析一个个的token，而不是一个个的字符。由于init解析语言很简 单，所以就将词法和语法分析器放到了一起。词法分析器就是next_token函数，而语法分析器就是T_NEWLINE分支中的代码。这些就清楚多了。 现在先看看next_token函数（在parser.c文件中实现）是如何获取每一个token的。</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre>    <span style="color: #0000ff;">int</span> next_token(<span style="color: #0000ff;">struct</span> parse_state *<span style="color: #000000;">state)  
+    {  
+        </span><span style="color: #0000ff;">char</span> *x = state-&gt;<span style="color: #000000;">ptr;  
+        </span><span style="color: #0000ff;">char</span> *<span style="color: #000000;">s;  
+      
+        </span><span style="color: #0000ff;">if</span> (state-&gt;<span style="color: #000000;">nexttoken) {  
+            </span><span style="color: #0000ff;">int</span> t = state-&gt;<span style="color: #000000;">nexttoken;  
+            state</span>-&gt;nexttoken = <span style="color: #800080;">0</span><span style="color: #000000;">;  
+            </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> t;  
+        }  
+        </span><span style="color: #008000;">/*</span><span style="color: #008000;">  在这里开始一个字符一个字符地分析  </span><span style="color: #008000;">*/</span>  
+        <span style="color: #0000ff;">for</span><span style="color: #000000;"> (;;) {  
+            </span><span style="color: #0000ff;">switch</span> (*<span style="color: #000000;">x) {  
+            </span><span style="color: #0000ff;">case</span> <span style="color: #800080;">0</span><span style="color: #000000;">:  
+                state</span>-&gt;ptr =<span style="color: #000000;"> x;  
+                </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> T_EOF;  
+            </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">\n</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+                x</span>++<span style="color: #000000;">;  
+                state</span>-&gt;ptr =<span style="color: #000000;"> x;  
+                </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> T_NEWLINE;  
+            </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span> <span style="color: #800000;">'</span><span style="color: #000000;">:  
+            </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">\t</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+            </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">\r</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+                x</span>++<span style="color: #000000;">;  
+                </span><span style="color: #0000ff;">continue</span><span style="color: #000000;">;  
+            </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">#</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+                </span><span style="color: #0000ff;">while</span> (*x &amp;&amp; (*x != <span style="color: #800000;">'</span><span style="color: #800000;">\n</span><span style="color: #800000;">'</span>)) x++<span style="color: #000000;">;  
+                </span><span style="color: #0000ff;">if</span> (*x == <span style="color: #800000;">'</span><span style="color: #800000;">\n</span><span style="color: #800000;">'</span><span style="color: #000000;">) {  
+                    state</span>-&gt;ptr = x+<span style="color: #800080;">1</span><span style="color: #000000;">;  
+                    </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> T_NEWLINE;  
+                } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {  
+                    state</span>-&gt;ptr =<span style="color: #000000;"> x;  
+                    </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> T_EOF;  
+                }  
+            </span><span style="color: #0000ff;">default</span><span style="color: #000000;">:  
+                </span><span style="color: #0000ff;">goto</span><span style="color: #000000;"> text;  
+            }  
+        }  
+      
+    textdone:  
+        state</span>-&gt;ptr =<span style="color: #000000;"> x;  
+        </span>*s = <span style="color: #800080;">0</span><span style="color: #000000;">;  
+        </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> T_TEXT;  
+    text:  
+        state</span>-&gt;text = s =<span style="color: #000000;"> x;  
+    textresume:  
+        </span><span style="color: #0000ff;">for</span><span style="color: #000000;"> (;;) {  
+            </span><span style="color: #0000ff;">switch</span> (*<span style="color: #000000;">x) {  
+            </span><span style="color: #0000ff;">case</span> <span style="color: #800080;">0</span><span style="color: #000000;">:  
+                </span><span style="color: #0000ff;">goto</span><span style="color: #000000;"> textdone;  
+            </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span> <span style="color: #800000;">'</span><span style="color: #000000;">:  
+            </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">\t</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+            </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">\r</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+                x</span>++<span style="color: #000000;">;  
+                </span><span style="color: #0000ff;">goto</span><span style="color: #000000;"> textdone;  
+            </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">\n</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+                state</span>-&gt;nexttoken =<span style="color: #000000;"> T_NEWLINE;  
+                x</span>++<span style="color: #000000;">;  
+                </span><span style="color: #0000ff;">goto</span><span style="color: #000000;"> textdone;  
+            </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">"</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+                x</span>++<span style="color: #000000;">;  
+                </span><span style="color: #0000ff;">for</span><span style="color: #000000;"> (;;) {  
+                    </span><span style="color: #0000ff;">switch</span> (*<span style="color: #000000;">x) {  
+                    </span><span style="color: #0000ff;">case</span> <span style="color: #800080;">0</span><span style="color: #000000;">:  
+                            </span><span style="color: #008000;">/*</span><span style="color: #008000;"> unterminated quoted thing </span><span style="color: #008000;">*/</span><span style="color: #000000;">  
+                        state</span>-&gt;ptr =<span style="color: #000000;"> x;  
+                        </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> T_EOF;  
+                    </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">"</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+                        x</span>++<span style="color: #000000;">;  
+                        </span><span style="color: #0000ff;">goto</span><span style="color: #000000;"> textresume;  
+                    </span><span style="color: #0000ff;">default</span><span style="color: #000000;">:  
+                        </span>*s++ = *x++<span style="color: #000000;">;  
+                    }  
+                }  
+                </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+            </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">\\</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+                x</span>++<span style="color: #000000;">;  
+                </span><span style="color: #0000ff;">switch</span> (*<span style="color: #000000;">x) {  
+                </span><span style="color: #0000ff;">case</span> <span style="color: #800080;">0</span><span style="color: #000000;">:  
+                    </span><span style="color: #0000ff;">goto</span><span style="color: #000000;"> textdone;  
+                </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">n</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+                    </span>*s++ = <span style="color: #800000;">'</span><span style="color: #800000;">\n</span><span style="color: #800000;">'</span><span style="color: #000000;">;  
+                    </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+                </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">r</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+                    </span>*s++ = <span style="color: #800000;">'</span><span style="color: #800000;">\r</span><span style="color: #800000;">'</span><span style="color: #000000;">;  
+                    </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+                </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">t</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+                    </span>*s++ = <span style="color: #800000;">'</span><span style="color: #800000;">\t</span><span style="color: #800000;">'</span><span style="color: #000000;">;  
+                    </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+                </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">\\</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+                    </span>*s++ = <span style="color: #800000;">'</span><span style="color: #800000;">\\</span><span style="color: #800000;">'</span><span style="color: #000000;">;  
+                    </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+                </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">\r</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+                        </span><span style="color: #008000;">/*</span><span style="color: #008000;"> \ &lt;cr&gt; &lt;lf&gt; -&gt; line continuation </span><span style="color: #008000;">*/</span>  
+                    <span style="color: #0000ff;">if</span> (x[<span style="color: #800080;">1</span>] != <span style="color: #800000;">'</span><span style="color: #800000;">\n</span><span style="color: #800000;">'</span><span style="color: #000000;">) {  
+                        x</span>++<span style="color: #000000;">;  
+                        </span><span style="color: #0000ff;">continue</span><span style="color: #000000;">;  
+                    }  
+                </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">\n</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+                        </span><span style="color: #008000;">/*</span><span style="color: #008000;"> \ &lt;lf&gt; -&gt; line continuation </span><span style="color: #008000;">*/</span><span style="color: #000000;">  
+                    state</span>-&gt;line++<span style="color: #000000;">;  
+                    x</span>++<span style="color: #000000;">;  
+                        </span><span style="color: #008000;">/*</span><span style="color: #008000;"> eat any extra whitespace </span><span style="color: #008000;">*/</span>  
+                    <span style="color: #0000ff;">while</span>((*x == <span style="color: #800000;">'</span> <span style="color: #800000;">'</span>) || (*x == <span style="color: #800000;">'</span><span style="color: #800000;">\t</span><span style="color: #800000;">'</span>)) x++<span style="color: #000000;">;  
+                    </span><span style="color: #0000ff;">continue</span><span style="color: #000000;">;  
+                </span><span style="color: #0000ff;">default</span><span style="color: #000000;">:  
+                        </span><span style="color: #008000;">/*</span><span style="color: #008000;"> unknown escape -- just copy </span><span style="color: #008000;">*/</span>  
+                    *s++ = *x++<span style="color: #000000;">;  
+                }  
+                </span><span style="color: #0000ff;">continue</span><span style="color: #000000;">;  
+            </span><span style="color: #0000ff;">default</span><span style="color: #000000;">:  
+                </span>*s++ = *x++<span style="color: #000000;">;  
+            }  
+        }  
+        </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> T_EOF;  
+    }  </span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; next_token函数的代码还是很多的，不过原理到很简单。就是逐一读取init.rc文件（还有import导入的初始化文件）的字符，并将 由空格、“/t”和“/r”分隔的字符串挑出来，并通过state-&gt;text返回。如果返回了正常的token，next_token函数就返回 T_TEXT。如果一行结束，就返回T_NEWLINE，如果init.rc文件的内容已读取完，就返回T_EOF。当返回T_NEWLINE时，开始语 法分析（由于init初始化语言是基于行的，所以语言分析实际上就是分析init.rc文件的每一行，只是这些行已经被分解成一个个token了）。感兴 趣的读者可以详细分析一下next_token函数的代码，尽管代码很多，但并不复杂。而且还很有意思。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 现在回到parse_config函数，先看一下T_TEXT分支。该分支将获得的每一行的token都存储在args数组中。现在来看 T_NEWLINE分支。该分支的代码涉及到一个state.parse_line函数指针，该函数指针指向的函数负责具体的分析工作。但我们发现，一看 是该函数指针指向了一个空函数parse_line_no_op，实际上，一开始该函数指针什么都不做，只是为了使该函数一开始不至于为null，否则调 用出错。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 现在来回顾一下T_NEWLINE分支的完整代码。</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre>    <span style="color: #0000ff;">case</span><span style="color: #000000;"> T_NEWLINE:  
+        state.line</span>++<span style="color: #000000;">;  
+        </span><span style="color: #0000ff;">if</span><span style="color: #000000;"> (nargs) {  
+            </span><span style="color: #0000ff;">int</span> kw = lookup_keyword(args[<span style="color: #800080;">0</span><span style="color: #000000;">]);  
+            </span><span style="color: #0000ff;">if</span><span style="color: #000000;"> (kw_is(kw, SECTION)) {  
+                state.parse_line(</span>&amp;state, <span style="color: #800080;">0</span>, <span style="color: #800080;">0</span><span style="color: #000000;">);  
+                parse_new_section(</span>&amp;<span style="color: #000000;">state, kw, nargs, args);  
+            } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {  
+                state.parse_line(</span>&amp;<span style="color: #000000;">state, nargs, args);  
+            }  
+            nargs </span>= <span style="color: #800080;">0</span><span style="color: #000000;">;  
+        }  
+        </span><span style="color: #0000ff;">break</span>;  </pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在上面的代码中首先调用了lookup_keyword方法搜索关键字。该方法的作用是判断当前行是否合法，也就是根据Init初始化语言预定义的关键字 查询，如果未查到，返回K_UNKNOWN。lookup_keyword方法在init_parser.c文件中实现，代码如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre>    <span style="color: #0000ff;">int</span> lookup_keyword(<span style="color: #0000ff;">const</span> <span style="color: #0000ff;">char</span> *<span style="color: #000000;">s)  
+    {  
+        </span><span style="color: #0000ff;">switch</span> (*s++<span style="color: #000000;">) {  
+        </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">c</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+        </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">opy</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_copy;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">apability</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_capability;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">hdir</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_chdir;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">hroot</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_chroot;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">lass</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_class;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">lass_start</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_class_start;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">lass_stop</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_class_stop;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">lass_reset</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_class_reset;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">onsole</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_console;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">hown</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_chown;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">hmod</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_chmod;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">ritical</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_critical;  
+            </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+        </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">d</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">isabled</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_disabled;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">omainname</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_domainname;  
+            </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+         … …  
+        </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">o</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">n</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_on;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">neshot</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_oneshot;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">nrestart</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_onrestart;  
+            </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+        </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">r</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">estart</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_restart;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">estorecon</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_restorecon;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">mdir</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_rmdir;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">m</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_rm;  
+            </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+        </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">s</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">eclabel</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_seclabel;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">ervice</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_service;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">etcon</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_setcon;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">etenforce</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_setenforce;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">etenv</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_setenv;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">etkey</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_setkey;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">etprop</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_setprop;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">etrlimit</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_setrlimit;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">etsebool</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_setsebool;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">ocket</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_socket;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">tart</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_start;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">top</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_stop;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">ymlink</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_symlink;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">ysclktz</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_sysclktz;  
+            </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+        </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">t</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">rigger</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_trigger;  
+            </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+        </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">u</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">ser</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_user;  
+            </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+        </span><span style="color: #0000ff;">case</span> <span style="color: #800000;">'</span><span style="color: #800000;">w</span><span style="color: #800000;">'</span><span style="color: #000000;">:  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">rite</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_write;  
+            </span><span style="color: #0000ff;">if</span> (!strcmp(s, <span style="color: #800000;">"</span><span style="color: #800000;">ait</span><span style="color: #800000;">"</span>)) <span style="color: #0000ff;">return</span><span style="color: #000000;"> K_wait;  
+            </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+        }  
+        </span><span style="color: #0000ff;">return</span><span style="color: #000000;"> K_UNKNOWN;  
+    }  </span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lookup_keyword方法按26个字母顺序（关键字首字母）进行处理。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 现在回到parse_config方法的T_NEWLIEN分支，接下来调用了kw_is宏具体判断当前行是否合法，该宏以及SECTION宏的定义如下。根据这些代码。明显是keyword_info数组中的某个元素的flags成员变量的值取最后一位。</p>
+<div class="cnblogs_code">
+<pre>    <span style="color: #0000ff;">#define</span> SECTION 0x01  
+    <span style="color: #0000ff;">#define</span> kw_is(kw, type) (keyword_info[kw].flags &amp; (type))  </pre>
+</div>
+<p>现在问题又转到keyword_info数组了。该数组也在init_parser.c文件中定义，代码如下:</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre>    #include <span style="color: #800000;">"</span><span style="color: #800000;">keywords.h</span><span style="color: #800000;">"</span>  
+    <span style="color: #0000ff;">#define</span> KEYWORD(symbol, flags, nargs, func) \  <span style="color: #000000;">
+        [ K_##symbol ] </span>= { #symbol, func, nargs + <span style="color: #800080;">1</span><span style="color: #000000;">, flags, },  
+    </span><span style="color: #0000ff;">struct</span><span style="color: #000000;"> {  
+        </span><span style="color: #0000ff;">const</span> <span style="color: #0000ff;">char</span> *<span style="color: #000000;">name;  
+        </span><span style="color: #0000ff;">int</span> (*func)(<span style="color: #0000ff;">int</span> nargs, <span style="color: #0000ff;">char</span> **<span style="color: #000000;">args);  
+        unsigned </span><span style="color: #0000ff;">char</span><span style="color: #000000;"> nargs;  
+        unsigned </span><span style="color: #0000ff;">char</span><span style="color: #000000;"> flags;  
+    } keyword_info[KEYWORD_COUNT] </span>=<span style="color: #000000;"> {  
+        [ K_UNKNOWN ] </span>= { <span style="color: #800000;">"</span><span style="color: #800000;">unknown</span><span style="color: #800000;">"</span>, <span style="color: #800080;">0</span>, <span style="color: #800080;">0</span>, <span style="color: #800080;">0</span><span style="color: #000000;"> },  
+    #include </span><span style="color: #800000;">"</span><span style="color: #800000;">keywords.h</span><span style="color: #800000;">"</span><span style="color: #000000;">  
+    };  </span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 从表面上看，keyword_info数组是一个struct数组，但本质上，是一个map。为每一个数组元素设置了一个key，例如，数组元素{ "unknown", 0, 0,0 }的key是K_UNKNOWN，而#include “keywords.h”大有玄机。上面的代码中引用了两次keywords.h文件，现在可以看一下keywords.h文件的代码。</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: #000000;">    #ifndef KEYWORD  
+    </span><span style="color: #0000ff;">int</span> do_chroot(<span style="color: #0000ff;">int</span> nargs, <span style="color: #0000ff;">char</span> **<span style="color: #000000;">args);  
+    … …  
+    </span><span style="color: #0000ff;">int</span> do_export(<span style="color: #0000ff;">int</span> nargs, <span style="color: #0000ff;">char</span> **<span style="color: #000000;">args);  
+    </span><span style="color: #0000ff;">int</span> do_hostname(<span style="color: #0000ff;">int</span> nargs, <span style="color: #0000ff;">char</span> **<span style="color: #000000;">args);  
+    </span><span style="color: #0000ff;">int</span> do_rmdir(<span style="color: #0000ff;">int</span> nargs, <span style="color: #0000ff;">char</span> **<span style="color: #000000;">args);  
+    </span><span style="color: #0000ff;">int</span> do_loglevel(<span style="color: #0000ff;">int</span> nargs, <span style="color: #0000ff;">char</span> **<span style="color: #000000;">args);  
+    </span><span style="color: #0000ff;">int</span> do_load_persist_props(<span style="color: #0000ff;">int</span> nargs, <span style="color: #0000ff;">char</span> **<span style="color: #000000;">args);  
+    </span><span style="color: #0000ff;">int</span> do_wait(<span style="color: #0000ff;">int</span> nargs, <span style="color: #0000ff;">char</span> **<span style="color: #000000;">args);  
+    </span><span style="color: #0000ff;">#define</span> __MAKE_KEYWORD_ENUM__  
+    <span style="color: #008000;">/*</span><span style="color: #008000;"> 
+    "K_chdir", ENUM 
+    </span><span style="color: #008000;">*/</span>  
+    <span style="color: #0000ff;">#define</span> KEYWORD(symbol, flags, nargs, func) K_##symbol,  
+    <span style="color: #0000ff;">enum</span><span style="color: #000000;"> {  
+        K_UNKNOWN,  
+    </span><span style="color: #0000ff;">#endif</span>  <span style="color: #000000;">
+        KEYWORD(capability,  OPTION,  </span><span style="color: #800080;">0</span>, <span style="color: #800080;">0</span><span style="color: #000000;">)  
+        KEYWORD(chdir,       COMMAND, </span><span style="color: #800080;">1</span><span style="color: #000000;">, do_chdir)  
+        KEYWORD(chroot,      COMMAND, </span><span style="color: #800080;">1</span><span style="color: #000000;">, do_chroot)  
+        KEYWORD(</span><span style="color: #0000ff;">class</span>,       OPTION,  <span style="color: #800080;">0</span>, <span style="color: #800080;">0</span><span style="color: #000000;">)  
+        KEYWORD(class_start, COMMAND, </span><span style="color: #800080;">1</span><span style="color: #000000;">, do_class_start)  
+        KEYWORD(class_stop,  COMMAND, </span><span style="color: #800080;">1</span><span style="color: #000000;">, do_class_stop)  
+        KEYWORD(class_reset, COMMAND, </span><span style="color: #800080;">1</span><span style="color: #000000;">, do_class_reset)  
+        KEYWORD(console,     OPTION,  </span><span style="color: #800080;">0</span>, <span style="color: #800080;">0</span><span style="color: #000000;">)  
+        … …  
+        KEYWORD(critical,    OPTION,  </span><span style="color: #800080;">0</span>, <span style="color: #800080;">0</span><span style="color: #000000;">)  
+        KEYWORD(load_persist_props,    COMMAND, </span><span style="color: #800080;">0</span><span style="color: #000000;">, do_load_persist_props)  
+        KEYWORD(ioprio,      OPTION,  </span><span style="color: #800080;">0</span>, <span style="color: #800080;">0</span><span style="color: #000000;">)  
+    #ifdef __MAKE_KEYWORD_ENUM__  
+        KEYWORD_COUNT,  
+    };  
+    </span><span style="color: #0000ff;">#undef</span> __MAKE_KEYWORD_ENUM__  
+    <span style="color: #0000ff;">#undef</span> KEYWORD  
+    <span style="color: #0000ff;">#endif</span>  </pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 从keywords.h文件的代码可以看出，如果未定义KEYWORD宏，则在keywords.h文件中定义一个KEYWORD宏，以及一个枚举类型， 其中K_##symbol的##表示连接的意思。而这个KEYWORD宏只用了第一个参数（symbol）。例 如，KEYWORD(chdir,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; COMMAND, 1, do_chdir)就会生成K_chdir。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp; 而在keyword_info结构体数组中再次导入keywords.h文件，这是KEYWORD宏已经在init_parser.c文件中重新定义，所以第一次导入keywords.h文件使用的是如下的宏。</p>
+<div class="cnblogs_code">
+<pre>    <span style="color: #0000ff;">#define</span> KEYWORD(symbol, flags, nargs, func) \  <span style="color: #000000;">
+        [ K_##symbol ] </span>= { #symbol, func, nargs + <span style="color: #800080;">1</span>, flags, },  </pre>
+</div>
+<p>&nbsp;&nbsp;&nbsp; 这下就明白了，如果不使用keywords.h文件，直接将所有的代码都写到init_parser.c文件中，就会有下面的代码。</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre>    <span style="color: #0000ff;">int</span> do_chroot(<span style="color: #0000ff;">int</span> nargs, <span style="color: #0000ff;">char</span> **<span style="color: #000000;">args);  
+    … …  
+    </span><span style="color: #0000ff;">enum</span><span style="color: #000000;">  
+    {  
+    K_UNKNOWN,  
+    K_ capability,  
+    K_ chdir,  
+    … …  
+    }  
+    </span><span style="color: #0000ff;">#define</span> KEYWORD(symbol, flags, nargs, func) \  <span style="color: #000000;">
+        [ K_##symbol ] </span>= { #symbol, func, nargs + <span style="color: #800080;">1</span><span style="color: #000000;">, flags, },  
+    </span><span style="color: #0000ff;">struct</span><span style="color: #000000;"> {  
+        </span><span style="color: #0000ff;">const</span> <span style="color: #0000ff;">char</span> *<span style="color: #000000;">name;  
+        </span><span style="color: #0000ff;">int</span> (*func)(<span style="color: #0000ff;">int</span> nargs, <span style="color: #0000ff;">char</span> **<span style="color: #000000;">args);  
+        unsigned </span><span style="color: #0000ff;">char</span><span style="color: #000000;"> nargs;  
+        unsigned </span><span style="color: #0000ff;">char</span><span style="color: #000000;"> flags;  
+    } keyword_info[KEYWORD_COUNT] </span>=<span style="color: #000000;"> {  
+        [ K_UNKNOWN ] </span>= { <span style="color: #800000;">"</span><span style="color: #800000;">unknown</span><span style="color: #800000;">"</span>, <span style="color: #800080;">0</span>, <span style="color: #800080;">0</span>, <span style="color: #800080;">0</span><span style="color: #000000;"> },  
+        [K_ capability] </span>= {<span style="color: #800000;">"</span><span style="color: #800000;"> capability </span><span style="color: #800000;">"</span>, <span style="color: #800080;">0</span>, <span style="color: #800080;">1</span><span style="color: #000000;">, OPTION },  
+        [K_ chdir] </span>= {<span style="color: #800000;">"</span><span style="color: #800000;">chdir</span><span style="color: #800000;">"</span>, do_chdir ,<span style="color: #800080;">2</span><span style="color: #000000;">, COMMAND},  
+        … …  
+    #include </span><span style="color: #800000;">"</span><span style="color: #800000;">keywords.h</span><span style="color: #800000;">"</span><span style="color: #000000;">  
+    };  </span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp; 可能我们还记着lookup_keyword方法，该方法的返回值就是keyword_info数组的key。</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 在keywords.h前面定义的函数指针都是处理init.rc文件中service、action和command的。现在就剩下一个问题了，在哪里 为这些函数指针赋值呢，也就是说，具体处理每个部分的函数在哪里呢。现在回到前面的语法分析部分。如果当前行合法，则会执行 parse_new_section函数（在init_parser.c文件中实现），该函数将为section和action设置处理这两部分的函数。 parse_new_section函数的代码如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre>    <span style="color: #0000ff;">void</span> parse_new_section(<span style="color: #0000ff;">struct</span> parse_state *state, <span style="color: #0000ff;">int</span><span style="color: #000000;"> kw,  
+                           </span><span style="color: #0000ff;">int</span> nargs, <span style="color: #0000ff;">char</span> **<span style="color: #000000;">args)  
+    {  
+        printf(</span><span style="color: #800000;">"</span><span style="color: #800000;">[ %s %s ]\n</span><span style="color: #800000;">"</span>, args[<span style="color: #800080;">0</span><span style="color: #000000;">],  
+               nargs </span>&gt; <span style="color: #800080;">1</span> ? args[<span style="color: #800080;">1</span>] : <span style="color: #800000;">""</span><span style="color: #000000;">);  
+        </span><span style="color: #0000ff;">switch</span><span style="color: #000000;">(kw) {  
+        </span><span style="color: #0000ff;">case</span> K_service:  <span style="color: #008000;">//</span><span style="color: #008000;">  处理service  </span>
+            state-&gt;context =<span style="color: #000000;"> parse_service(state, nargs, args);  
+            </span><span style="color: #0000ff;">if</span> (state-&gt;<span style="color: #000000;">context) {  
+                state</span>-&gt;parse_line =<span style="color: #000000;"> parse_line_service;  
+                </span><span style="color: #0000ff;">return</span><span style="color: #000000;">;  
+            }  
+            </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+        </span><span style="color: #0000ff;">case</span> K_on:  <span style="color: #008000;">//</span><span style="color: #008000;">  处理action  </span>
+            state-&gt;context =<span style="color: #000000;"> parse_action(state, nargs, args);  
+            </span><span style="color: #0000ff;">if</span> (state-&gt;<span style="color: #000000;">context) {  
+                state</span>-&gt;parse_line =<span style="color: #000000;"> parse_line_action;  
+                </span><span style="color: #0000ff;">return</span><span style="color: #000000;">;  
+            }  
+            </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+        </span><span style="color: #0000ff;">case</span> K_import:   <span style="color: #008000;">//</span><span style="color: #008000;">  单独处理import导入的初始化文件。  </span>
+<span style="color: #000000;">            parse_import(state, nargs, args);  
+            </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+        }  
+        state</span>-&gt;parse_line =<span style="color: #000000;"> parse_line_no_op;  
+    }  </span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>现在看一下处理service的函数（parse_line_service）。</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre>    <span style="color: #0000ff;">static</span> <span style="color: #0000ff;">void</span> parse_line_service(<span style="color: #0000ff;">struct</span> parse_state *state, <span style="color: #0000ff;">int</span> nargs, <span style="color: #0000ff;">char</span> **<span style="color: #000000;">args)  
+    {  
+        </span><span style="color: #0000ff;">struct</span> service *svc = state-&gt;<span style="color: #000000;">context;  
+        </span><span style="color: #0000ff;">struct</span> command *<span style="color: #000000;">cmd;  
+        </span><span style="color: #0000ff;">int</span><span style="color: #000000;"> i, kw, kw_nargs;  
+      
+        </span><span style="color: #0000ff;">if</span> (nargs == <span style="color: #800080;">0</span><span style="color: #000000;">) {  
+            </span><span style="color: #0000ff;">return</span><span style="color: #000000;">;  
+        }  
+      
+        svc</span>-&gt;ioprio_class =<span style="color: #000000;"> IoSchedClass_NONE;  
+      
+        kw </span>= lookup_keyword(args[<span style="color: #800080;">0</span><span style="color: #000000;">]);  
+        </span><span style="color: #008000;">//</span><span style="color: #008000;">  下面处理每一个option  </span>
+        <span style="color: #0000ff;">switch</span><span style="color: #000000;"> (kw) {  
+        </span><span style="color: #0000ff;">case</span><span style="color: #000000;"> K_capability:  
+            </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+        … …  
+        </span><span style="color: #0000ff;">case</span><span style="color: #000000;"> K_group:  
+            </span><span style="color: #0000ff;">if</span> (nargs &lt; <span style="color: #800080;">2</span><span style="color: #000000;">) {  
+                parse_error(state, </span><span style="color: #800000;">"</span><span style="color: #800000;">group option requires a group id\n</span><span style="color: #800000;">"</span><span style="color: #000000;">);  
+            } </span><span style="color: #0000ff;">else</span> <span style="color: #0000ff;">if</span> (nargs &gt; NR_SVC_SUPP_GIDS + <span style="color: #800080;">2</span><span style="color: #000000;">) {  
+                parse_error(state, </span><span style="color: #800000;">"</span><span style="color: #800000;">group option accepts at most %d supp. groups\n</span><span style="color: #800000;">"</span><span style="color: #000000;">,  
+                            NR_SVC_SUPP_GIDS);  
+            } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {  
+                </span><span style="color: #0000ff;">int</span><span style="color: #000000;"> n;  
+                svc</span>-&gt;gid = decode_uid(args[<span style="color: #800080;">1</span><span style="color: #000000;">]);  
+                </span><span style="color: #0000ff;">for</span> (n = <span style="color: #800080;">2</span>; n &lt; nargs; n++<span style="color: #000000;">) {  
+                    svc</span>-&gt;supp_gids[n-<span style="color: #800080;">2</span>] =<span style="color: #000000;"> decode_uid(args[n]);  
+                }  
+                svc</span>-&gt;nr_supp_gids = n - <span style="color: #800080;">2</span><span style="color: #000000;">;  
+            }  
+            </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+        </span><span style="color: #0000ff;">case</span><span style="color: #000000;"> K_keycodes:  
+            </span><span style="color: #0000ff;">if</span> (nargs &lt; <span style="color: #800080;">2</span><span style="color: #000000;">) {  
+                parse_error(state, </span><span style="color: #800000;">"</span><span style="color: #800000;">keycodes option requires atleast one keycode\n</span><span style="color: #800000;">"</span><span style="color: #000000;">);  
+            } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {  
+                svc</span>-&gt;keycodes = malloc((nargs - <span style="color: #800080;">1</span>) * <span style="color: #0000ff;">sizeof</span>(svc-&gt;keycodes[<span style="color: #800080;">0</span><span style="color: #000000;">]));  
+                </span><span style="color: #0000ff;">if</span> (!svc-&gt;<span style="color: #000000;">keycodes) {  
+                    parse_error(state, </span><span style="color: #800000;">"</span><span style="color: #800000;">could not allocate keycodes\n</span><span style="color: #800000;">"</span><span style="color: #000000;">);  
+                } </span><span style="color: #0000ff;">else</span><span style="color: #000000;"> {  
+                    svc</span>-&gt;nkeycodes = nargs - <span style="color: #800080;">1</span><span style="color: #000000;">;  
+                    </span><span style="color: #0000ff;">for</span> (i = <span style="color: #800080;">1</span>; i &lt; nargs; i++<span style="color: #000000;">) {  
+                        svc</span>-&gt;keycodes[i - <span style="color: #800080;">1</span>] =<span style="color: #000000;"> atoi(args[i]);  
+                    }  
+                }  
+            }  
+            </span><span style="color: #0000ff;">break</span><span style="color: #000000;">;  
+            … …  
+         }  
+        ……  
+    }  </span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp; Action的处理方式与service类似，读者可以自行查看相应的函数代码。现在一切都清楚了。处理service的函数是 parse_line_service，处理action的函数是parse_line_action。而前面的state.parse_line根据当 前是service还是action，指向这两个处理函数中的一个，并执行相应的函数处理actioncommand和serviceoption。&nbsp;&nbsp;&nbsp;&nbsp;</p>
+<p>&nbsp;&nbsp;&nbsp; 综合上述，实际上分析init.rc文件的过程就是通过一系列地处理，最终转换为通过parse_line_service或parse_line_action函数分析Init.rc文件中每一行的行为。</p>
+<p>&nbsp;</p>
+<div id="xunlei_com_thunder_helper_plugin_d462f475-c18e-46be-bd10-327458d045bd">&nbsp;</div>
+<div id="xunlei_com_thunder_helper_plugin_d462f475-c18e-46be-bd10-327458d045bd">&nbsp;</div></div><div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+<div id="BlogPostCategory"></div>
+<div id="EntryTag">标签: <a href="http://www.cnblogs.com/nokiaguy/tag/android/">android</a>, <a href="http://www.cnblogs.com/nokiaguy/tag/init/">init</a></div>
+<div id="blog_post_info"><div id="green_channel">
+<a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(3164799,cb_blogId,1);green_channel_success(this,&#39;谢谢推荐！&#39;);">好文要顶</a>
+<a id="green_channel_follow" onclick="c_follow();" href="javascript:void(0);">关注我</a>
+<a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a><a id="green_channel_contact" href="http://msg.cnblogs.com/send/%E9%93%B6%E6%B2%B3%E4%BD%BF%E8%80%85" target="_blank">联系我</a>
+<a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/icon_weibo_24.png" alt=""></a>
+<a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+<div id="author_profile_info" class="author_profile_info">
+<a href="http://home.cnblogs.com/u/nokiaguy/" target="_blank"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/u32818.jpg" class="author_avatar" alt=""></a>
+<div id="author_profile_detail" class="author_profile_info">
+<a href="http://home.cnblogs.com/u/nokiaguy/">银河使者</a><br>
+<a href="http://home.cnblogs.com/u/nokiaguy/followees">关注 - 3</a><br>
+<a href="http://home.cnblogs.com/u/nokiaguy/followers">粉丝 - 334</a>
+</div>
+</div>
+<div class="clear"></div>
+<div id="author_profile_honor"></div>
+<div id="author_profile_follow">
+    <a href="javascript:void(0);" onclick="c_follow();return false;">+加关注</a>
+</div>
+</div>
+<div id="div_digg">										
+    <div class="diggit" onclick="votePost(3164799,&#39;Digg&#39;)">
+        <span class="diggnum" id="digg_count">6</span>
+    </div>
+	<div class="buryit" onclick="votePost(3164799,&#39;Bury&#39;)"> 
+		<span class="burynum" id="bury_count">0</span>
+	</div>
+	<div class="clear"></div>	
+	<div class="diggword" id="digg_tips">
+    (请您对文章做出评价)
+    </div>	
+</div>
+</div>
+<div class="clear"></div>
+<div id="post_next_prev"><a href="http://www.cnblogs.com/nokiaguy/p/3156357.html" class="p_n_p_prefix">« </a> 上一篇：<a href="http://www.cnblogs.com/nokiaguy/p/3156357.html" title="发布于2013-06-26 11:58">Java向前引用容易出错的地方</a><br><a href="http://www.cnblogs.com/nokiaguy/p/3304192.html" class="p_n_p_prefix">» </a> 下一篇：<a href="http://www.cnblogs.com/nokiaguy/p/3304192.html" title="发布于2013-09-05 19:52">Android、iOS和Windows Phone中的推送技术</a><br></div>
+</div>
+
+
+		</div>
+		<p class="postfoot">
+			posted on <span id="post-date">2013-07-01 14:05</span> <a href="http://www.cnblogs.com/nokiaguy/">银河使者</a> 阅读(<span id="post_view_count">7049</span>) 评论(<span id="post_comment_count">2</span>)  <a href="http://i.cnblogs.com/EditPosts.aspx?postid=3164799" rel="nofollow">编辑</a> <a href="http://www.cnblogs.com/nokiaguy/p/3164799.html#" onclick="AddToWz(3164799);return false;">收藏</a>
+		</p>
+	</div>
+	<script type="text/javascript">var allowComments=true,isLogined=false,cb_blogId=36378,cb_entryId=3164799,cb_blogApp=currentBlogApp,cb_blogUserGuid='9437420b-63cf-dd11-9e4d-001cf0cd104b',cb_entryCreatedDate='2013/7/1 14:05:00';loadViewCount(cb_entryId);</script>
+	
+	</div><a name="!comments"></a><div id="blog-comments-placeholder"><div id="comments_pager_top"></div>
+<a name="评论"></a>
+<div id="comments">
+<h3>评论</h3>
+	
+	
+			<div class="post">
+				<h2>
+					<a href="http://www.cnblogs.com/nokiaguy/p/3164799.html#2717312" class="layer">#1楼</a><a name="2717312" id="comment_anchor_2717312"></a>
+					&nbsp;&nbsp;<span class="comment_actions"></span>
+				</h2>
+				<div id="comment_body_2717312" class="blog_comment_body">不错！支持楼主！</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2717312,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2717312,&#39;Bury&#39;,this)">反对(0)</a></div><span id="comment_2717312_avatar" style="display:none;">http://pic.cnblogs.com/face/117794/20140605144717.png</span>
+				<div class="postfoot">
+					 <span class="comment_date">2013-07-01 14:52</span> | <a id="a_comment_author_2717312" href="http://www.cnblogs.com/wheretime/" target="_blank">时间都去哪了</a> <a href="http://msg.cnblogs.com/send/%E6%97%B6%E9%97%B4%E9%83%BD%E5%8E%BB%E5%93%AA%E4%BA%86" title="发送站内短消息" class="sendMsg2This">&nbsp;</a>
+				</div>
+			</div>
+		
+			<div class="post">
+				<h2>
+					<a href="http://www.cnblogs.com/nokiaguy/p/3164799.html#2717418" class="layer">#2楼</a><a name="2717418" id="comment_anchor_2717418"></a><span id="comment-maxId" style="display:none;">2717418</span><span id="comment-maxDate" style="display:none;">2013/7/1 16:53:03</span>
+					&nbsp;&nbsp;<span class="comment_actions"></span>
+				</h2>
+				<div id="comment_body_2717418" class="blog_comment_body">您们好朋友   我有个不错的android学习交流群，里面有很多高手和干货分享，希望能给你带来帮助群号：247330979   验证码  111</div><div class="comment_vote"><a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(2717418,&#39;Digg&#39;,this)">支持(0)</a><a href="javascript:void(0);" class="comment_bury" onclick="return voteComment(2717418,&#39;Bury&#39;,this)">反对(0)</a></div>
+				<div class="postfoot">
+					 <span class="comment_date">2013-07-01 16:53</span> | <a id="a_comment_author_2717418" href="http://home.cnblogs.com/u/543855/" target="_blank">清源之心</a> <a href="http://msg.cnblogs.com/send/%E6%B8%85%E6%BA%90%E4%B9%8B%E5%BF%83" title="发送站内短消息" class="sendMsg2This">&nbsp;</a>
+				</div>
+			</div>
+		
+</div>
+<div id="comments_pager_bottom"></div></div><script type="text/javascript">var commentManager = new blogCommentManager();commentManager.renderComments(0);</script>
+<div id="comment_form" class="commentform">
+<a name="commentform"></a>
+<div id="divCommentShow"></div>
+<div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="http://www.cnblogs.com/nokiaguy/p/3164799.html#" onclick="return RefreshPage();">刷新页面</a><a href="http://www.cnblogs.com/nokiaguy/p/3164799.html#top">返回顶部</a></div>
+<div id="comment_form_container"><div class="login_tips">注册用户登录后才能发表评论，请 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return login(&#39;commentform&#39;);">登录</a> 或 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return register();">注册</a>，<a href="http://www.cnblogs.com/">访问</a>网站首页。</div></div>
+<div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+<div id="ad_t2"><a href="http://www.ucancode.com/index.htm" target="_blank">【推荐】50万行VC++源码: 大型组态工控、电力仿真CAD与GIS源码库</a><br><a href="http://www.rongcloud.cn/" target="_blank">【推荐】融云即时通讯云－专注为 App 开发者提供IM云服务</a><br><a href="http://www.ucloud.cn/site/active/new_gift.html?utm_source=cost&amp;utm_campaign=bokeyuan1&amp;utm_medium=display&amp;utm_content=3yuecu" target="_blank">【推荐】UCloud开年大礼，充5000返1000；买云主机送CDN，详情点击</a><br></div>
+<div id="opt_under_post"></div>
+<div id="ad_c1" class="c_ad_block"><a href="https://bce.baidu.com/event/promotion-march/index.html?t=cp:online-media|pf:pc|pp:mar|pu:244" target="_blank"><img width="300" height="250" src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/24442-20160324115230854-2017204765.png" alt="百度云_20160324" title="百度云_20160324"></a></div>
+<div id="under_post_news"><div class="itnews c_ad_block"><b>最新IT新闻</b>:<br> ·  <a href="http://news.cnblogs.com/n/542131/" target="_blank">微软陷“质量门” 第二代手环腕带大量开裂</a><br> ·  <a href="http://news.cnblogs.com/n/542133/" target="_blank">支付宝服务下沉 蚂蚁金服欲打造千个支付宝县</a><br> ·  <a href="http://news.cnblogs.com/n/542132/" target="_blank">再不担心密码泄露了!谷歌发布新版Chrome浏览器</a><br> ·  <a href="http://news.cnblogs.com/n/542130/" target="_blank">微软Build 2016开发者大会开幕在即，这6点值得期待</a><br> ·  <a href="http://news.cnblogs.com/n/542129/" target="_blank">雅虎要求潜在收购方4月11日前提交初步报价</a><br>» <a href="http://news.cnblogs.com/" title="IT新闻" target="_blank">更多新闻...</a></div></div>
+<div id="ad_c2" class="c_ad_block"><a href="https://www.jpush.cn/?from=cnblogs01" target="_blank"><img width="468" height="60" src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/24442-20160307140747632-1210035054.jpg" alt="极光推送20160307" title="极光推送20160307"></a></div>
+<div id="under_post_kb"><div class="itnews c_ad_block" id="kb_block"><b>最新知识库文章</b>:<br><div id="kb_recent"> ·  <a href="http://kb.cnblogs.com/page/541862/" target="_blank">为什么未来是全栈工程师的世界？</a><br> ·  <a href="http://kb.cnblogs.com/page/541805/" target="_blank">程序bug导致了天大的损失，要枪毙程序猿吗？</a><br> ·  <a href="http://kb.cnblogs.com/page/541230/" target="_blank">如何运维千台以上游戏云服务器</a><br> ·  <a href="http://kb.cnblogs.com/page/539160/" target="_blank">架构漫谈（一）：什么是架构？</a><br> ·  <a href="http://kb.cnblogs.com/page/540632/" target="_blank">架构的本质</a><br></div>» <a href="http://kb.cnblogs.com/" target="_blank">更多知识库文章...</a></div></div>
+<div id="HistoryToday" class="c_ad_block"><b>历史上的今天:</b><br>2010-07-01 <a href="http://www.cnblogs.com/nokiaguy/archive/2010/07/01/1769079.html">《Android/OPhone 开发完全讲义》已出版，现提供源代码下载</a><br></div>
+<script type="text/javascript">
+$(function () {
+    setTimeout(function () { incrementViewCount(cb_entryId); }, 50);
+    deliverAdT2();
+    deliverAdC1();
+    deliverAdC2();    
+    loadNewsAndKb();
+    loadBlogSignature();
+    LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+    GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate);
+    loadOptUnderPost();
+    GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);    
+});
+</script>
+</div>
+
+
+</div>
+</div>
+<div id="leftmenu">
+
+
+<h3>导航</h3>
+<ul>
+<li>
+<a id="MyLinks1_HomeLink" href="http://www.cnblogs.com/">博客园</a></li>
+<li>
+<a id="MyLinks1_MyHomeLink" class="two_words" href="http://www.cnblogs.com/nokiaguy/">首页</a></li>
+<li>
+<a id="MyLinks1_NewPostLink" rel="nofollow" href="http://i.cnblogs.com/EditPosts.aspx?opt=1">新随笔</a></li>
+<li>
+<a id="MyLinks1_ContactLink" accesskey="9" class="two_words" rel="nofollow" href="http://msg.cnblogs.com/send/%E9%93%B6%E6%B2%B3%E4%BD%BF%E8%80%85">联系</a></li>
+<li>
+<a id="MyLinks1_Syndication" class="two_words" href="http://www.cnblogs.com/nokiaguy/rss">订阅</a>
+<a id="MyLinks1_XMLLink" href="http://www.cnblogs.com/nokiaguy/rss"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/xml.gif" alt="订阅"></a>
+</li>
+<li>
+<a id="MyLinks1_Admin" class="two_words" rel="nofollow" href="http://i.cnblogs.com/">管理</a></li>
+</ul>
+
+<div id="blog-calendar" style=""><table id="blogCalendar" class="Cal" cellspacing="0" cellpadding="0" title="Calendar">
+	<tbody><tr><td colspan="7"><table class="CalTitle" cellspacing="0">
+		<tbody><tr><td class="CalNextPrev"><a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2016/02/01&#39;);return false;">&lt;</a></td><td align="center">2016年3月</td><td class="CalNextPrev" align="right"><a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2016/04/01&#39;);return false;">&gt;</a></td></tr>
+	</tbody></table></td></tr><tr><th class="CalDayHeader" align="center" abbr="日" scope="col">日</th><th class="CalDayHeader" align="center" abbr="一" scope="col">一</th><th class="CalDayHeader" align="center" abbr="二" scope="col">二</th><th class="CalDayHeader" align="center" abbr="三" scope="col">三</th><th class="CalDayHeader" align="center" abbr="四" scope="col">四</th><th class="CalDayHeader" align="center" abbr="五" scope="col">五</th><th class="CalDayHeader" align="center" abbr="六" scope="col">六</th></tr><tr><td class="CalOtherMonthDay" align="center">28</td><td class="CalOtherMonthDay" align="center">29</td><td align="center">1</td><td align="center">2</td><td align="center">3</td><td align="center">4</td><td class="CalWeekendDay" align="center">5</td></tr><tr><td class="CalWeekendDay" align="center">6</td><td align="center">7</td><td align="center">8</td><td align="center">9</td><td align="center">10</td><td align="center">11</td><td class="CalWeekendDay" align="center">12</td></tr><tr><td class="CalWeekendDay" align="center">13</td><td align="center">14</td><td align="center">15</td><td align="center">16</td><td align="center">17</td><td align="center">18</td><td class="CalWeekendDay" align="center">19</td></tr><tr><td class="CalWeekendDay" align="center">20</td><td align="center">21</td><td align="center">22</td><td align="center">23</td><td align="center">24</td><td align="center">25</td><td class="CalWeekendDay" align="center">26</td></tr><tr><td class="CalWeekendDay" align="center">27</td><td align="center">28</td><td class="CalTodayDay" align="center">29</td><td align="center">30</td><td align="center">31</td><td class="CalOtherMonthDay" align="center">1</td><td class="CalOtherMonthDay" align="center">2</td></tr><tr><td class="CalOtherMonthDay" align="center">3</td><td class="CalOtherMonthDay" align="center">4</td><td class="CalOtherMonthDay" align="center">5</td><td class="CalOtherMonthDay" align="center">6</td><td class="CalOtherMonthDay" align="center">7</td><td class="CalOtherMonthDay" align="center">8</td><td class="CalOtherMonthDay" align="center">9</td></tr>
+</tbody></table></div><script type="text/javascript">loadBlogDefaultCalendar();</script>
+<meta name="vs_showGrid" content="False">
+
+<h3>公告</h3>
+<div id="blog-news"><span style="color: #FF0000;">本博客的所有文章，未经说明均为原创，如需转载，请注明出处！</span>
+<br><br>
+<strong></strong>
+<h3 class="boxtitle"><span style="color: red;">个人简介</span>&nbsp;
+</h3>
+<strong>李宁（银河使者）</strong>：IT作家、讲师、技术顾问，主要研究领域：移动技术、编译器、Linux内核、电子电路。主要著
+作：<span style="color: #ff6600;">《Android深度探索（卷1）：HAL与驱动开发》</span><span style="color: #339966;">、《</span><span style="color: #339966;">Android应用开发实战（第2版）》</span>、<span style="color: #993366;">《Android开发完全讲义（第2版）》</span>、《Android开发权威指南（第2版）》、《Android高
+薪之路：Android程序员面试宝典 》。<br><br>
+<strong>
+<h3 class="boxtitle"><span style="color: red;">QQ群</span>&nbsp;
+</h3>
+游戏开发：264268059
+<br>
+<br>
+<!--<span style="color: blue;">请各位同学加入自己感兴趣的QQ群</span>
+<br>
+<br>
+-->
+
+<h3 class="boxtitle"><span style="color: red;">我的视频课程</span>&nbsp;
+</h3>
+<strong>
+<p>Cocos2d-x 3.0入门与实战视频教程(基于3.0正式版）
+</p>
+<p>
+<a href="http://edu.51cto.com/course/course_id-1227.html"><img alt="" src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/20140429210606953" height="120" width="175"></a></p></strong>
+<br><br>
+<h3 class="boxtitle"><span style="color: red;">我的新浪围脖</span>&nbsp;
+</h3>
+<strong>
+<br>
+<a href="http://weibo.com/androidguy"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/30211130-209df6a265284672a96131b58e245138.png" alt="" height="89" width="185"></a>
+<p>&nbsp;</p><strong>
+<h3 class="boxtitle"><span style="color: red;">我的著作</span>&nbsp;
+</h3>
+<p>Android深度探索(卷2)系统应用源代码分析与ROM定制[<span style="color:red">火热销售中</span>]
+</p>
+<p>
+<a href="http://item.jd.com/11592417.html"><img alt="" src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/031740079665555.png" height="225" width="175"></a>
+<a href="http://www.amazon.cn/Android%E6%B7%B1%E5%BA%A6%E6%8E%A2%E7%B4%A2-%E5%8D%B72-%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E6%BA%90%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%8EROM%E5%AE%9A%E5%88%B6-%E6%9D%8E%E5%AE%81/dp/B00QPSOM2S/ref=sr_1_2?ie=UTF8&amp;qid=1420277140&amp;sr=8-2&amp;keywords=android%E6%B7%B1%E5%BA%A6%E6%8E%A2%E7%B4%A2">【1】亚马逊</a></p>
+<p><a href="http://product.dangdang.com/23615864.html#ddclick?act=click&amp;pos=23615864_1_1_q&amp;cat=&amp;key=android%C9%EE%B6%C8%CC%BD%CB%F7&amp;qinfo=11_1_60&amp;pinfo=&amp;minfo=&amp;ninfo=&amp;custid=&amp;permid=20141216211010788468275562016645463&amp;ref=http%3A%2F%2Fwww.dangdang.com%2F&amp;rcount=&amp;type=&amp;t=1420277287000&amp;ver=A">【2】当当网</a></p>
+<p><a href="http://item.jd.com/11592417.html">【3】京东商城</a></p>
+<p><a href="http://product.china-pub.com/4467546">【4】互动网</a></p>
+<p></p>
+
+<br>
+<br>
+<p>Android开发权威指南（第2版）[<span style="color:red">火热销售中</span> ]
+</p>
+<p>
+<a href="http://www.amazon.cn/Android%E5%BC%80%E5%8F%91%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97-%E6%9D%8E%E5%AE%81/dp/B00EOIDFX8/ref=sr_1_1?ie=UTF8&amp;qid=1378380978&amp;sr=8-1&amp;keywords=android+%E6%9D%8E%E5%AE%81"><img alt="" src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/05193245-5f70d5ccbc764ee387cb7eb27184f871.png" height="225" width="175"></a></p>
+<p>
+<a href="http://product.suning.com/104327423.html">【1】苏宁易购</a></p>
+<p>
+<a href="http://www.amazon.cn/Android%E5%BC%80%E5%8F%91%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97-%E6%9D%8E%E5%AE%81/dp/B00EOIDFX8/ref=sr_1_1?ie=UTF8&amp;qid=1378380978&amp;sr=8-1&amp;keywords=android+%E6%9D%8E%E5%AE%81">【2】亚马逊</a></p>
+<p><a href="http://product.dangdang.com/23321534.html#ddclick?act=click&amp;pos=23321534_3_1_q&amp;cat=&amp;key=android%2B%C0%EE%C4%FE&amp;qinfo=30_1_48&amp;pinfo=&amp;minfo=&amp;ninfo=&amp;custid=&amp;permid=20130826174028820239899307364377788&amp;ref=http%3A%2F%2Fwww.dangdang.com%2F&amp;rcount=&amp;type=&amp;t=1378381094000">【3】当当网</a></p>
+<p><a href="http://item.jd.com/11306297.html">【4】京东商城</a></p>
+<p><a href="http://product.china-pub.com/3802200">【5】互动网</a></p>
+<p><a href="http://s.taobao.com/search?q=Android%BF%AA%B7%A2%C8%A8%CD%FE%D6%B8%C4%CF%A3%A8%B5%DA2%B0%E6%A3%A9&amp;suggest=history_1&amp;wq=Android%BF%AA%B7%A2&amp;suggest_query=Android%BF%AA%B7%A2&amp;source=suggest&amp;initiative_id=tbindexz_20130905&amp;spm=1.1000386.5803581.d4908513&amp;sourceId=tb.index&amp;search_type=item&amp;commend=all">【6】淘宝网</a></p>
+<p></p>
+
+<br>
+<br>
+<p>Android深度探索（卷1）：HAL与驱动开发[<span style="color:red">火热销售中</span> ]
+</p>
+<p>
+<a href="http://book.360buy.com/11155655.html"><img alt="" src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/14215858-813a829d47ef4e37957fcbe9806eeb1b.jpg" height="225" width="175"></a></p>
+<p>
+<a href="http://product.suning.com/103530430.html">【1】苏宁易购（58折）</a></p>
+<p>
+<a href="http://www.amazon.cn/Android%E6%B7%B1%E5%BA%A6%E6%8E%A2%E7%B4%A2-HAL%E4%B8%8E%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91-%E6%9D%8E%E5%AE%81/dp/B00ASIN7L8/ref=sr_1_1?ie=UTF8&amp;qid=1359549360&amp;sr=8-1">【2】亚马逊</a></p>
+<p><a href="http://union.dangdang.com/transfer/transfer.aspx?from=P-263982&amp;backurl=http://product.dangdang.com/main/product.aspx?product_id=23043311">【3】当当网</a></p>
+<p><a href="http://book.360buy.com/11155655.html">【4】京东商城</a></p>
+<p><a href="http://product.china-pub.com/3021757">【5】互动网</a></p>
+<p><a href="http://s.taobao.com/search?q=android%C9%EE%B6%C8%CC%BD%CB%F7&amp;commend=all&amp;ssid=s5-e&amp;search_type=item&amp;sourceId=tb.index&amp;initiative_id=tbindexz_20130130">【6】淘宝网</a></p>
+<p><a href="http://book.douban.com/subject/20480745/">【7】豆瓣网 </a><br>
+</p>
+<p>
+</p>
+<p>&nbsp;</p>
+<p>Android应用开发实战（第2版）[<span style="color:red">火热销售中</span> ] <br>
+</p>
+<p>
+<a href="http://book.360buy.com/11131468.html"><img src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/30211855-4a9bc7d2b3314d47b9f97c7a3dd3a00e.jpg" alt="" height="227" width="174"></a></p>
+<p><a href="http://book.360buy.com/11131468.html">【1】京东商城</a></p>
+<p><a href="http://union.dangdang.com/transfer/transfer.aspx?from=P-263982&amp;backurl=http://product.dangdang.com/main/product.aspx?product_id=22915560">【2】当当网</a></p>
+<p><a href="http://www.amazon.cn/Android%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98-%E6%9D%8E%E5%AE%81/dp/B00AAOO42Q/ref=sr_1_6?ie=UTF8&amp;qid=1359550638&amp;sr=8-6">【3】亚马逊</a></p>
+<p><a href="http://product.china-pub.com/3020660">【4】互动网</a></p>
+<p><a href="http://www.suning.com/emall/prd_10052_22001_-7_4091929_.html">【5】苏宁易购</a></p>
+<p><a href="http://s.taobao.com/search?q=Android%D3%A6%D3%C3%BF%AA%B7%A2%CA%B5%D5%BD%A3%A8%B5%DA2%B0%E6%A3%A9&amp;commend=all&amp;ssid=s5-e&amp;search_type=item&amp;sourceId=tb.index&amp;initiative_id=tbindexz_20130130">【6】淘宝网</a></p>
+<p><a href="http://book.douban.com/subject/20396237/">【7】豆瓣网 </a><br>
+</p>
+<p>&nbsp;</p>
+<p>Android开发完全讲义（第2版）[<span style="color:red">火热销售中</span> ]&nbsp; <br>
+</p>
+<p>
+<a href="http://book.360buy.com/10994906.html"><img alt="" src="./Android的init过程（二）：初始化语言（init.rc）解析 - 银河使者 - 博客园_files/aa.png" height="225" width="175"></a></p>
+<p><a href="http://union.dangdang.com/transfer/transfer.aspx?from=P-263982&amp;backurl=http://product.dangdang.com/main/product.aspx?product_id=22741502">【1】当当网</a></p>
+<p><a href="http://www.amazon.cn/Android%E5%BC%80%E5%8F%91%E5%AE%8C%E5%85%A8%E8%AE%B2%E4%B9%89-%E6%9D%8E%E5%AE%81/dp/B00827VLLA/ref=sr_1_2?ie=UTF8&amp;qid=1359550638&amp;sr=8-2">【2】亚马逊</a></p>
+<p><a href="http://book.360buy.com/10994906.html">【3】京东商城</a></p>
+<p><a href="http://product.china-pub.com/199758">【4】互动网</a></p>
+<p><a href="http://s.taobao.com/search?q=Android%BF%AA%B7%A2%CD%EA%C8%AB%BD%B2%D2%E5&amp;initiative_id=staobaoz_20130130">【5】淘宝网</a></p>
+<p><a href="http://book.douban.com/subject/10733303/">【6】豆瓣网 </a><br>
+</p>
+<p>&nbsp;<br>
+</p>
+<p>&nbsp;</p>
+</strong>
+<strong>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</strong><div id="profile_block">昵称：<a href="http://home.cnblogs.com/u/nokiaguy/">银河使者</a><br>园龄：<a href="http://home.cnblogs.com/u/nokiaguy/" title="入园时间：2008-04-22">7年11个月</a><br>粉丝：<a href="http://home.cnblogs.com/u/nokiaguy/followers/">334</a><br>关注：<a href="http://home.cnblogs.com/u/nokiaguy/followees/">3</a><div id="p_b_follow"><a href="javascript:void(0);" onclick="cnblogs.UserManager.FollowBlogger(&#39;9437420b-63cf-dd11-9e4d-001cf0cd104b&#39;)">+加关注</a></div></div></strong></strong></div><script type="text/javascript">loadBlogNews();</script>
+
+<div id="blog-sidecolumn"><div id="sidebar_search" class="sidebar-block">
+<div id="sidebar_search" class="mySearch">
+<h3 class="catListTitle">搜索</h3>
+<div id="sidebar_search_box">
+<div id="widget_my_zzk" class="div_my_zzk"><input type="text" id="q" onkeydown="return zzk_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="zzk_go()" type="button" value="找找看" id="btnZzk" class="btn_my_zzk"></div>
+<div id="widget_my_google" class="div_my_zzk"><input type="text" name="google_q" id="google_q" onkeydown="return google_go_enter(event)" class="input_my_zzk">&nbsp;<input onclick="google_go()" type="button" value="谷歌搜索" class="btn_my_zzk"></div>
+</div>
+</div>
+
+</div><div id="sidebar_shortcut" class="sidebar-block">
+<h3 class="catListTitle">常用链接</h3>
+<ul>
+<li><a href="http://www.cnblogs.com/nokiaguy/p/" title="我的博客的随笔列表">我的随笔</a></li><li><a href="http://www.cnblogs.com/nokiaguy/MyComments.html" title="我发表过的评论列表">我的评论</a></li><li><a href="http://www.cnblogs.com/nokiaguy/OtherPosts.html" title="我评论过的随笔列表">我的参与</a></li><li><a href="http://www.cnblogs.com/nokiaguy/RecentComments.html" title="我的博客的评论列表">最新评论</a></li><li><a href="http://www.cnblogs.com/nokiaguy/tag/" title="我的博客的标签列表">我的标签</a></li>
+</ul>
+<div id="itemListLin_con" style="display:none;">
+
+</div></div><div id="sidebar_toptags" class="sidebar-block">
+<h3 class="catListTitle">我的标签</h3>
+<div id="MyTag">
+<ul>
+<li><a href="http://www.cnblogs.com/nokiaguy/tag/android/">android</a>(28)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/java/">java</a>(9)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/linux/">linux</a>(6)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/ophone/">ophone</a>(6)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/%E7%AE%97%E6%B3%95/">算法</a>(6)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>(4)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/SQL%20Server/">SQL Server</a>(4)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91/">交叉编译</a>(4)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/CodeSourcery/">CodeSourcery</a>(4)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/C%23/">C#</a>(4)</li><li><a href="http://www.cnblogs.com/nokiaguy/tag/">更多</a></li>
+</ul>
+</div></div><div id="sidebar_categories">
+		<h3>随笔分类<span style="font-size:11px;font-weight:normal">(287)</span></h3>
+		
+				<ul>
+			
+				<li><a id="CatList_LinkList_0_Link_0" href="http://www.cnblogs.com/nokiaguy/category/177252.html">获奖作品(3)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_1" href="http://www.cnblogs.com/nokiaguy/category/137117.html">原创(95)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_2" href="http://www.cnblogs.com/nokiaguy/category/136726.html">.net高级技术(7)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_3" href="http://www.cnblogs.com/nokiaguy/category/136727.html">.net入门技术(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_4" href="http://www.cnblogs.com/nokiaguy/category/139675.html">.net新特性(2)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_5" href="http://www.cnblogs.com/nokiaguy/category/136142.html">ajax(4)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_6" href="http://www.cnblogs.com/nokiaguy/category/135618.html">algorithm(18)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_7" href="http://www.cnblogs.com/nokiaguy/category/250234.html">Android(27)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_8" href="http://www.cnblogs.com/nokiaguy/category/135708.html">C#(13)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_9" href="http://www.cnblogs.com/nokiaguy/category/135889.html">C/C++(13)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_10" href="http://www.cnblogs.com/nokiaguy/category/137462.html">database(11)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_11" href="http://www.cnblogs.com/nokiaguy/category/136315.html">delphi(3)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_12" href="http://www.cnblogs.com/nokiaguy/category/182507.html">IE（6至8）(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_13" href="http://www.cnblogs.com/nokiaguy/category/455402.html">iOS(2)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_14" href="http://www.cnblogs.com/nokiaguy/category/255288.html">Java(15)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_15" href="http://www.cnblogs.com/nokiaguy/category/136144.html">javascript(5)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_16" href="http://www.cnblogs.com/nokiaguy/category/174001.html">linux(11)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_17" href="http://www.cnblogs.com/nokiaguy/category/135707.html">MSIL(2)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_18" href="http://www.cnblogs.com/nokiaguy/category/137461.html">mysql(4)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_19" href="http://www.cnblogs.com/nokiaguy/category/719702.html">nginx(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_20" href="http://www.cnblogs.com/nokiaguy/category/455404.html">Objective-C</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_21" href="http://www.cnblogs.com/nokiaguy/category/135890.html">open source(3)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_22" href="http://www.cnblogs.com/nokiaguy/category/538168.html">Python(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_23" href="http://www.cnblogs.com/nokiaguy/category/135420.html">SQL Server(12)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_24" href="http://www.cnblogs.com/nokiaguy/category/138650.html">VBA(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_25" href="http://www.cnblogs.com/nokiaguy/category/136143.html">web(9)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_26" href="http://www.cnblogs.com/nokiaguy/category/177251.html">WPF(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_27" href="http://www.cnblogs.com/nokiaguy/category/174002.html">wxWidgets(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_28" href="http://www.cnblogs.com/nokiaguy/category/133688.html">安全(2)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_29" href="http://www.cnblogs.com/nokiaguy/category/144877.html">进程、线程、并发(5)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_30" href="http://www.cnblogs.com/nokiaguy/category/177027.html">设计模式(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_31" href="http://www.cnblogs.com/nokiaguy/category/174026.html">网络营销(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_32" href="http://www.cnblogs.com/nokiaguy/category/137983.html">宇宙探秘(1)</a></li>
+			
+				<li><a id="CatList_LinkList_0_Link_33" href="http://www.cnblogs.com/nokiaguy/category/136347.html">杂七杂八(11)</a></li>
+			
+				</ul>
+			
+	
+		<h3>随笔档案<span style="font-size:11px;font-weight:normal">(149)</span></h3>
+		
+				<ul>
+			
+				<li><a id="CatList_LinkList_1_Link_0" href="http://www.cnblogs.com/nokiaguy/archive/2015/08.html">2015年8月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_1" href="http://www.cnblogs.com/nokiaguy/archive/2015/05.html">2015年5月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_2" href="http://www.cnblogs.com/nokiaguy/archive/2014/11.html">2014年11月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_3" href="http://www.cnblogs.com/nokiaguy/archive/2014/08.html">2014年8月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_4" href="http://www.cnblogs.com/nokiaguy/archive/2014/04.html">2014年4月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_5" href="http://www.cnblogs.com/nokiaguy/archive/2013/12.html">2013年12月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_6" href="http://www.cnblogs.com/nokiaguy/archive/2013/11.html">2013年11月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_7" href="http://www.cnblogs.com/nokiaguy/archive/2013/09.html">2013年9月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_8" href="http://www.cnblogs.com/nokiaguy/archive/2013/07.html">2013年7月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_9" href="http://www.cnblogs.com/nokiaguy/archive/2013/06.html">2013年6月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_10" href="http://www.cnblogs.com/nokiaguy/archive/2013/05.html">2013年5月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_11" href="http://www.cnblogs.com/nokiaguy/archive/2013/04.html">2013年4月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_12" href="http://www.cnblogs.com/nokiaguy/archive/2013/03.html">2013年3月 (6)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_13" href="http://www.cnblogs.com/nokiaguy/archive/2013/02.html">2013年2月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_14" href="http://www.cnblogs.com/nokiaguy/archive/2013/01.html">2013年1月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_15" href="http://www.cnblogs.com/nokiaguy/archive/2011/10.html">2011年10月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_16" href="http://www.cnblogs.com/nokiaguy/archive/2011/09.html">2011年9月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_17" href="http://www.cnblogs.com/nokiaguy/archive/2011/04.html">2011年4月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_18" href="http://www.cnblogs.com/nokiaguy/archive/2010/11.html">2010年11月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_19" href="http://www.cnblogs.com/nokiaguy/archive/2010/10.html">2010年10月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_20" href="http://www.cnblogs.com/nokiaguy/archive/2010/09.html">2010年9月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_21" href="http://www.cnblogs.com/nokiaguy/archive/2010/08.html">2010年8月 (5)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_22" href="http://www.cnblogs.com/nokiaguy/archive/2010/07.html">2010年7月 (8)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_23" href="http://www.cnblogs.com/nokiaguy/archive/2010/06.html">2010年6月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_24" href="http://www.cnblogs.com/nokiaguy/archive/2010/05.html">2010年5月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_25" href="http://www.cnblogs.com/nokiaguy/archive/2010/04.html">2010年4月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_26" href="http://www.cnblogs.com/nokiaguy/archive/2010/03.html">2010年3月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_27" href="http://www.cnblogs.com/nokiaguy/archive/2010/01.html">2010年1月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_28" href="http://www.cnblogs.com/nokiaguy/archive/2009/12.html">2009年12月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_29" href="http://www.cnblogs.com/nokiaguy/archive/2009/11.html">2009年11月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_30" href="http://www.cnblogs.com/nokiaguy/archive/2009/09.html">2009年9月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_31" href="http://www.cnblogs.com/nokiaguy/archive/2009/08.html">2009年8月 (1)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_32" href="http://www.cnblogs.com/nokiaguy/archive/2009/07.html">2009年7月 (2)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_33" href="http://www.cnblogs.com/nokiaguy/archive/2009/06.html">2009年6月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_34" href="http://www.cnblogs.com/nokiaguy/archive/2009/03.html">2009年3月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_35" href="http://www.cnblogs.com/nokiaguy/archive/2009/02.html">2009年2月 (6)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_36" href="http://www.cnblogs.com/nokiaguy/archive/2009/01.html">2009年1月 (5)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_37" href="http://www.cnblogs.com/nokiaguy/archive/2008/12.html">2008年12月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_38" href="http://www.cnblogs.com/nokiaguy/archive/2008/10.html">2008年10月 (4)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_39" href="http://www.cnblogs.com/nokiaguy/archive/2008/09.html">2008年9月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_40" href="http://www.cnblogs.com/nokiaguy/archive/2008/08.html">2008年8月 (3)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_41" href="http://www.cnblogs.com/nokiaguy/archive/2008/07.html">2008年7月 (6)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_42" href="http://www.cnblogs.com/nokiaguy/archive/2008/06.html">2008年6月 (9)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_43" href="http://www.cnblogs.com/nokiaguy/archive/2008/05.html">2008年5月 (36)</a></li>
+			
+				<li><a id="CatList_LinkList_1_Link_44" href="http://www.cnblogs.com/nokiaguy/archive/2008/04.html">2008年4月 (1)</a></li>
+			
+				</ul>
+			
+	
+		<h3>相册<span style="font-size:11px;font-weight:normal">(4)</span></h3>
+		
+				<ul>
+			
+				<li><a id="CatList_LinkList_2_Link_0" href="http://www.cnblogs.com/nokiaguy/gallery/136562.html" rel="nofollow">images(2)</a></li>
+			
+				<li><a id="CatList_LinkList_2_Link_1" href="http://www.cnblogs.com/nokiaguy/gallery/139674.html" rel="nofollow">其他</a></li>
+			
+				<li><a id="CatList_LinkList_2_Link_2" href="http://www.cnblogs.com/nokiaguy/gallery/136978.html" rel="nofollow">微软认证(2)</a></li>
+			
+				</ul>
+			
+	</div><div id="sidebar_scorerank" class="sidebar-block">
+<h3>积分与排名</h3>
+<ul>
+	<li>
+		积分 -
+		369374
+	</li><li>
+		排名 -
+		293
+	</li>
+</ul>
+</div><div id="sidebar_recentcomments" class="sidebar-block"><div id="recent_comments_wrap">
+<h3 class="catListTitle">最新评论</h3>
+<div class="RecentComment" id="RecentComments">
+	<div id="RecentCommentsBlock"><ul>
+    <li class="recent_comment_title"><a href="http://www.cnblogs.com/nokiaguy/archive/2008/05/11/1191914.html#3372452">1. Re:全排列算法原理和实现</a></li>
+    <li class="recent_comment_body">/*全排列非递归实现，超快的哦*/#include int main() { int a,b,c,d,e,n=0;	for(a=1;a&lt;=5;a++)	{ for(b=1;b&lt;=5;b+......</li>
+    <li class="recent_comment_author">--goodgoodluck</li>
+    <li class="recent_comment_title"><a href="http://www.cnblogs.com/nokiaguy/archive/2008/05/29/1209858.html#3321790">2. Re:Web上传文件的原理及实现</a></li>
+    <li class="recent_comment_body">思路不错～</li>
+    <li class="recent_comment_author">--规格严格-功夫到家</li>
+    <li class="recent_comment_title"><a href="http://www.cnblogs.com/nokiaguy/archive/2008/09/06/1285794.html#3291312">3. Re:向C#的String类添加按字节截取字符串的扩展方法</a></li>
+    <li class="recent_comment_body">哈哈用到了！</li>
+    <li class="recent_comment_author">--阿水</li>
+    <li class="recent_comment_title"><a href="http://www.cnblogs.com/nokiaguy/archive/2010/07/28/1787271.html#3262047">4. Re:不使用中间变量交换两个数（Java版）</a></li>
+    <li class="recent_comment_body">@极地雪狼将操作系统的时候说过，使用异或的方式可以实现一个空间达到双向链表的效果...</li>
+    <li class="recent_comment_author">--tianxia2s</li>
+    <li class="recent_comment_title"><a href="http://www.cnblogs.com/nokiaguy/archive/2010/07/28/1787271.html#3262045">5. Re:不使用中间变量交换两个数（Java版）</a></li>
+    <li class="recent_comment_body">@DiryBoy相对来说使用异或不会存在溢出问题...</li>
+    <li class="recent_comment_author">--tianxia2s</li>
+</ul>
+</div>
+</div>
+</div></div><div id="sidebar_topviewedposts" class="sidebar-block"><div id="topview_posts_wrap">
+<h3 class="catListTitle">阅读排行榜</h3>
+<div class="RecentComment" id="TopViewPosts"> 
+	<div id="TopViewPostsBlock"><ul><li><a href="http://www.cnblogs.com/nokiaguy/archive/2008/05/11/1191914.html">1. 全排列算法原理和实现(73757)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2010/08/15/1799944.html">2. 哈佛大学凌晨4点半的景象(52826)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2008/07/13/1241817.html">3. C#线程系列讲座(1)：BeginInvoke和EndInvoke方法(30535)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2013/04/14/3020774.html">4. Android的init过程详解（一）(26436)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2010/08/23/1806870.html">5. 可循环显示图像的Android Gallery组件(22413)</a></li></ul></div>
+</div>
+</div></div><div id="sidebar_topcommentedposts" class="sidebar-block"><div id="topfeedback_posts_wrap">
+<h3 class="catListTitle">评论排行榜</h3>
+<div class="RecentComment" id="TopCommentsPosts">
+	<div id="TopFeedbackPostsBlock"><ul><li><a href="http://www.cnblogs.com/nokiaguy/archive/2013/01/29/2881476.html">1. 百度面试题：求绝对值最小的数(87)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2010/03/23/1692170.html">2. Google搜索服务退出中国(55)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/p/3691921.html">3. 一道淘汰85%面试者的百度开发者面试题(43)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2008/04/28/1174529.html">4. 用VC实现洪水攻击程序(39)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2008/07/13/1241817.html">5. C#线程系列讲座(1)：BeginInvoke和EndInvoke方法(36)</a></li></ul></div>
+</div></div></div><div id="sidebar_topdiggedposts" class="sidebar-block"><div id="topdigg_posts_wrap">
+<h3 class="catListTitle">推荐排行榜</h3>
+<div class="RecentComment">
+	<div id="TopDiggPostsBlock"><ul><li><a href="http://www.cnblogs.com/nokiaguy/archive/2008/07/13/1241817.html">1. C#线程系列讲座(1)：BeginInvoke和EndInvoke方法(19)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2008/05/11/1191914.html">2. 全排列算法原理和实现(12)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2010/08/23/1806870.html">3. 可循环显示图像的Android Gallery组件(12)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2010/08/15/1799944.html">4. 哈佛大学凌晨4点半的景象(12)</a></li><li><a href="http://www.cnblogs.com/nokiaguy/archive/2013/03/12/2955128.html">5. 疯狂极客前传：用最快的速度设计一种新的编程语言(7)</a></li></ul></div>
+</div></div></div></div><script type="text/javascript">loadBlogSideColumn();</script>
+
+</div>
+</div>
+<div class="clear"></div>
+<div id="footer">
+
+<p id="footer">
+	Powered by: 
+	<br>
+	
+	<a id="Footer1_Hyperlink3" name="Hyperlink1" href="http://www.cnblogs.com/" style="font-family:Verdana;font-size:12px;">博客园</a>
+	<br>
+	Copyright © 银河使者
+</p>
+</div>
+</div>
+
+
+
+<div id="qb-sougou-search" style="display: none; opacity: 0;"><p>搜索</p><p class="last-btn">复制</p><iframe src=""></iframe></div></body></html>

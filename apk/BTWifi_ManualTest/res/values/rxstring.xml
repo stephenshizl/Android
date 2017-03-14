@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="datastring">Data pattern:</string>
+    <string name="packestring">Packet type:</string>
+    <string name="whitentring">Whitening on/off:</string>
+    <string name="powertring">Power control level:</string>
+    <string name="rxgainstring">High Rx gain:</string>
+    <string name="lendatastring">Length of test data:</string>
+    <!-- Data Pattern -->
+    <string-array name="datapattern">
+        <item>All ‘0’</item>
+        <item>All ‘1’</item>
+        <item>10101010</item>
+        <item>00001111</item>
+        <item>Pseudorandom</item>
+    </string-array>
+    <string-array name="datapatternvalue">
+        <item>0x00</item>
+        <item>0x01</item>
+        <item>0x02</item>
+        <item>0x03</item>
+        <item>0x04</item>
+    </string-array>
+    
+        <!-- packet type -->
+    <string-array name="packettypelength">
+        <item>DM1</item>
+        <item>DH1</item>
+        <item>HV1</item>
+        <item>HV2</item>
+        <item>HV3</item>
+        <item>DV</item>
+        <item>AUX1</item>
+        <item>DM3</item>
+        <item>DH3</item>
+        <item>DM5</item>        
+        <item>DH5</item>
+        <item>EV3</item>
+        <item>EV4</item>
+        <item>EV5</item>
+        <item>2-DH1</item>
+        <item>3-DH1</item>
+        <item>2-DH3</item>
+        <item>3-DH3</item>
+        <item>2-DH5</item>
+        <item>3-DH5</item>        
+        <item>2-EV3</item>
+        <item>3-EV3</item>
+        <item>2-EV5</item>
+        <item>3-EV5</item>
+    </string-array>
+    
+    <string-array name="packettypelengthvalue">
+        <item>0x11 0x00</item>
+        <item>0x1B 0x00 </item>
+        <item>0x0A 0x00</item>
+        <item>0x14 0x00</item>
+        <item>0x1E 0x00</item>
+        <item>0x13 0x00</item>
+        <item>0x1D 0x00</item>
+        <item>0x79 0x00</item>
+        <item>0xB7 0x00</item>
+        <item>0xE0 0x00</item>        
+        <item>0x53 0x01</item>
+        <item>0x1E 0x00</item>
+        <item>0x78 0x00</item>
+        <item>0xB4 0x00</item>
+        <item>0x36 0x00</item>
+        <item>0x53 0x00</item>
+        <item>0x6F 0x01</item>
+        <item>0x28 0x02</item>
+        <item>0xA7 0x02</item>
+        <item>0xFD 0x03</item>        
+        <item>0x3C 0x00</item>
+        <item>0x5A 0x00</item>
+        <item>0x68 0x01</item>
+        <item>0x1C 0x02</item>
+    </string-array>
+   <string-array name="packettype">
+        <item>NULL</item>
+        <item>POLL</item>
+        <item>FHS</item>
+        <item>DM1</item>
+        <item>DH1</item>
+        <item>HV1</item>
+        <item>HV2</item>
+        <item>HV3</item>
+        <item>DV</item>
+        <item>AUX1</item>        
+        <item>DM3</item>
+        <item>DH3</item>
+        <item>DM5</item>
+        <item>DH5</item>
+        <item>EV3</item>
+        <item>EV4</item>
+        <item>EV5</item>
+        <item>2-DH1</item>
+        <item>3-DH1</item>
+        <item>2-DH3</item>        
+        <item>3-DH3</item>
+        <item>2-DH5</item>
+        <item>3-DH5</item>
+        <item>2-EV3</item>
+        <item>3-EV3</item>
+        <item>2-EV5</item>
+        <item>3-EV5</item>
+    </string-array>
+       <string-array name="packettypevalue">
+        <item>0x00</item>
+        <item>0x01</item>
+        <item>0x02</item>
+        <item>0x03</item>
+        <item>0x04</item>
+        <item>0x05</item>
+        <item>0x06</item>
+        <item>0x07</item>
+        <item>0x08</item>
+        <item>0x09</item>        
+        <item>0x0A</item>
+        <item>0x0B</item>
+        <item>0x0E</item>
+        <item>0x0F</item>
+        <item>0x17</item>
+        <item>0x1C</item>
+        <item>0x1D</item>
+        <item>0x24</item>
+        <item>0x28</item>
+        <item>0x2A</item>        
+        <item>0x2B</item>
+        <item>0x2E</item>
+        <item>0x2F</item>
+        <item>0x36</item>
+        <item>0x37</item>
+        <item>0x3C</item>
+        <item>0x3D</item>
+    </string-array>
+    
+     <!-- Whitening -->
+    <string-array name="whitening">
+        <item>Whitening Off </item>
+        <item>Whitening On</item>
+    </string-array>
+    <string-array name="Whiteningvalue">
+        <item>0x00</item>
+        <item>0x01</item>
+    </string-array>
+    
+    <!--  Power control level -->
+    <string-array name="power">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+    </string-array>
+    <string-array name="powervalue">
+        <item>0x00</item>
+        <item>0x01</item>
+        <item>0x02</item>
+        <item>0x03</item>
+        <item>0x04</item>
+        <item>0x05</item>
+        <item>0x06</item>
+        <item>0x07</item>
+        <item>0x08</item>
+        <item>0x09</item>     
+    </string-array>
+    
+    <!--  Rx gain level -->
+    <string-array name="rxgain">
+        <item>High Rx gain</item>
+        <item>Low Rx gain</item>
+    </string-array>
+    <string-array name="rxgainvalue">
+        <item>0x01</item>
+        <item>0x00</item>    
+    </string-array>
+</resources>

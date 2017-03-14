@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Pattern -->
+    <string-array name="pattern">
+        <item>Pseudo-random bit sequence 9</item>
+        <item>11110000</item>
+        <item>10101010</item>
+        <item>Pseudo-random bit sequence 15</item>
+        <item>All ‘0’</item>
+        <item>All ‘0’</item>
+        <item>00001111</item>
+        <item>0101</item>
+    </string-array>
+    <string-array name="patternvalue">
+        <item>0x00</item>
+        <item>0x01</item>
+        <item>0x02</item>
+        <item>0x03</item>
+        <item>0x04</item>
+		<item>0x05</item>
+		<item>0x06</item>
+		<item>0x07</item>
+    </string-array>
+    
+        <!-- channel -->
+    <string-array name="channel">
+        <item>2402MHz</item>
+        <item>2404MHz</item>
+        <item>2406MHz</item>
+        <item>2408MHz</item>
+        <item>2410MHz</item>
+        <item>2412MHz</item>
+        <item>2414MHz</item>
+        <item>2416MHz</item>
+        <item>2418MHz</item>
+        <item>2420MHz</item>        
+        <item>2422MHz</item>
+        <item>2424MHz</item>
+        <item>2426MHz</item>
+        <item>2428MHz</item>
+        <item>2430MHz</item>
+        <item>2432MHz</item>
+        <item>2434MHz</item>
+        <item>2436MHz</item>
+        <item>2438MHz</item>
+        <item>2440MHz</item>        
+        <item>2442MHz</item>
+        <item>2444MHz</item>
+        <item>2446MHz</item>
+        <item>2448MHz</item>
+        <item>2450MHz</item>
+        <item>2452MHz</item>
+        <item>2454MHz</item>
+		<item>2456MHz</item>
+        <item>2458MHz</item>
+        <item>2460MHz</item>
+        <item>2462MHz</item>
+        <item>2464MHz</item>
+		<item>2466MHz</item>
+        <item>2468MHz</item>
+        <item>2470MHz</item>
+        <item>2472MHz</item>
+        <item>2474MHz</item>
+        <item>2476MHz</item>
+        <item>2478MHz</item>
+        <item>2480MHz</item>
+    </string-array>
+    
+    <string-array name="channelvalue">
+        <item>0x00</item>
+        <item>0x01</item>
+        <item>0x02</item>
+        <item>0x03</item>
+        <item>0x04</item>
+        <item>0x05</item>
+        <item>0x06</item>
+        <item>0x07</item>
+        <item>0x08</item>
+        <item>0x09</item>        
+        <item>0x0A</item>
+        <item>0x0B</item>
+        <item>0x0C</item>
+        <item>0x0D</item>
+        <item>0x0E</item>
+        <item>0x0F</item>
+        <item>0x10</item>
+        <item>0x11</item>
+        <item>0x12</item>
+        <item>0x13</item>        
+        <item>0x14</item>
+        <item>0x15</item>
+        <item>0x16</item>
+        <item>0x17</item>
+        <item>0x18</item>
+        <item>0x19</item>
+        <item>0x1A</item>
+		<item>0x1B</item>
+        <item>0x1C</item>
+        <item>0x1D</item>
+        <item>0x1E</item>
+        <item>0x1F</item>
+		<item>0x20</item>
+        <item>0x21</item>
+        <item>0x22</item>
+        <item>0x23</item>
+        <item>0x24</item>
+        <item>0x25</item>
+        <item>0x26</item>
+        <item>0x27</item>
+    </string-array>
+
+</resources>

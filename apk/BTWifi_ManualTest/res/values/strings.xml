@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">BTWifi_ManualTest</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_bt">BT</string>
+    <string name="title_wifi">Wifi</string>
+    <string name="title_activity_txtest">TXTest</string>
+    <string name="title_activity_rxtest">RXTest</string>
+    <string name="title_activity_bletest">BLE TestMode:</string>
+    <string name="rxtest">Rx Test</string>
+    <string name="txtest">Tx Test</string>
+    <string name="channelstring">Channel: </string>
+    <string name="patternstring">Pattern: </string>
+    <string name="hello_world">Hello world!</string>
+	<string name="starttest">Start</string>
+    <string name="stoptest">Stop</string>
+    <string name="sendok">Send Command success!</string>
+</resources>

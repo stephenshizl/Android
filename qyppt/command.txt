@@ -1,0 +1,215 @@
+打开root权限：setprop service.adb.root 1
+关闭root权限：setprop service.adb.root 0
+Phoebe user版本Root方法：adb shell setprop service.adb.root 1
+
+
+Phoebe 修改log等级
+cat proc/sys/kernel/printk
+echo 8 > *
+
+
+1、adb shell cat /proc/kmsg > pc.txt//记录现在时间点以后的log
+2、adb shell dmesg > pc.txt//抓前面的log    
+3、adb logcat -c && adb logcat -b main -b system -b radio -b events -b crash -v long > pc.txt
+adb logcat -c && adb logcat -b all -v threadtime > pc.txt
+adb logcat -c && adb logcat -v threadtime > pc.txt
+
+Logcat使用 –G参数可以设置缓存区大小，如：
+logcat –G 10m 设置所有缓冲区大小为10m（默认是256k）
+
+
+
+adb bugreport > bugreport.txt
+
+打印调用堆栈
+RuntimeException re = new RuntimeException();
+re.fillInStackTrace();
+Log.d("pengchong","stackTrace",re);
+
+C++打印调用栈
+.mk
+LOCAL_SHARED_LIBRARIES:=libutils
+.cpp
+#include <utils/CallStack.h>
+CallStack stack;
+stack.update();
+stack.log("pengchong");
+
+adb pull data/logs/kernel_kmsg
+
+
+
+adb shell
+rm -rf data/logs/kernel_kmsg
+
+
+获取想要的属性状态
+adb shell getprop | findstr "persist.sys"
+
+
+
+adb shell "tinymix 'MultiMedia1 Mixer QUAT_MI2S_TX' '1'"
+adb shell "tinymix 'IN3R Digital Volume' '159'"
+adb shell "tinymix 'IN4R Digital Volume' '159'"
+adb shell "tinymix 'AIF1TX1 Input 1' 'IN3R'" 
+adb shell "tinymix 'AIF1TX2 Input 1' 'IN4R'"
+adb shell "tinymix 'IN3R HPF Switch' '1'"
+adb shell "tinymix 'IN4R HPF Switch' '1'"
+adb shell "tinycap /sdcard/test.wav -D 0 -d 0 -c 1 -r 48000 -b 24"
+
+
+窗口调试命令
+adb shell dumpsys window tokens 
+adb shell dumpsys window lastanr
+adb shell dumpsys window policy
+adb shell dumpsys window animator
+adb shell dumpsys window sessions
+adb shell dumpsys window windows
+
+
+
+
+命令行发广播
+adb shell am broadcast 后面的参数有：
+
+[-a <ACTION>]
+[-d <DATA_URI>]
+[-t <MIME_TYPE>] 
+[-c <CATEGORY> [-c <CATEGORY>] ...] 
+[-e|--es <EXTRA_KEY> <EXTRA_STRING_VALUE> ...] 
+[--ez <EXTRA_KEY> <EXTRA_BOOLEAN_VALUE> ...] 
+[-e|--ei <EXTRA_KEY> <EXTRA_INT_VALUE> ...] 
+[-n <COMPONENT>]
+[-f <FLAGS>] [<URI>]
+
+例如：
+
+adb shell am broadcast -a com.Android.test --es test_string "this is test string" --ei test_int 100 --ez test_boolean true
+
+
+
+
+
+一、pm命令——系统Package管理
+
+frameworks/base/cmds/pm/
+
+查看
+
+pm list packages -f
+
+pm dump com.Android.inputmethod.pinyin
+
+安装
+
+pm install -r demo.apk
+
+二、am命令——系统Activity管理
+
+frameworks/base/cmds/am/
+
+1.查看
+
+am stack list
+
+2.启动
+
+am start -n 
+
+三、wm命令
+
+frameworks/base/cmds/wm/
+
+窗口分辨率
+
+wm size
+
+四、service命令
+
+frameworks/native/cmds/service/
+
+查看
+
+service list
+
+五、ime命令——系统输入方管理
+
+frameworks/base/cmds/ime/
+
+查看
+
+ime list
+
+六、input命令——向系统注入按键
+
+frameworks/base/cmds/input/
+
+input keyevent 3
+
+七、dumpsys
+
+frameworks/native/cmds/dumpsys/
+
+1.window
+dumpsys window lastanr
+dumpsys window policy
+dumpsys window animator
+dumpsys window sessions
+dumpsys window tokens
+dumpsys window windows
+2.input
+dumpsys input
+3.activity
+dumpsys activity activities
+dumpsys activity broadcasts
+dumpsys activity intents
+dumpsys activity processes
+dumpsys activity providers
+dumpsys activity services
+dumpsys activity recents
+4.display
+dumpsys display
+5.power
+dumpsys power
+6.accessibility
+dumpsys accessibility
+7.meminfo
+
+dumpsys meminfo
+
+adb shell cat proc/meminfo
+
+8.package
+
+dumpsys package
+
+查看内存还可以用procrank
+
+八、dumpstate
+
+frameworks/native/cmds/dumpstate/
+
+dumpstate命令
+
+
+十、其他
+
+1./data/anr/trace.txt
+
+2./data/tombstones/tombstone_00
+
+3.debuggerd -b 6726
+
+4./var/core_dump.1220.gz
+
+5./data/system/dropbox
+
+
+手动进dump
+adb shell
+cd proc
+ls -l | grep tr
+echo c > sysrq—trigger
+
+dump解析命令
+ramparser/linux-ramdump-parser-v2/ramparse.py  --everything -g ~/Phoebe_M/LINUX/android/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-gdb -n ~/Phoebe_M/LINUX/android/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-nm --force-hardware=8916 -d --vmlinux ~/phoebem_dump/Port_COM5_646/vmlinux --auto-dump ~/phoebem_dump/Port_COM5_646/ -o ~/phoebem_dump/Port_COM5_646/out

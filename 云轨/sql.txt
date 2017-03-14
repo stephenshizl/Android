@@ -1,0 +1,43 @@
+quint8 CiProcessUnitTest::deleteAlltable()
+{
+    //delete data table
+    QString connectName = "ciroute";
+    QSqlDatabase dbConnInit;
+    if(!QSqlDatabase::contains(connectName))
+    {
+        dbConnInit = QSqlDatabase::addDatabase("QMYSQL", connectName);
+    }
+    dbConnInit.setHostName("127.0.0.1");
+    dbConnInit.setPort(3306);
+    dbConnInit.setUserName("root");
+    dbConnInit.setPassword("123456");
+    dbConnInit.setDatabaseName("mss");
+    QSqlDatabase dbConn = QSqlDatabase::database(connectName);
+    int dbresult = dbConn.open();
+    if(1 != dbresult)
+    {
+        dbConn.close();
+        return -1;
+    }
+    QSqlQuery query = (QSqlQuery)QSqlDatabase::database(connectName);
+    QString drop = "select concat('drop table ',table_name,';') from information_schema.TABLES where table_schema='mss'";
+    if(!query.exec(drop))
+    {
+        return -1;
+    }
+    QString sqlDel =  "";
+    while(query.next())
+        sqlDel += query.value(0).toString();
+    //if(CI_DEBUG) qDebug()<<"clean up testcase:sqlDel="<<sqlDel;
+    if(sqlDel.compare("")==0)
+    {
+        return 0;
+    }
+    if(!query.exec(sqlDel))
+    {
+        qDebug()<<"CiProcessUnitTest::deleteAlltable fail";
+        return -1;
+    }
+    dbConn.close();
+    return 0;
+}
